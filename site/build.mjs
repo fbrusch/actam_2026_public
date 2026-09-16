@@ -16,6 +16,12 @@ await rm(dist, { recursive: true, force: true })
 await mkdir(dist, { recursive: true })
 await cp(path.join(root, 'site/index.html'), path.join(dist, 'index.html'))
 await writeFile(path.join(dist, '.nojekyll'), '')
+if (process.env.SITE_CUSTOM_DOMAIN) {
+  if (!/^[a-z0-9.-]+$/i.test(process.env.SITE_CUSTOM_DOMAIN)) {
+    throw new Error(`Invalid SITE_CUSTOM_DOMAIN: ${process.env.SITE_CUSTOM_DOMAIN}`)
+  }
+  await writeFile(path.join(dist, 'CNAME'), `${process.env.SITE_CUSTOM_DOMAIN}\n`)
+}
 
 execFileSync(
   path.join(root, 'node_modules/.bin/slidev'),
