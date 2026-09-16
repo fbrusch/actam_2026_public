@@ -37,6 +37,19 @@ execFileSync(
   { cwd: lesson, stdio: 'inherit' },
 )
 
+// Count page loads, but not every navigation between Slidev slides.
+if (process.env.SITE_ANALYTICS_TOKEN) {
+  const token = process.env.SITE_ANALYTICS_TOKEN
+  if (!/^[a-f0-9]{32}$/i.test(token)) throw new Error('Invalid SITE_ANALYTICS_TOKEN')
+  const snippet = `<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='${JSON.stringify({ token, spa: false })}'></script>`
+  for (const file of ['index.html', 'slides/index.html', 'lesson-01/slides/index.html']) {
+    const target = path.join(dist, file)
+    const html = await readFile(target, 'utf8')
+    if (!html.includes('</body>')) throw new Error(`Missing body closing tag in ${file}`)
+    await writeFile(target, html.replace('</body>', `  ${snippet}\n</body>`))
+  }
+}
+
 // Slidev uses history URLs (/slides/1, /slides/2, ...). Give every slide
 // a static entry point so direct links and browser refreshes work too.
 const source = await readFile(path.join(root, 'introduction/content.md'), 'utf8')

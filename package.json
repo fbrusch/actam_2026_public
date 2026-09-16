@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "build": "node site/build.mjs",
-    "build:pages": "SITE_BASE_PATH=/ SITE_CUSTOM_DOMAIN=actam.bruschi.dev npm run build",
+    "build:pages": "SITE_BASE_PATH=/ SITE_CUSTOM_DOMAIN=actam.bruschi.dev SITE_ANALYTICS_TOKEN=f0427f56e626492fad6cdcf05fbce5bb npm run build",
     "publish:pages": "node site/publish-pages.mjs",
     "dev:slides": "slidev introduction/content.md"
   },
