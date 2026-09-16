@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.wrangler/
+wrangler*.jsonc
+.env
+.venv/
+.pio/
+__pycache__/
+*.pyc
+*.log
+*.tmp
+.DS_Store

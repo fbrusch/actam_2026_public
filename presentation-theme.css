@@ -1,0 +1,52 @@
+.slidev-layout {
+  --ink: #182f3a;
+  --muted: #53656c;
+  --teal: #087e83;
+  --accent: #cb4f38;
+  --paper: #f7f4ec;
+  --slidev-theme-primary: var(--teal);
+  background: var(--paper);
+  color: var(--ink);
+  padding: 46px 56px 52px;
+  font-size: 23px;
+  line-height: 1.42;
+}
+
+.slidev-layout h1 { font-size: 43px; line-height: 1.08; font-weight: 650; letter-spacing: -1.5px; margin: 0 0 28px; }
+.slidev-layout h2 { font-size: 26px; font-weight: 600; margin: 0 0 15px; }
+.slidev-layout p { margin: 16px 0; line-height: 1.45; }
+.slidev-layout h1 + p { opacity: 1 !important; }
+.slidev-layout strong { color: var(--teal); font-weight: 650; }
+.slidev-layout .kicker { color: var(--accent); font: 13px/1.4 Menlo, monospace; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 18px; }
+.slidev-layout .lead { font-size: 29px; line-height: 1.4; max-width: 770px; }
+.slidev-layout .small { font-size: 18px; color: var(--muted); }
+.slidev-layout .answer { color: var(--teal); border-left: 3px solid var(--teal); padding-left: 16px; margin-top: 22px; }
+.slidev-layout .columns { display: grid; grid-template-columns: 1fr 1fr; gap: 34px; align-items: start; }
+.slidev-layout .columns.wide-plot { grid-template-columns: 0.8fr 1.2fr; gap: 26px; }
+.slidev-layout .columns p:first-child { margin-top: 0; }
+.slidev-layout pre { --slidev-code-font-size: 18px; --slidev-code-line-height: 1.55; padding: 18px 20px !important; border-radius: 0 !important; border: 1px solid #d5ddd8; background: #edf0eb !important; }
+.slidev-layout pre code { font-family: Menlo, monospace; }
+.slidev-layout :not(pre) > code { color: var(--teal); background: #e5ece6; padding: 1px 5px; font-size: 0.86em; }
+.slidev-layout table { font-size: 21px; width: 100%; margin: 22px 0; }
+.slidev-layout th, .slidev-layout td { padding: 11px 14px; border-color: #ccd4cf; }
+.slidev-layout th { color: var(--muted); font-weight: 500; }
+.slidev-layout.dark { background: #182f3a; color: #f7f4ec; }
+.slidev-layout.dark .kicker, .slidev-layout.dark strong { color: #7bd2c1; }
+.slidev-layout.dark .small { color: #bfcec9; }
+
+.course-home {
+  position: fixed;
+  top: 14px;
+  right: 20px;
+  z-index: 30;
+  color: #087e83;
+  background: rgba(247, 244, 236, 0.88);
+  border-bottom: 1px solid currentColor;
+  padding: 3px 0;
+  font: 12px/1.2 Menlo, monospace;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+}
+
+.course-home:hover, .course-home:focus-visible { color: var(--accent); }
+.course-home:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }

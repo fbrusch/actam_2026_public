@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5f4f0" />
+    <meta name="description" content="Materiali del corso Advanced Coding Tools and Methodologies." />
+    <title>ACTAM — Advanced Coding Tools and Methodologies</title>
+    <style>
+      :root { color-scheme: light; font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace; }
+      * { box-sizing: border-box; }
+      body { margin: 0; min-height: 100vh; background: #f7f5ef; color: #182f3a; }
+      main { width: min(100% - 2.5rem, 760px); margin: 0 auto; padding: clamp(2.5rem, 9vh, 6rem) 0 4rem; }
+      .eyebrow { margin: 0 0 2.5rem; color: #087e83; font-size: .8rem; letter-spacing: .08em; }
+      h1 { max-width: 680px; margin: 0; font-size: clamp(2rem, 5.5vw, 4.2rem); line-height: 1.1; letter-spacing: -.07em; font-weight: 650; }
+      .intro { max-width: 610px; margin: 1.75rem 0 0; color: #4d5d61; font-size: clamp(1rem, 2vw, 1.15rem); line-height: 1.65; }
+      section { margin-top: clamp(3.5rem, 9vh, 6rem); }
+      h2 { margin: 0 0 1rem; font-size: .8rem; color: #087e83; font-weight: 500; letter-spacing: .08em; }
+      a { display: grid; grid-template-columns: 3.5rem 1fr auto; gap: 1rem; align-items: start; padding: 1.2rem 0; border-top: 1px solid #b9c6c0; color: inherit; text-decoration: none; }
+      a:last-child { border-bottom: 1px solid #b9c6c0; }
+      a:hover { color: #087e83; }
+      a:focus-visible { outline: 3px solid #cb4f38; outline-offset: 5px; }
+      .number { color: #087e83; font-size: .9rem; }
+      .link-title { display: block; font-size: 1.05rem; font-weight: 600; }
+      .link-detail { display: block; margin-top: .45rem; color: #53656c; font-size: .86rem; line-height: 1.5; }
+      .arrow { color: #087e83; font-size: 1.2rem; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="eyebrow">ACTAM · 2026–2027</p>
+      <h1>Advanced Coding Tools and Methodologies</h1>
+      <p class="intro">Programming languages, abstractions, sound, and music. Find the course materials here.</p>
+      <section aria-labelledby="materials">
+        <h2 id="materials">Materials</h2>
+        <a href="slides/" aria-label="Open the course introduction slides">
+          <span class="number">00</span>
+          <span><span class="link-title">Course introduction</span><span class="link-detail">Slides</span></span>
+          <span class="arrow" aria-hidden="true">↗</span>
+        </a>
+        <a href="lesson-01/slides/" aria-label="Open Lesson 01 slides">
+          <span class="number">01</span>
+          <span><span class="link-title">Python as a conversation</span><span class="link-detail">Slides · expressions, lists and sound samples</span></span>
+          <span class="arrow" aria-hidden="true">↗</span>
+        </a>
+        <a href="lesson-01/notebook.ipynb" download="actam-lesson-01.ipynb" aria-label="Download the Lesson 01 notebook">
+          <span class="number">01</span>
+          <span><span class="link-title">Reference notebook</span><span class="link-detail">Download · .ipynb</span></span>
+          <span class="arrow" aria-hidden="true">↓</span>
+        </a>
+      </section>
+    </main>
+  </body>
+</html>

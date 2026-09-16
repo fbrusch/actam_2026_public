@@ -1,0 +1,14 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "node site/build.mjs",
+    "build:pages": "SITE_BASE_PATH=/actam_2026_public/ npm run build",
+    "publish:pages": "node site/publish-pages.mjs",
+    "dev:slides": "slidev introduction/content.md"
+  },
+  "devDependencies": {
+    "@slidev/cli": "^52.19.1",
+    "@slidev/parser": "^52.19.1",
+    "@slidev/theme-default": "^0.25.0"
+  }
+}

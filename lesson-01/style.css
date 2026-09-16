@@ -1,0 +1,25 @@
+@import '../presentation-theme.css';
+.slidev-layout .notebook-cue { position: absolute; bottom: 22px; left: 56px; right: 56px; padding-top: 10px; border-top: 1px solid #ccd4cf; font-size: 13px; color: var(--muted); }
+.slidev-layout .notebook-cue strong { margin-right: 12px; }
+.slidev-layout .chapter { max-width: 790px; margin-top: 76px; }
+.slidev-layout .chapter h1 { font-size: 70px; line-height: 1.02; letter-spacing: -3px; margin: 18px 0 30px; }
+.slidev-layout .cover-title { font-size: 76px; line-height: 1.02; letter-spacing: -3px; margin: 40px 0 26px; }
+.slidev-layout .cover-meta { position: absolute; bottom: 28px; font: 14px Menlo, monospace; color: #bfcec9; }
+.slidev-layout .formula { font-size: 39px; color: var(--teal); margin: 26px 0; }
+.slidev-layout .signal-plot { width: 100%; display: block; overflow: visible; }
+.slidev-layout .signal-plot text { font-family: Arial, sans-serif; font-size: 16px; fill: var(--muted); }
+.slidev-layout .signal-plot .axis { stroke: #94a5a3; stroke-width: 1; }
+.slidev-layout .signal-plot .guide { stroke: #dce1d9; stroke-width: 1; }
+.slidev-layout .signal-plot .trace { fill: none; stroke: var(--teal); stroke-width: 2.5; }
+.slidev-layout .signal-plot .reference { fill: none; stroke: #a8b6b1; stroke-width: 2; }
+.slidev-layout .signal-plot .stem { stroke: var(--teal); stroke-width: 1; opacity: 0.45; }
+.slidev-layout .signal-plot .sample { fill: var(--teal); }
+.slidev-layout .lab-controls { display: flex; gap: 24px; align-items: center; font-size: 17px; margin: 12px 0; }
+.slidev-layout .lab-controls label { display: flex; align-items: center; gap: 10px; }
+.slidev-layout .lab-controls select { color: var(--ink); background: white; padding: 5px 8px; border: 1px solid #9baead; border-radius: 0; }
+.slidev-layout .lab-controls input { width: 120px; accent-color: var(--teal); }
+.slidev-layout .lab-controls button { background: var(--teal); color: white; padding: 8px 16px; font-size: 17px; min-width: 110px; }
+.slidev-layout .lab-controls button:focus-visible, .slidev-layout .lab-controls input:focus-visible, .slidev-layout .lab-controls select:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.slidev-layout .lab-readout { font: 19px/1.5 Menlo, monospace; color: var(--teal); margin-top: 8px; }
+.slidev-layout .lab-error { font-size: 15px; color: #a23520; }
+@media print { .slidev-layout .lab-controls { display: none; } }
