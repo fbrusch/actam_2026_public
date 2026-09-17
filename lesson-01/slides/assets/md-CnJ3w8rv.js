@@ -1,0 +1,3 @@
+import{E as e,R as t,X as n,_ as r,_t as i,ht as a,v as o,x as s,y as c}from"./modules/shiki-T78Cobuh.js";import{nt as l,rt as u}from"./index-BdcPiJPk.js";import{t as d}from"./slidev/default-Bh9PGuyd.js";var f={__name:`slides.md__slidev_1`,setup(f){let{$slidev:p,$nav:m,$clicksContext:h,$clicks:g,$page:_,$renderContext:v,$frontmatter:y}=u();return h.setup(),(u,f)=>(t(),o(d,i(e(a(l)(a(y),0))),{default:n(()=>[f[0]||=r(`div`,{class:`kicker`},`ACTAM 2026 · Lesson 01`,-1),f[1]||=r(`h1`,{class:`cover-title`},[s(`Python as`),r(`br`),s(`a conversation`)],-1),c(`
+<p class="lead">A few expressions.<br>A list of numbers.<br>Something we can hear.</p>
+`),f[2]||=r(`div`,{class:`cover-meta`},`Expressions, lists and our first sounds`,-1)]),_:1},16))}};export{f as default};
