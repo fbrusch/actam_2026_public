@@ -1,4 +1,6 @@
 @import '../presentation-theme.css';
+.slidev-layout .exercise-plot { display: block; width: 100%; height: 315px; object-fit: contain; margin: -10px 0 0; }
+.slidev-layout .exercise-prompt { font-size: 20px; color: var(--muted); margin: 2px 0 0; }
 .slidev-layout .notebook-cue { position: absolute; bottom: 22px; left: 56px; right: 56px; padding-top: 10px; border-top: 1px solid #ccd4cf; font-size: 13px; color: var(--muted); }
 .slidev-layout .notebook-cue strong { margin-right: 12px; }
 .slidev-layout .chapter { max-width: 790px; margin-top: 76px; }

@@ -1,5 +1,5 @@
 <script setup>
-const homeHref = import.meta.env.BASE_URL.replace(/(?:lesson-01\/)?slides\/$/, '')
+const homeHref = import.meta.env.BASE_URL.replace(/(?:lesson-01\/)?(?:slides|exercise)\/$/, '')
 </script>
 
 <template>
