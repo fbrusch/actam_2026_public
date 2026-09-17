@@ -36,13 +36,18 @@ execFileSync(
   ['build', 'slides.md', '--base', `${basePath}lesson-01/slides/`, '--out', path.join(dist, 'lesson-01', 'slides'), '--without-notes'],
   { cwd: lesson, stdio: 'inherit' },
 )
+execFileSync(
+  path.join(root, 'node_modules/.bin/slidev'),
+  ['build', 'exercise.md', '--base', `${basePath}lesson-01/exercise/`, '--out', path.join(dist, 'lesson-01', 'exercise'), '--without-notes'],
+  { cwd: lesson, stdio: 'inherit' },
+)
 
 // Count page loads, but not every navigation between Slidev slides.
 if (process.env.SITE_ANALYTICS_TOKEN) {
   const token = process.env.SITE_ANALYTICS_TOKEN
   if (!/^[a-f0-9]{32}$/i.test(token)) throw new Error('Invalid SITE_ANALYTICS_TOKEN')
   const snippet = `<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='${JSON.stringify({ token, spa: false })}'></script>`
-  for (const file of ['index.html', 'slides/index.html', 'lesson-01/slides/index.html']) {
+  for (const file of ['index.html', 'slides/index.html', 'lesson-01/slides/index.html', 'lesson-01/exercise/index.html']) {
     const target = path.join(dist, file)
     const html = await readFile(target, 'utf8')
     if (!html.includes('</body>')) throw new Error(`Missing body closing tag in ${file}`)
@@ -66,4 +71,12 @@ await Promise.all(Array.from({ length: lessonSlideCount }, async (_, index) => {
   const slideDir = path.join(dist, 'lesson-01', 'slides', String(index + 1))
   await mkdir(slideDir, { recursive: true })
   await cp(path.join(dist, 'lesson-01', 'slides', 'index.html'), path.join(slideDir, 'index.html'))
+}))
+
+const exerciseSource = await readFile(path.join(lesson, 'exercise.md'), 'utf8')
+const exerciseSlideCount = parseSync(exerciseSource).slides.length
+await Promise.all(Array.from({ length: exerciseSlideCount }, async (_, index) => {
+  const slideDir = path.join(dist, 'lesson-01', 'exercise', String(index + 1))
+  await mkdir(slideDir, { recursive: true })
+  await cp(path.join(dist, 'lesson-01', 'exercise', 'index.html'), path.join(slideDir, 'index.html'))
 }))
