@@ -5,12 +5,17 @@
     "introduction/global-top.vue": "e1cda81844524303f4575cd24e5a200b39b1a34646c5309e3e4725fed566ecd3",
     "introduction/style.css": "124fb497e204403e2149405c0a268b9187c748cc5619006e56d853e063810826",
     "lesson-01/slides.md": "3955fe0bf6fcbf554d733481906ff9710ddec35c12e796f673df84c0fafd3c83",
-    "lesson-01/exercise.md": "0afdb1bdeac5396e30ff788836d5434ac442a1134e0208402aa075ff685dfe3e",
+    "lesson-01/exercise.md": "65ca06de8d9c87ff8914e04a123bb838a664f09b07b014c4d3c2d7be613b012b",
     "lesson-01/notebook.ipynb": "45d0b1c1d872f6079a4b02df3524c012ec736bd0ababbf2dd9a00bf3df75f23a",
     "lesson-01/global-top.vue": "8a310e80213d67beef623528b523f708bacd1ccff597486df3a688cd2f0217ca",
     "lesson-01/style.css": "4734ad5ee1fb96994b40ae55e042f692c1d0ba7f022efdfd900f1d4910cf7623",
+    "lesson-02/slides.md": "513fd4af17d7a8e3d7eb5544dd0aed41e5b67f836932d5da8c0c1279f977f172",
+    "lesson-02/notebook.ipynb": "716fdb73e4d3d20b89ec9688c1a3ba083de93bc7f42259221a5eafc982b734df",
+    "lesson-02/global-top.vue": "e5f76d3082a768d1e9921fcb4ec49f6e1b3b1778720ab180967b5c279389620d",
+    "lesson-02/style.css": "c22f1a5157c044d2e8857617526bb4aa9bc3a1bacaa9ed09d4dcebe3ad492203",
+    "site/build.mjs": "b4c14947f554c28e9f5e5a82d454934dbde424665689439595a61cc262d77bec",
     "presentation-theme.css": "e6df5b9e217864dafc56ebcf1b327e8780671d8a80f9ec0109bac80138d8efac",
-    "site/index.html": "77aa3bf360c4260f2d464a61580800aa11e375f9fd18d606b38da3829645cb65",
+    "site/index.html": "42553080322d01b84f8826b8dfeb798126ae8fda8aa8deebf917fa6cf97eaffe",
     "lesson-01/components/NotebookCue.vue": "a0e38f1a574284171f1c7fc9cae4959ff71855e68a802dfbb8d050650dd883b8",
     "lesson-01/components/SampleLab.vue": "af18207141b732909e3a37d0885276d3cd1652e32cd279f88a195a2fda6170ca",
     "lesson-01/components/WavePlot.vue": "a9bcf846da2daffb5beddfab7ef6fd27f2351fdb438138a4c0a0fd1bd9e415cc",
@@ -19,6 +24,7 @@
     "lesson-01/plots/hidden-pattern.svg": "e52d72ff542db5b0f7f5b724f1200338f7a11301d02475b060f3401fc2e64896",
     "lesson-01/plots/hill.svg": "14d737c0380d27a38a5b96cbd77772f261eaebf2643bc5defaedf9080c5e3f02",
     "lesson-01/plots/spike.svg": "f13291317636d585f532b742caf059380c90eea56b9b7d0fd5ad9b4b6b1e6f1b",
-    "lesson-01/plots/two-peaks.svg": "e09a958c527f38c60e0d541cd1efeecb2a55d3e6f608f34d39edf7d7a52f928a"
+    "lesson-01/plots/two-peaks.svg": "e09a958c527f38c60e0d541cd1efeecb2a55d3e6f608f34d39edf7d7a52f928a",
+    "lesson-02/components/NotebookCue.vue": "a0e38f1a574284171f1c7fc9cae4959ff71855e68a802dfbb8d050650dd883b8"
   }
 }

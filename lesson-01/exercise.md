@@ -18,7 +18,6 @@ transition: none
 
 <h1 class="cover-title">Draw it with<br>a list</h1>
 
-<p class="lead">Five plots. Five lists to invent.</p>
 
 <div class="cover-meta">Expressions · comprehensions · discrete samples</div>
 
