@@ -16,6 +16,9 @@ const lesson01 = publicLayout
 const lesson02 = publicLayout
   ? path.join(root, 'lesson-02')
   : path.join(root, 'lesson_02', 'publish', 'lesson-02')
+const exerciseFolder = publicLayout && await exists(path.join(root, 'lab-01'))
+  ? path.join(root, 'lab-01')
+  : lesson01
 const basePath = process.env.SITE_BASE_PATH || '/'
 
 if (!/^\/(?:[A-Za-z0-9._-]+\/)*$/.test(basePath)) {
@@ -50,7 +53,7 @@ buildSlides(
 )
 
 for (const [slug, folder, includeExercise] of [
-  ['lesson-01', lesson01, true],
+  ['lesson-01', lesson01, false],
   ['lesson-02', lesson02, false],
 ]) {
   await mkdir(path.join(dist, slug), { recursive: true })
@@ -70,6 +73,13 @@ for (const [slug, folder, includeExercise] of [
     )
   }
 }
+
+buildSlides(
+  'exercise.md',
+  exerciseFolder,
+  `${basePath}lesson-01/exercise/`,
+  path.join(dist, 'lesson-01', 'exercise'),
+)
 
 if (process.env.SITE_ANALYTICS_TOKEN) {
   const token = process.env.SITE_ANALYTICS_TOKEN
@@ -94,6 +104,7 @@ const slideRoutes = [
   ['slides', introduction, ''],
   ['lesson-01/slides', lesson01, 'slides.md'],
   ['lesson-02/slides', lesson02, 'slides.md'],
+  ['lesson-01/exercise', exerciseFolder, 'exercise.md'],
 ]
 for (const [route, folder, source] of slideRoutes) {
   const count = parseSync(await readFile(source ? path.join(folder, source) : folder, 'utf8')).slides.length
