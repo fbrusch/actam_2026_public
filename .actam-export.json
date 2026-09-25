@@ -13,9 +13,13 @@
     "lesson-02/notebook.ipynb": "716fdb73e4d3d20b89ec9688c1a3ba083de93bc7f42259221a5eafc982b734df",
     "lesson-02/global-top.vue": "e5f76d3082a768d1e9921fcb4ec49f6e1b3b1778720ab180967b5c279389620d",
     "lesson-02/style.css": "c22f1a5157c044d2e8857617526bb4aa9bc3a1bacaa9ed09d4dcebe3ad492203",
-    "site/build.mjs": "2807c7e876fc9943cc77720ff3879dc37cdddfae19c4e836987989b1c02e6ee2",
+    "lesson-03/slides.md": "56e92c9c7ff982a3652b6e20e148543f74beb20198de5ac0eeccfbec515d3793",
+    "lesson-03/notebook.ipynb": "7cb6142c9af0de8d73cacf07d2e16a84523ddac27176ae0e65431d23e8ba8f32",
+    "lesson-03/global-top.vue": "3d90e84100bcc760b26376a8c731bbab74f5ea1079f0d864bd1d0247262735b8",
+    "lesson-03/style.css": "ebe46e732a6899eb5c0d011614c96cc9a9846133ee6d2ae87b7f1fa4d55b7410",
+    "site/build.mjs": "d5727ef4fa5a28fe4f850fec70b99eae78ad643efaa4a471b3cf120982301d51",
     "presentation-theme.css": "e6df5b9e217864dafc56ebcf1b327e8780671d8a80f9ec0109bac80138d8efac",
-    "site/index.html": "42553080322d01b84f8826b8dfeb798126ae8fda8aa8deebf917fa6cf97eaffe",
+    "site/index.html": "adac007abee8d70dd483fdf17dd190ac1054d7fc64831887b797bad31b91ec60",
     "lesson-01/components/NotebookCue.vue": "a0e38f1a574284171f1c7fc9cae4959ff71855e68a802dfbb8d050650dd883b8",
     "lesson-01/components/SampleLab.vue": "af18207141b732909e3a37d0885276d3cd1652e32cd279f88a195a2fda6170ca",
     "lesson-01/components/WavePlot.vue": "a9bcf846da2daffb5beddfab7ef6fd27f2351fdb438138a4c0a0fd1bd9e415cc",
@@ -25,6 +29,7 @@
     "lesson-01/plots/hill.svg": "14d737c0380d27a38a5b96cbd77772f261eaebf2643bc5defaedf9080c5e3f02",
     "lesson-01/plots/spike.svg": "f13291317636d585f532b742caf059380c90eea56b9b7d0fd5ad9b4b6b1e6f1b",
     "lesson-01/plots/two-peaks.svg": "e09a958c527f38c60e0d541cd1efeecb2a55d3e6f608f34d39edf7d7a52f928a",
-    "lesson-02/components/NotebookCue.vue": "a0e38f1a574284171f1c7fc9cae4959ff71855e68a802dfbb8d050650dd883b8"
+    "lesson-02/components/NotebookCue.vue": "a0e38f1a574284171f1c7fc9cae4959ff71855e68a802dfbb8d050650dd883b8",
+    "lesson-03/components/NotebookCue.vue": "a0e38f1a574284171f1c7fc9cae4959ff71855e68a802dfbb8d050650dd883b8"
   }
 }

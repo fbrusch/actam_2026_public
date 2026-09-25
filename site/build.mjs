@@ -16,6 +16,9 @@ const lesson01 = publicLayout
 const lesson02 = publicLayout
   ? path.join(root, 'lesson-02')
   : path.join(root, 'lesson_02', 'publish', 'lesson-02')
+const lesson03 = publicLayout
+  ? path.join(root, 'lesson-03')
+  : path.join(root, 'lesson_03', 'publish', 'lesson-03')
 const exerciseFolder = publicLayout && await exists(path.join(root, 'lab-01'))
   ? path.join(root, 'lab-01')
   : lesson01
@@ -45,6 +48,19 @@ function buildSlides(source, cwd, base, out) {
   )
 }
 
+function cleanNotebook(data) {
+  const notebook = JSON.parse(data)
+  notebook.cells = notebook.cells.filter((cell) =>
+    cell.cell_type !== 'code' || (Array.isArray(cell.source) ? cell.source.join('') : cell.source).trim(),
+  )
+  for (const cell of notebook.cells) {
+    if (cell.cell_type !== 'code') continue
+    cell.execution_count = null
+    cell.outputs = []
+  }
+  return `${JSON.stringify(notebook, null, 1)}\n`
+}
+
 buildSlides(
   path.relative(root, introduction),
   root,
@@ -55,9 +71,16 @@ buildSlides(
 for (const [slug, folder, includeExercise] of [
   ['lesson-01', lesson01, false],
   ['lesson-02', lesson02, false],
+  ['lesson-03', lesson03, false],
 ]) {
   await mkdir(path.join(dist, slug), { recursive: true })
-  await cp(path.join(folder, 'notebook.ipynb'), path.join(dist, slug, 'notebook.ipynb'))
+  const notebookSource = path.join(folder, 'notebook.ipynb')
+  const notebookTarget = path.join(dist, slug, 'notebook.ipynb')
+  if (slug === 'lesson-03') {
+    await writeFile(notebookTarget, cleanNotebook(await readFile(notebookSource, 'utf8')))
+  } else {
+    await cp(notebookSource, notebookTarget)
+  }
   buildSlides(
     'slides.md',
     folder,
@@ -91,6 +114,7 @@ if (process.env.SITE_ANALYTICS_TOKEN) {
     'lesson-01/slides/index.html',
     'lesson-01/exercise/index.html',
     'lesson-02/slides/index.html',
+    'lesson-03/slides/index.html',
   ]
   for (const file of pages) {
     const target = path.join(dist, file)
@@ -104,6 +128,7 @@ const slideRoutes = [
   ['slides', introduction, ''],
   ['lesson-01/slides', lesson01, 'slides.md'],
   ['lesson-02/slides', lesson02, 'slides.md'],
+  ['lesson-03/slides', lesson03, 'slides.md'],
   ['lesson-01/exercise', exerciseFolder, 'exercise.md'],
 ]
 for (const [route, folder, source] of slideRoutes) {
