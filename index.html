@@ -24,6 +24,19 @@
       .link-title { display: block; font-size: 1.05rem; font-weight: 600; }
       .link-detail { display: block; margin-top: .45rem; color: #53656c; font-size: .86rem; line-height: 1.5; }
       .arrow { color: #087e83; font-size: 1.2rem; }
+      details { border-top: 1px solid #b9c6c0; }
+      details:last-of-type { border-bottom: 1px solid #b9c6c0; }
+      details a:last-child { border-bottom: 0; }
+      details > a { border-top: 1px dashed #d5ddd8; }
+      summary { display: grid; grid-template-columns: 3.5rem 1fr auto; gap: 1rem; align-items: baseline; padding: 1.2rem 0; cursor: pointer; list-style: none; }
+      summary::-webkit-details-marker { display: none; }
+      summary:hover { color: #087e83; }
+      summary:focus-visible { outline: 3px solid #cb4f38; outline-offset: 5px; }
+      .lesson-title { font-size: 1.05rem; font-weight: 600; }
+      .count { display: block; margin-top: .45rem; color: #53656c; font-size: .86rem; }
+      .chevron { color: #087e83; transition: transform .15s; }
+      details[open] .chevron { transform: rotate(90deg); }
+      .intro-link { border-bottom: 0 !important; }
     </style>
   </head>
   <body>
@@ -33,73 +46,113 @@
       <p class="intro">Programming languages, abstractions, sound, and music. Find the course materials here.</p>
       <section aria-labelledby="materials">
         <h2 id="materials">Materials</h2>
-        <a href="slides/" aria-label="Open the course introduction slides">
+        <a class="intro-link" href="slides/" aria-label="Open the course introduction slides">
           <span class="number">00</span>
           <span><span class="link-title">Course introduction</span><span class="link-detail">Slides</span></span>
           <span class="arrow" aria-hidden="true">↗</span>
         </a>
-        <a href="lesson-01/slides/" aria-label="Open Lesson 01 slides">
-          <span class="number">01</span>
-          <span><span class="link-title">Python as a conversation</span><span class="link-detail">Slides · expressions, lists and sound samples</span></span>
-          <span class="arrow" aria-hidden="true">↗</span>
-        </a>
-        <a href="lesson-01/exercise/" aria-label="Open the Lesson 01 plot exercise slides">
-          <span class="number">01</span>
-          <span><span class="link-title">Draw it with a list</span><span class="link-detail">Exercise · reconstruct five plots with comprehensions</span></span>
-          <span class="arrow" aria-hidden="true">↗</span>
-        </a>
-        <a href="lesson-01/notebook.ipynb" download="actam-lesson-01.ipynb" aria-label="Download the Lesson 01 notebook">
-          <span class="number">01</span>
-          <span><span class="link-title">Reference notebook</span><span class="link-detail">Download · .ipynb</span></span>
-          <span class="arrow" aria-hidden="true">↓</span>
-        </a>
-        <a href="lesson-02/slides/" aria-label="Open Lesson 02 slides">
-          <span class="number">02</span>
-          <span><span class="link-title">From samples to a musical language</span><span class="link-detail">Slides · functions, melodies and a first percussion instrument</span></span>
-          <span class="arrow" aria-hidden="true">↗</span>
-        </a>
-        <a href="lesson-02/notebook.ipynb" download="actam-lesson-02.ipynb" aria-label="Download the Lesson 02 notebook">
-          <span class="number">02</span>
-          <span><span class="link-title">Reference notebook</span><span class="link-detail">Download · .ipynb</span></span>
-          <span class="arrow" aria-hidden="true">↓</span>
-        </a>
-        <a href="lesson-03/slides/" aria-label="Open Lesson 03 slides">
-          <span class="number">03</span>
-          <span><span class="link-title">Small instruments connected</span><span class="link-detail">Slides · envelopes, oscillators and percussion</span></span>
-          <span class="arrow" aria-hidden="true">↗</span>
-        </a>
-        <a href="lesson-03/notebook.ipynb" download="actam-lesson-03.ipynb" aria-label="Download the Lesson 03 notebook">
-          <span class="number">03</span>
-          <span><span class="link-title">Reference notebook</span><span class="link-detail">Download · .ipynb</span></span>
-          <span class="arrow" aria-hidden="true">↓</span>
-        </a>
-        <a href="lesson-04/slides/" aria-label="Open Lesson 04 slides">
-          <span class="number">04</span>
-          <span><span class="link-title">From sounds to a rhythmic language</span><span class="link-detail">Slides · patterns, instruments and tracks</span></span>
-          <span class="arrow" aria-hidden="true">↗</span>
-        </a>
-        <a href="lesson-04/notebook.ipynb" download="actam-lesson-04.ipynb" aria-label="Download the Lesson 04 notebook">
-          <span class="number">04</span>
-          <span><span class="link-title">Reference notebook</span><span class="link-detail">Download · .ipynb</span></span>
-          <span class="arrow" aria-hidden="true">↓</span>
-        </a>
-        <a href="lesson-04/kit/" aria-label="Open the Lesson 04 kit code">
-          <span class="number">04</span>
-          <span><span class="link-title">The kit</span><span class="link-detail">Code · the drum kit, ready to copy into a notebook</span></span>
-          <span class="arrow" aria-hidden="true">↗</span>
-        </a>
-        <a href="lesson-04/challenges/" aria-label="Open the Lesson 04 listening challenges">
-          <span class="number">04</span>
-          <span><span class="link-title">Listen, then build</span><span class="link-detail">Listening · ten rhythms to rebuild as patterns</span></span>
-          <span class="arrow" aria-hidden="true">↗</span>
-        </a>
-        <a href="lesson-04/drum-links/" aria-label="Open the Lesson 04 groove challenge">
-          <span class="number">04</span>
-          <span><span class="link-title">Rebuild the groove</span><span class="link-detail">Challenge · rebuild famous drum parts with the kit</span></span>
-          <span class="arrow" aria-hidden="true">↗</span>
-        </a>
+        <details class="lesson" id="lesson-01">
+          <summary>
+            <span class="number">01</span>
+            <span><span class="lesson-title">Python as a conversation</span><span class="count">3 items</span></span>
+            <span class="chevron" aria-hidden="true">▸</span>
+          </summary>
+          <a href="lesson-01/slides/">
+            <span></span>
+            <span><span class="link-title">Slides</span><span class="link-detail">expressions, lists and sound samples</span></span>
+            <span class="arrow" aria-hidden="true">↗</span>
+          </a>
+          <a href="lesson-01/exercise/">
+            <span></span>
+            <span><span class="link-title">Draw it with a list</span><span class="link-detail">Exercise · reconstruct five plots with comprehensions</span></span>
+            <span class="arrow" aria-hidden="true">↗</span>
+          </a>
+          <a href="lesson-01/notebook.ipynb" download="actam-lesson-01.ipynb" aria-label="Download the Lesson 01 notebook">
+            <span></span>
+            <span><span class="link-title">Reference notebook</span><span class="link-detail">Download · .ipynb</span></span>
+            <span class="arrow" aria-hidden="true">↓</span>
+          </a>
+        </details>
+        <details class="lesson" id="lesson-02">
+          <summary>
+            <span class="number">02</span>
+            <span><span class="lesson-title">From samples to a musical language</span><span class="count">2 items</span></span>
+            <span class="chevron" aria-hidden="true">▸</span>
+          </summary>
+          <a href="lesson-02/slides/">
+            <span></span>
+            <span><span class="link-title">Slides</span><span class="link-detail">functions, melodies and a first percussion instrument</span></span>
+            <span class="arrow" aria-hidden="true">↗</span>
+          </a>
+          <a href="lesson-02/notebook.ipynb" download="actam-lesson-02.ipynb" aria-label="Download the Lesson 02 notebook">
+            <span></span>
+            <span><span class="link-title">Reference notebook</span><span class="link-detail">Download · .ipynb</span></span>
+            <span class="arrow" aria-hidden="true">↓</span>
+          </a>
+        </details>
+        <details class="lesson" id="lesson-03">
+          <summary>
+            <span class="number">03</span>
+            <span><span class="lesson-title">Small instruments connected</span><span class="count">2 items</span></span>
+            <span class="chevron" aria-hidden="true">▸</span>
+          </summary>
+          <a href="lesson-03/slides/">
+            <span></span>
+            <span><span class="link-title">Slides</span><span class="link-detail">envelopes, oscillators and percussion</span></span>
+            <span class="arrow" aria-hidden="true">↗</span>
+          </a>
+          <a href="lesson-03/notebook.ipynb" download="actam-lesson-03.ipynb" aria-label="Download the Lesson 03 notebook">
+            <span></span>
+            <span><span class="link-title">Reference notebook</span><span class="link-detail">Download · .ipynb</span></span>
+            <span class="arrow" aria-hidden="true">↓</span>
+          </a>
+        </details>
+        <details class="lesson" open id="lesson-04">
+          <summary>
+            <span class="number">04</span>
+            <span><span class="lesson-title">From sounds to a rhythmic language</span><span class="count">5 items</span></span>
+            <span class="chevron" aria-hidden="true">▸</span>
+          </summary>
+          <a href="lesson-04/slides/">
+            <span></span>
+            <span><span class="link-title">Slides</span><span class="link-detail">patterns, instruments and tracks</span></span>
+            <span class="arrow" aria-hidden="true">↗</span>
+          </a>
+          <a href="lesson-04/notebook.ipynb" download="actam-lesson-04.ipynb" aria-label="Download the Lesson 04 notebook">
+            <span></span>
+            <span><span class="link-title">Reference notebook</span><span class="link-detail">Download · .ipynb</span></span>
+            <span class="arrow" aria-hidden="true">↓</span>
+          </a>
+          <a href="lesson-04/kit/">
+            <span></span>
+            <span><span class="link-title">The kit</span><span class="link-detail">Code · the drum kit, ready to copy into a notebook</span></span>
+            <span class="arrow" aria-hidden="true">↗</span>
+          </a>
+          <a href="lesson-04/challenges/">
+            <span></span>
+            <span><span class="link-title">Listen, then build</span><span class="link-detail">Listening · ten rhythms to rebuild as patterns</span></span>
+            <span class="arrow" aria-hidden="true">↗</span>
+          </a>
+          <a href="lesson-04/drum-links/">
+            <span></span>
+            <span><span class="link-title">Rebuild the groove</span><span class="link-detail">Challenge · rebuild famous drum parts with the kit</span></span>
+            <span class="arrow" aria-hidden="true">↗</span>
+          </a>
+        </details>
       </section>
     </main>
+    <script>
+      // Open the lesson named in the URL (#lesson-04), e.g. from a page's breadcrumb.
+      function openFromHash() {
+        const target = location.hash && document.querySelector(location.hash)
+        if (target && target.tagName === 'DETAILS') {
+          target.open = true
+          target.scrollIntoView()
+        }
+      }
+      openFromHash()
+      addEventListener('hashchange', openFromHash)
+    </script>
     <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"f0427f56e626492fad6cdcf05fbce5bb","spa":false}'></script>
 </body>
 </html>
