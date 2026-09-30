@@ -19,10 +19,11 @@ const lesson02 = publicLayout
 const lesson03 = publicLayout
   ? path.join(root, 'lesson-03')
   : path.join(root, 'lesson_03', 'publish', 'lesson-03')
-// Lesson 04 publishes ready-made static pages (no slides yet).
-const lesson04Pages = publicLayout
+const lesson04 = publicLayout
   ? path.join(root, 'lesson-04')
-  : path.join(root, 'lesson_04', 'publish', 'lesson-04', 'pages')
+  : path.join(root, 'lesson_04', 'publish', 'lesson-04')
+// Lesson 04 also publishes ready-made static pages (kit, challenges, …).
+const lesson04Pages = path.join(lesson04, 'pages')
 const exerciseFolder = publicLayout && await exists(path.join(root, 'lab-01'))
   ? path.join(root, 'lab-01')
   : lesson01
@@ -76,11 +77,12 @@ for (const [slug, folder, includeExercise] of [
   ['lesson-01', lesson01, false],
   ['lesson-02', lesson02, false],
   ['lesson-03', lesson03, false],
+  ['lesson-04', lesson04, false],
 ]) {
   await mkdir(path.join(dist, slug), { recursive: true })
   const notebookSource = path.join(folder, 'notebook.ipynb')
   const notebookTarget = path.join(dist, slug, 'notebook.ipynb')
-  if (slug === 'lesson-03') {
+  if (slug === 'lesson-03' || slug === 'lesson-04') {
     await writeFile(notebookTarget, cleanNotebook(await readFile(notebookSource, 'utf8')))
   } else {
     await cp(notebookSource, notebookTarget)
@@ -121,6 +123,7 @@ if (process.env.SITE_ANALYTICS_TOKEN) {
     'lesson-01/exercise/index.html',
     'lesson-02/slides/index.html',
     'lesson-03/slides/index.html',
+    'lesson-04/slides/index.html',
     'lesson-04/kit/index.html',
     'lesson-04/challenges/index.html',
     'lesson-04/drum-links/index.html',
@@ -139,6 +142,7 @@ const slideRoutes = [
   ['lesson-01/slides', lesson01, 'slides.md'],
   ['lesson-02/slides', lesson02, 'slides.md'],
   ['lesson-03/slides', lesson03, 'slides.md'],
+  ['lesson-04/slides', lesson04, 'slides.md'],
   ['lesson-01/exercise', exerciseFolder, 'exercise.md'],
 ]
 for (const [route, folder, source] of slideRoutes) {
