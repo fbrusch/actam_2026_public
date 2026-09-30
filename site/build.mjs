@@ -35,7 +35,7 @@ if (!/^\/(?:[A-Za-z0-9._-]+\/)*$/.test(basePath)) {
 
 await rm(dist, { recursive: true, force: true })
 await mkdir(dist, { recursive: true })
-await cp(path.join(root, 'site', 'index.html'), path.join(dist, 'index.html'))
+await writeFile(path.join(dist, 'index.html'), prepareHome(await readFile(path.join(root, 'site', 'index.html'), 'utf8')))
 await writeFile(path.join(dist, '.nojekyll'), '')
 
 if (process.env.SITE_CUSTOM_DOMAIN) {
@@ -153,6 +153,19 @@ for (const [route, folder, source] of slideRoutes) {
     await mkdir(slideDir, { recursive: true })
     await cp(indexPage, path.join(slideDir, 'index.html'))
   }))
+}
+
+// Home page: each lesson is a <details>. Count its materials, and open the
+// latest lesson so the page starts on the current one.
+function prepareHome(html) {
+  const parts = html.split('<details class="lesson"')
+  for (let i = 1; i < parts.length; i++) {
+    const body = parts[i].slice(0, parts[i].indexOf('</details>'))
+    const n = (body.match(/<a /g) || []).length
+    parts[i] = parts[i].replace('<!-- COUNT -->', `${n} ${n === 1 ? 'item' : 'items'}`)
+  }
+  if (parts.length > 1) parts[parts.length - 1] = ' open' + parts[parts.length - 1]
+  return parts.join('<details class="lesson"')
 }
 
 async function exists(file) {
