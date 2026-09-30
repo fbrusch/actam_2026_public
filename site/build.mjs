@@ -19,6 +19,10 @@ const lesson02 = publicLayout
 const lesson03 = publicLayout
   ? path.join(root, 'lesson-03')
   : path.join(root, 'lesson_03', 'publish', 'lesson-03')
+// Lesson 04 publishes ready-made static pages (no slides yet).
+const lesson04Pages = publicLayout
+  ? path.join(root, 'lesson-04')
+  : path.join(root, 'lesson_04', 'publish', 'lesson-04', 'pages')
 const exerciseFolder = publicLayout && await exists(path.join(root, 'lab-01'))
   ? path.join(root, 'lab-01')
   : lesson01
@@ -104,6 +108,8 @@ buildSlides(
   path.join(dist, 'lesson-01', 'exercise'),
 )
 
+await cp(lesson04Pages, path.join(dist, 'lesson-04'), { recursive: true })
+
 if (process.env.SITE_ANALYTICS_TOKEN) {
   const token = process.env.SITE_ANALYTICS_TOKEN
   if (!/^[a-f0-9]{32}$/i.test(token)) throw new Error('Invalid SITE_ANALYTICS_TOKEN')
@@ -115,6 +121,8 @@ if (process.env.SITE_ANALYTICS_TOKEN) {
     'lesson-01/exercise/index.html',
     'lesson-02/slides/index.html',
     'lesson-03/slides/index.html',
+    'lesson-04/kit/index.html',
+    'lesson-04/drum-quiz/index.html',
   ]
   for (const file of pages) {
     const target = path.join(dist, file)
