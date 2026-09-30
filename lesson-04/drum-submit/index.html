@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f5ef">
+  <title>How to submit · ACTAM 04</title>
+  <style>
+    :root { color-scheme: light; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #182f3a; background: #f7f5ef; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f7f5ef; }
+    main { max-width: 820px; margin: auto; padding: 56px 24px 80px; }
+    .eyebrow, .meta { color: #42666a; font-size: .85rem; }
+    .eyebrow { letter-spacing: .12em; }
+    h1 { font-size: clamp(2.5rem, 7vw, 4.5rem); letter-spacing: -.065em; margin: 24px 0 32px; line-height: 1.06; }
+    a { color: #076e73; text-underline-offset: 4px; }
+    a:focus-visible, summary:focus-visible { outline: 3px solid #cb4f38; outline-offset: 4px; }
+    article { border-top: 1px solid #b9c6c0; padding: 18px 0; }
+    h2 { font-size: 1.1rem; margin: 0 0 8px; }
+    h2 .meta { font-weight: 400; }
+    h3 { font-size: 1rem; margin: 32px 0 8px; }
+    p, li { line-height: 1.7; }
+    ol { padding-left: 22px; }
+    code { background: #e8ebe4; padding: 1px 4px; }
+    pre { max-width: 100%; overflow-x: auto; padding: 14px; background: #182f3a; color: #eef2ef; font-size: .8rem; line-height: 1.6; }
+    pre code { background: none; padding: 0; }
+    mark { background: #f3d9a4; padding: 0 4px; }
+    details { border: 1px solid #b9c6c0; margin: 12px 0; background: #fbfaf6; min-width: 0; overflow: hidden; }
+    summary { cursor: pointer; padding: 12px 14px; font-weight: 600; }
+    details > div { padding: 0 14px 14px; }
+    .top { margin: -16px 0 32px; }
+    @media (max-width: 620px) { main { padding: 32px 16px; } }
+  </style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">ACTAM · LESSON 04</p>
+  <h1>How to submit.</h1>
+  <p class="top"><a href="../drum-links/">← The grooves</a></p>
+
+  <h3>Categories</h3>
+  <ul>
+    <li><strong>fidelity</strong>: rebuild a groove as close to the original as you can.</li>
+    <li><strong>remix</strong>: take a groove and change something on purpose.</li>
+    <li><strong>mashup</strong>: combine parts of two or more grooves.</li>
+  </ul>
+
+  <h3>Steps</h3>
+  <ol>
+    <li>Create your repository from the template: <a href="https://github.com/fbrusch/actam-groove-template">https://github.com/fbrusch/actam-groove-template</a> (<em>Use this template</em> on GitHub).</li>
+    <li>Work in <code>solution.ipynb</code>. Use <code>drumkit.py</code> and the Python standard library. The <strong>last cell</strong> must be <code>play(...)</code> with your result.</li>
+    <li>Commit and push. On GitHub, open <em>Commits</em> and copy the full commit id (SHA).</li>
+    <li>One member sends an email from their <code>polimi.it</code> address to francesco.bruschi@polimi.it.</li>
+  </ol>
+
+  <h3>Email</h3>
+<pre><code>To:      francesco.bruschi@polimi.it
+Subject: [ACTAM] lesson04-groove fidelity levee_breaks
+
+repo: https://github.com/your-name/your-repo
+commit: 3f2c9e1d8a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d
+
+members:
+teammate.one@mail.polimi.it
+teammate.two@mail.polimi.it
+
+public_note:
+We could not hear the hi-hat in the intro, so we guessed eighths.
+
+private_note:
+Anything you want to tell only the teacher.</code></pre>
+
+  <h3>Subject</h3>
+  <p><code>[ACTAM] lesson04-groove &lt;category&gt; &lt;id&gt;</code>. Each groove’s id is on the <a href="../drum-links/">grooves page</a>. For a mashup, join ids with <code>+</code>: <code>[ACTAM] lesson04-groove mashup levee_breaks+be_my_baby</code>.</p>
+
+  <h3>Body</h3>
+  <ul>
+    <li><code>repo</code> and <code>commit</code>: where your solution is. No GitHub? Leave them out and attach <code>solution.ipynb</code>.</li>
+    <li><code>members</code>: the <code>polimi.it</code> addresses of the other members, one per line. The sender is a member automatically. Working alone? Leave it out.</li>
+    <li><code>public_note</code>: optional, shown to anyone who sees your solution.</li>
+    <li><code>private_note</code>: optional, read only by the teacher.</li>
+  </ul>
+
+  <h3>Resubmitting</h3>
+  <p>You can submit again at any time. The most recent submission counts.</p>
+</main>
+</body>
+</html>
