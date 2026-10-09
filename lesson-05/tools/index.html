@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f5ef">
+  <title>The tools · ACTAM 05</title>
+  <style>
+    :root { color-scheme: light; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #182f3a; background: #f7f5ef; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f7f5ef; }
+    main { max-width: 960px; margin: auto; padding: 56px 24px 80px; }
+    .eyebrow { color: #42666a; font-size: .85rem; letter-spacing: .12em; }
+    h1 { font-size: clamp(2.5rem, 7vw, 4.5rem); letter-spacing: -.065em; margin: 24px 0 16px; line-height: 1.06; }
+    p { line-height: 1.7; }
+    .bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 32px 0 0; }
+    button { font: inherit; padding: 10px 16px; border: 1px solid #087e83; background: #087e83; color: #fff; cursor: pointer; }
+    button:focus-visible { outline: 3px solid #cb4f38; outline-offset: 4px; }
+    .status { color: #42666a; font-size: .85rem; }
+    pre { max-width: 100%; margin: 12px 0 0; padding: 18px; overflow-x: auto; background: #182f3a; color: #eef2ef; font-size: .82rem; line-height: 1.55; }
+    @media (max-width: 620px) { main { padding: 32px 16px; } }
+  </style>
+</head>
+<body>
+<main>
+  <style>.crumbs ol { display: flex; flex-wrap: wrap; gap: 0 .6em; margin: 0; padding: 0; list-style: none; }.crumbs li + li::before { content: '›'; margin-right: .6em; }.crumbs { text-transform: uppercase; margin: 1em 0; }nav.crumbs a { color: inherit; text-decoration: none; padding: 0; border: 0; background: none; }nav.crumbs a:hover { text-decoration: underline; text-underline-offset: 3px; }</style><nav class="eyebrow crumbs" aria-label="Breadcrumb"><ol><li><a href="../../">ACTAM</a></li><li><a href="../../#lesson-05">Lesson 05</a></li><li><span aria-current="page">The tools</span></li></ol></nav>
+  <h1>The tools.</h1>
+  <p>Paste this into the first cell of a new notebook and run it.</p>
+  <div class="bar">
+    <span class="status" id="status" role="status"></span>
+    <button type="button" id="copy">Copy code</button>
+  </div>
+  <pre><code id="code">SR = 48000
+
+from math import exp
+from IPython.display import Audio
+from matplotlib import pyplot as plt
+
+def play(wave, sample_rate=SR):
+    return Audio(wave, rate=sample_rate, normalize=False, autoplay=False)
+
+def square_wave_f(f, sample_rate=SR, amplitude=0.15):
+    phase = 0.0
+    wave = []
+    for frequency in f:
+        if not 0 &lt; frequency &lt; sample_rate / 2:
+            raise ValueError(&quot;Each frequency must be positive and below half the sample rate.&quot;)
+        wave.append(-amplitude if phase &lt; 0.5 else amplitude)
+        phase = (phase + frequency / sample_rate) % 1
+    return wave
+
+def envelope_exp(duration=0.05, tau=0.012, sample_rate=SR):
+    if tau &lt;= 0:
+        raise ValueError(&quot;tau must be positive.&quot;)
+    n = round(duration * sample_rate)
+    return [exp(-(i / sample_rate) / tau) for i in range(n)]
+
+def vca(wave, signal):
+    if len(wave) != len(signal):
+        raise ValueError(&quot;The sound and control signal must have equal lengths.&quot;)
+    return [x * gain for x, gain in zip(wave, signal)]
+
+def edge_fade(wave, attack=0.001, release=0.005, sample_rate=SR):
+    n = len(wave)
+    attack_samples = max(1, round(attack * sample_rate))
+    release_samples = max(1, round(release * sample_rate))
+    edge = [
+        min(1.0, i / attack_samples, (n - 1 - i) / release_samples)
+        for i in range(n)
+    ]
+    return vca(wave, edge)
+
+def mix(a, b, ga=1.0, gb=1.0):
+    if len(a) != len(b):
+        raise ValueError(&quot;Pad the shorter sound with silence before mixing.&quot;)
+    return [ga * x + gb * y for x, y in zip(a, b)]
+
+def fit(wave, n_samples):
+    padding = max(0, n_samples - len(wave))
+    return wave[:n_samples] + [0] * padding
+
+def gain(wave, g=1.0):
+    return [g * x for x in wave]
+
+def peak(wave):
+    return max([abs(x) for x in wave])
+</code></pre>
+</main>
+<script>
+  const button = document.getElementById('copy');
+  const status = document.getElementById('status');
+  const code = document.getElementById('code');
+  button.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(code.textContent);
+      status.textContent = 'Copied.';
+    } catch {
+      const range = document.createRange();
+      range.selectNodeContents(code);
+      const selection = getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      status.textContent = 'Selected: press Ctrl+C or ⌘C.';
+    }
+  });
+</script>
+  <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"f0427f56e626492fad6cdcf05fbce5bb","spa":false}'></script>
+</body>
+</html>
