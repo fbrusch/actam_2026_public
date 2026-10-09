@@ -275,7 +275,324 @@ bar = mix(bar, hh_patt_tot, 1, 0.7)</code></pre>
 <article id="group-05">
   <h2>Group 05 · Another One Bites the Dust</h2>
   <p class="meta">fidelity · 2026-10-02</p>
-  <p class="error">Not rendered yet: the notebook was shared as a OneDrive link.</p>
+  <p class="error">Not rendered: Cell 11 failed: NameError: name &#x27;parse&#x27; is not defined</p>
+  <p class="links"><a href="notebooks/group-05.ipynb" download="group-05.ipynb">Download notebook</a></p>
+  <details><summary>Show the notebook</summary>
+<pre><code>SR = 48000
+
+from math import exp
+from random import random
+
+def vca(wave, signal):
+    if len(wave) != len(signal):
+        raise ValueError(&quot;The sound and control signal must have equal lengths.&quot;)
+    return [x * gain for x, gain in zip(wave, signal)]
+
+def noise(duration=0.05, amplitude=0.15, sample_rate=SR):
+    n = round(duration * sample_rate)
+    return [amplitude * (2 * random() - 1) for _ in range(n)]
+
+def envelope_lin(duration=0.05, sample_rate=SR):
+    n = round(duration * sample_rate)
+    denominator = max(1, n - 1)
+    return [1 - i / denominator for i in range(n)]
+
+def square_wave_f(f, sample_rate=SR, amplitude=0.15):
+    phase = 0.0
+    wave = []
+    for frequency in f:
+        if not 0 &lt; frequency &lt; sample_rate / 2:
+            raise ValueError(&quot;Each frequency must be positive and below half the sample rate.&quot;)
+        wave.append(-amplitude if phase &lt; 0.5 else amplitude)
+        phase = (phase + frequency / sample_rate) % 1
+    return wave
+
+def edge_fade(wave, attack=0.001, release=0.005, sample_rate=SR):
+    n = len(wave)
+    attack_samples = max(1, round(attack * sample_rate))
+    release_samples = max(1, round(release * sample_rate))
+    edge = [
+        min(1.0, i / attack_samples, (n - 1 - i) / release_samples)
+        for i in range(n)
+    ]
+    return vca(wave, edge)
+
+def envelope_exp(duration=0.05, tau=0.012, sample_rate=SR):
+    if tau &lt;= 0:
+        raise ValueError(&quot;tau must be positive.&quot;)
+    n = round(duration * sample_rate)
+    return [exp(-(i / sample_rate) / tau) for i in range(n)]
+
+def closed_hat(duration=0.06, tau=0.010, amplitude=0.15, sample_rate=SR):
+    source = noise(duration, amplitude=amplitude, sample_rate=sample_rate)
+    shape = envelope_exp(duration, tau=tau, sample_rate=sample_rate)
+    return edge_fade(vca(source, shape), sample_rate=sample_rate)
+
+def open_hat(duration=0.2, tau=0.070, amplitude=0.15, sample_rate=SR):
+    source = noise(duration, amplitude=amplitude, sample_rate=sample_rate)
+    shape = envelope_exp(duration, tau=tau, sample_rate=sample_rate)
+    return edge_fade(vca(source, shape), sample_rate=sample_rate)
+
+def kick_raw(
+    duration=0.25, start_hz=180, end_hz=45,
+    pitch_tau=0.025, amp_tau=0.060,
+    amplitude=0.20, sample_rate=SR,
+):
+    pitch_shape = envelope_exp(duration, tau=pitch_tau, sample_rate=sample_rate)
+    pitch = [end_hz + (start_hz - end_hz) * value for value in pitch_shape]
+    body = square_wave_f(pitch, sample_rate=sample_rate, amplitude=amplitude)
+    shape = envelope_exp(duration, tau=amp_tau, sample_rate=sample_rate)
+    return vca(body, shape)
+
+def kick(
+    duration=0.25, start_hz=180, end_hz=45,
+    pitch_tau=0.025, amp_tau=0.060,
+    amplitude=0.20, sample_rate=SR,
+):
+    wave = kick_raw(
+        duration=duration, start_hz=start_hz, end_hz=end_hz,
+        pitch_tau=pitch_tau, amp_tau=amp_tau,
+        amplitude=amplitude, sample_rate=sample_rate,
+    )
+    return edge_fade(wave, sample_rate=sample_rate)
+
+def mix(a, b, ga=1.0, gb=1.0):
+    if len(a) != len(b):
+        raise ValueError(&quot;Pad the shorter sound with silence before mixing.&quot;)
+    return [ga * x + gb * y for x, y in zip(a, b)]
+
+def snare(
+    duration=0.20, amplitude=0.1, noise_gain=0.5,
+    sample_rate=SR,
+):
+    pitch = [
+        180 + 120 * value
+        for value in envelope_exp(duration, tau=0.010, sample_rate=sample_rate)
+    ]
+    body = vca(
+        square_wave_f(pitch, amplitude=amplitude, sample_rate=sample_rate),
+        envelope_exp(duration, tau=0.025, sample_rate=sample_rate),
+    )
+    wires = vca(
+        noise(duration, amplitude=amplitude, sample_rate=sample_rate),
+        envelope_exp(duration, tau=0.055, sample_rate=sample_rate),
+    )
+    return edge_fade(
+        mix(body, wires, ga=1.0, gb=noise_gain),
+        sample_rate=sample_rate,
+    )
+</code></pre>
+<pre><code>def fit(wave, n_samples):
+    return wave[:n_samples] + [0] * (n_samples - len(wave))
+
+eight_duration = 0.3
+eight_samples = round(SR * eight_duration)
+
+slot_s = round(SR/2)</code></pre>
+<pre><code>def mixreal(signal1, signal2):
+    n = max(len(signal1), len(signal2))
+
+    mixed = []
+
+    for i in range(n):
+        sample1 = signal1[i] if i &lt; len(signal1) else 0
+        sample2 = signal2[i] if i &lt; len(signal2) else 0
+
+        mixed.append(sample1 + sample2)
+
+    return mixed</code></pre>
+<pre><code>from IPython.display import Audio
+bombo = kick_raw()
+redo = snare()
+hatclosed = closed_hat()
+hatopen = open_hat()
+Audio(hatopen, rate=SR)
+
+</code></pre>
+<pre><code>T = 20
+Bpm = 120
+Bps = Bpm/60
+negra_duration = 1/Bps
+blanca_duration = negra_duration*2
+corchea_duration = negra_duration/2
+semicorchea_duration = negra_duration/4
+
+negra_samples = round(negra_duration * 48000)
+blanca_samples = round(blanca_duration * 48000)
+corchea_samples = round(corchea_duration * 48000)
+semicorchea_samples = round(semicorchea_duration * 48000)
+Bombo = (bombo + [0]*(negra_samples-len(bombo)))*40
+Charles = ([0]*corchea_samples + hatclosed + [0]*(corchea_samples-len(hatclosed)))*40
+Percu1 = mixreal(Bombo, Charles)
+Audio(Percu1, rate = SR)</code></pre>
+<pre><code>T = 20
+Bpm = 120
+Bps = Bpm/60
+negra_duration = 1/Bps #0.5
+blanca_duration = negra_duration*2
+corchea_duration = negra_duration/2   #0.25
+semicorchea_duration = negra_duration/4
+
+negra_samples = round(negra_duration * 48000)
+blanca_samples = round(blanca_duration * 48000)
+corchea_samples = round(corchea_duration * 48000)
+semicorchea_samples = round(semicorchea_duration * 48000)
+Bombo = (bombo + [0]*(corchea_samples-len(bombo)) + bombo + [0]*(corchea_samples-len(bombo)) + [0]*negra_samples + bombo + [0]*(corchea_samples-len(bombo)) + [0]*negra_samples + [0]*corchea_samples)*10
+Charles = ([0]*corchea_samples*3 + hatclosed + [0]*(corchea_samples-len(hatclosed))+ [0]*corchea_samples+ hatclosed + [0]*(corchea_samples-len(hatclosed))+ [0]*corchea_samples+ hatclosed + [0]*(corchea_samples-len(hatclosed)))*10
+Redo = ([0]*negra_samples + redo + [0]*(negra_samples-len(redo)))*20
+Percu1 = mixreal(Bombo, Redo)
+Percu2 = mixreal(Percu1, Charles)
+Audio(Percu2, rate = SR)</code></pre>
+<pre><code>T = 20
+Bpm = 120
+Bps = Bpm/60
+negra_duration = 1/Bps #0.5
+blanca_duration = negra_duration*2
+corchea_duration = negra_duration/2   #0.25
+semicorchea_duration = negra_duration/4
+
+negra_samples = round(negra_duration * 48000)
+blanca_samples = round(blanca_duration * 48000)
+corchea_samples = round(corchea_duration * 48000)
+semicorchea_samples = round(semicorchea_duration * 48000)
+Bombo = (bombo + [0]*(negra_samples-len(bombo)))*40
+Charles = ([0]*corchea_samples + hatopen + [0]*(corchea_samples-len(hatopen)))*40
+Redo = ([0]*negra_samples + redo + [0]*(corchea_samples-len(redo))+ [0]*corchea_samples)*20
+Percu1 = mixreal(Bombo, Redo)
+Percu2 = mixreal(Percu1, Charles)
+Audio(Percu2, rate = SR)</code></pre>
+<pre><code>T = 20
+Bpm = 95
+Bps = Bpm/60
+negra_duration = 1/Bps #0.5
+blanca_duration = negra_duration*2
+corchea_duration = negra_duration/2   #0.25
+semicorchea_duration = negra_duration/4
+
+negra_samples = round(negra_duration * 48000)
+blanca_samples = round(blanca_duration * 48000)
+corchea_samples = round(corchea_duration * 48000)
+semicorchea_samples = round(semicorchea_duration * 48000)
+Bombo = (bombo + [0]*(negra_samples-len(bombo)))*40
+Charles = ([0]*corchea_samples + hatclosed + [0]*(corchea_samples-len(hatclosed)))*40
+Redo = ([0]*semicorchea_samples*3 + redo + [0]*(semicorchea_samples-len(redo))+ [0]*semicorchea_samples*2+[0]*(semicorchea_samples-len(redo))+[0]*semicorchea_samples)*20
+Percu1 = mixreal(Bombo, Redo)
+Percu2 = mixreal(Percu1, Charles)
+Audio(Percu1, rate = SR)</code></pre>
+<pre><code>def render_pattern (pattern, instrument, BPM = 130 , rate = SR):
+    fourth_s = 60/BPM
+    slot_n = round(fourth_s * SR)
+
+    beats = [fit(instrument() if x == 1 else [], slot_n) for x in parse(pattern)]
+    rendered_pattern = sum(beats, [])
+    return rendered_pattern
+</code></pre>
+<pre><code>def play(wave, sample_rate=SR):
+    return Audio(wave, rate=sample_rate, normalize=False)
+
+def silence(duration=0.5, sample_rate=SR):
+    return [0.0] * round(duration * sample_rate)</code></pre>
+<pre><code>play(render_pattern(&quot;x.xx&quot;, kick_raw))</code></pre>
+<pre><code>def render_pattern (pattern, instrument, nth = 4, BPM = 110 , rate = SR):
+    slot_s = (60/BPM) * 4 / nth
+    slot_n = round(slot_s * SR)
+
+    beats = [fit(instrument() if x == 1 else [], slot_n) for x in parse(pattern)]
+    rendered_pattern = sum(beats, [])
+    return rendered_pattern</code></pre>
+<pre><code>def multiple_mix(waves):
+    result = []
+    max_len = max(len(w) for w in waves) #cerco il segnale più lungo
+    for w in waves:
+        result = mix(fit(result, max_len), fit(w, max_len))
+    return result
+</code></pre>
+<pre><code>def kick(duration=0.02, samplerate=48000, amplitude=1):
+
+    n = round(duration * samplerate)
+    kick_wave = []
+
+    for i in range(n):
+
+        t = i / samplerate
+
+        # Frecuencia que baja rápidamente
+        f = 150 * (1 - t / duration) + 50
+
+        # Envolvente para que el sonido desaparezca
+        envelope = 1 - t / duration
+
+        # Oscilación
+        sample = amplitude * envelope * (
+            __import__(&#x27;math&#x27;).sin(2 * __import__(&#x27;math&#x27;).pi * f * t)
+        )
+
+        kick_wave.append(sample)
+
+    return kick_wave</code></pre>
+<pre><code>def bass(duration=0.1, freq = 100,  samplerate=48000, amplitude=0.35):
+
+    n = round(duration * samplerate)
+    kick_wave = []
+
+    for i in range(n):
+
+        t = i / samplerate
+
+        # Frecuencia que baja rápidamente
+        f = freq
+
+        # Envolvente para que el sonido desaparezca
+        envelope = 1 - t / duration
+
+        # Oscilación
+        sample = amplitude * envelope * (
+            __import__(&#x27;math&#x27;).sin(2 * __import__(&#x27;math&#x27;).pi * f * t)
+        )
+
+        kick_wave.append(sample)
+
+    return kick_wave
+</code></pre>
+<div class="md">BASS NOTES</div>
+<pre><code>bassbb = bass(duration=0.1, freq=116.541)
+bassf = bass(duration=0.1, freq=87.3)
+bassg = bass(duration=0.1, freq=103.826)
+bassf2 = bass(duration=0.1, freq=87.3*2)
+bassg2 = bass(duration=0.1, freq=103.826*2)
+bassbb2 = bass(duration=0.1, freq=116.541*2)
+
+
+
+
+Audio(bassf2, rate=48000)</code></pre>
+<div class="md">CREATING BASS LINE</div>
+<pre><code>T = 20
+Bpm = 110
+Bps = Bpm/60
+negra_duration = 1/Bps #0.5
+blanca_duration = negra_duration*2
+corchea_duration = negra_duration/2   #0.25
+semicorchea_duration = negra_duration/4
+
+negra_samples = round(negra_duration * 48000)
+blanca_samples = round(blanca_duration * 48000)
+corchea_samples = round(corchea_duration * 48000)
+semicorchea_samples = round(semicorchea_duration * 48000)
+Bombo = (bassbb + [0]*(semicorchea_samples-len(bassbb)) + bassg + [0]*(semicorchea_samples-len(bassbb))+bassf + [0]*(semicorchea_samples-len(bassbb))+[0]*(semicorchea_samples)*3+bassf+[0]*(semicorchea_samples-len(bassbb))+[0]*(semicorchea_samples)*3+ bassf+[0]*(semicorchea_samples-len(bassbb))+[0]*(semicorchea_samples)*6+ (bassf+[0]*(semicorchea_samples-len(bassbb)))*2+[0]*semicorchea_samples+ bassf+[0]*(semicorchea_samples-len(bassbb))+[0]*semicorchea_samples+bassg+[0]*(semicorchea_samples-len(bassbb))+[0]*semicorchea_samples+ bassf+[0]*(semicorchea_samples-len(bassbb))+ bassbb+[0]*(semicorchea_samples-len(bassbb))+[0]*semicorchea_samples*6)*2
+Bass2 =(bassbb2 + [0]*(semicorchea_samples-len(bassbb)) + bassg2 + [0]*(semicorchea_samples-len(bassbb))+bassf2 + [0]*(semicorchea_samples-len(bassbb))+[0]*(semicorchea_samples)*3+bassf2+[0]*(semicorchea_samples-len(bassbb))+[0]*(semicorchea_samples)*3+ bassf2+[0]*(semicorchea_samples-len(bassbb))+[0]*(semicorchea_samples)*6+ (bassf2+[0]*(semicorchea_samples-len(bassbb)))*2+[0]*semicorchea_samples+ bassf2+[0]*(semicorchea_samples-len(bassbb))+[0]*semicorchea_samples+bassg2+[0]*(semicorchea_samples-len(bassbb))+[0]*semicorchea_samples+ bassf2+[0]*(semicorchea_samples-len(bassbb))+ bassbb2+[0]*(semicorchea_samples-len(bassbb))+[0]*semicorchea_samples*6)
+
+Bombo2 = (bassbb + [0]*(semicorchea_samples-len(bassbb)) + bassg + [0]*(semicorchea_samples-len(bassbb))+bassf + [0]*(semicorchea_samples-len(bassbb))+[0]*(semicorchea_samples)*3+bassf+[0]*(semicorchea_samples-len(bassbb))+[0]*(semicorchea_samples)*3+ bassf+[0]*(semicorchea_samples-len(bassbb))+[0]*(semicorchea_samples)*6+ (bassf+[0]*(semicorchea_samples-len(bassbb)))*2+[0]*semicorchea_samples+ bassf+[0]*(semicorchea_samples-len(bassbb))+[0]*semicorchea_samples+bassg+[0]*(semicorchea_samples-len(bassbb))+[0]*semicorchea_samples+ bassf+[0]*(semicorchea_samples-len(bassbb))+ bassbb+[0]*(semicorchea_samples-len(bassbb))+[0]*semicorchea_samples*6)
+Basss = Bombo +mix(Bass2,Bombo2)*2
+
+Audio(Basss, rate = SR)</code></pre>
+<div class="md">FINAL RESULT</div>
+<pre><code>Queen = multiple_mix([render_pattern(&quot;..&quot;, kick, 16)])+multiple_mix([render_pattern(&quot;xxxx&quot;, kick, 4), render_pattern(&quot;.x.x&quot;, snare, 4), render_pattern(&quot;xx.xxx.x&quot;,closed_hat , 8), render_pattern(&quot;..x...x.&quot;,open_hat , 8)])*8
+Audio(mixreal(Basss, Queen), rate = 48000)
+</code></pre>
+<div class="md">PERCUSSION</div>
+<pre><code>Audio(Queen, rate = 48000)</code></pre>
+  </details>
 </article>
 <article id="group-06">
   <h2>Group 06 · Billie Jean + Another One Bites the Dust</h2>
@@ -618,7 +935,575 @@ bar2 = render_tracks(tracks_drop)*4</code></pre>
 The solution.ipynb is different because I started adding features before the challenge lecture, but it&#x27;s essentially the same.
 Used numpy for basic tanh(.) wave shaping, floor function, and a simpler way to do stereo but is converted as an interleaved list at the end.
 Also, I developed a custom envelope formula, the derivation is a markdown before the final cell.</p>
-  <p class="error">Not rendered yet: the notebook was sent as a mail attachment.</p>
+  <p class="error">Not rendered: Cell 23 failed: NameError: name &#x27;Full_kit&#x27; is not defined</p>
+  <p class="links"><a href="notebooks/group-11.ipynb" download="group-11.ipynb">Download notebook</a></p>
+  <details><summary>Show the notebook</summary>
+<pre><code>fs = 48000;
+SR = fs;
+from IPython.display import Audio
+from drumkit import *
+import matplotlib.pyplot as plt
+import numpy as np
+import wave, struct</code></pre>
+<pre><code>## Fundamental functions
+def float2int(fnumb):
+    return int(np.floor(fnumb))
+
+def fill_zeros(array,fill_length):
+    return array + [0]*(fill_length - len(array))
+
+def play(wave,fs=SR):
+    return Audio(wave, rate=fs, normalize=False)
+
+def noise(amp,length):
+    return [amp*random() for z in range(length)]
+
+def envelope(length,decay,A=1,B=0):
+    assert 0 &lt; decay &lt;= 1, &quot;DECAY MUST BE IN (0, 1]&quot;
+    return [ (A-B) * ( (decay*(1-z/length))/((1-2*decay)*z/length + decay) ) + B for z in range(length) ]
+
+def normalize(sound):
+    g = np.max(np.abs(sound)).tolist()
+    return [ sound[z]/g for z in range(len(sound)) ]
+
+def save_wav_stereo(path, wave_samples, fs):
+    &quot;&quot;&quot;Write a stereo 16-bit WAV. Refuses to clip instead of normalising.&quot;&quot;&quot;
+    Left, Right = wave_samples
+    
+    &quot;&quot;&quot; Checks max across both channels &quot;&quot;&quot;
+    peak = max(max(abs(z) for z in Left), max(abs(z) for z in Right))
+    if peak &gt; 1:
+        raise ValueError(f&quot;Peak {peak:.2f} exceeds 1: lower the gains.&quot;)
+    
+    &quot;&quot;&quot; Interleaves samples in pairs &quot;&quot;&quot;
+    interleaved = [sample for pair in zip(Left, Right) for sample in pair]
+    
+    with wave.open(str(path), &quot;wb&quot;) as f:
+        f.setnchannels(2) # 2 channels for stereo 
+        f.setsampwidth(2)
+        f.setframerate(fs)
+        f.writeframes(struct.pack(
+            &quot;&lt;&quot; + &quot;h&quot; * len(interleaved),
+            *(round(x * 32767) for x in interleaved),
+        ))
+</code></pre>
+<pre><code>## Sound generators
+def square_wave(f,fs,amp,length):
+
+    T = 1/f[0];
+    T_samples = float2int(T*fs);
+    Thalf_samples = float2int(T_samples/2);
+
+    wave = [];
+    z = 0;
+
+    while z &lt; length:
+        T = 1/max(f[z],50);
+        T_samples = float2int(T*fs);
+        Thalf_samples = float2int(T_samples/2);
+
+        wave = wave + ( [-amp]* Thalf_samples + [amp]* Thalf_samples );
+        z = z + T_samples;
+        
+    return fill_zeros(wave,length)
+
+def make_cymb(length, env, att_fact):
+    N = noise(1,length)
+    att = envelope(length,att_fact,0,1)
+    return [ (2*N[z]-1)*env[z]*att[z] for z in range(length) ]
+
+def make_drum(length, freq, env, noise_amp):
+    wave = square_wave(freq,fs,1,length)
+    nose = noise(noise_amp,length)
+    return [ (wave[z] + ( 2*nose[z]-1*noise_amp ) )/(1+noise_amp)*env[z] for z in range(length) ]
+
+def make_pattern(rhythm,wave):
+    silence = [0] * len(wave)
+    sounds = [silence, wave]
+    groove = []
+    for z in rhythm:
+        groove += sounds[z]
+    return groove
+
+def mix(sounds,gains,pans):
+    assert len(sounds) == len(gains)
+    return [ sum(sample*gain*pan for sample, gain, pan in zip(current_wave, gains, pans)) for current_wave in zip(*sounds) ];  </code></pre>
+<pre><code>## Main routine
+def set_length(fs,tempo,bars,beats,subbeats):
+
+    tempo_time = 60/tempo; # tempo in seconds
+    beat_samples = float2int(fs*tempo_time); # tempo in samples
+    L_subb = float2int(beat_samples/subbeats); # subbeat in samples
+    L_bar = beat_samples * beats;
+    
+    return L_subb, L_bar
+
+def drum_kit(fs, bars, L_bar, waves, rhythm, gains, pans):
+
+    # Grooves
+    sounds = []
+    for i in range(len(rhythm)):
+        pat = make_pattern(rhythm[i], waves[i])
+        sounds.append(pat)
+
+    # Mixdown
+    Kit = mix(sounds,gains,pans)
+    Kit = normalize(Kit)
+    Kit = fill_zeros(Kit,L_bar) * bars
+
+    # Result
+    time = [ z/fs for z in range( len(Kit) ) ]
+    plt.figure(figsize=(15,2))
+    plt.plot(time,Kit)
+    plt.xlim(0,time[-1])
+    plt.ylim(-1.1, 1.1)
+    plt.grid(True)
+    
+    return Kit</code></pre>
+<div class="md">### The Ronettes - Be my baby</div>
+<pre><code># User parameters
+tempo = float2int(129/2)+1;
+bars = 2;
+beats = 4;
+subbeats = 8;
+
+# Grooves
+rhy_kick = [1,0,0,0,0,0,1,0, 1,0,0,0,0,0,0,0, 1,0,0,0,0,0,1,0, 1,0,0,0,0,0,0,0]
+rhy_snre = [0,0,0,0,0,0,0,0, 0,0,0,0,1,0,0,0, 0,0,0,0,0,0,0,0, 0,0,1,0,1,0,1,0]
+rhy_hhat = [1,0,1,0,1,0,1,0, 1,0,1,0,1,0,1,0, 1,0,1,0,1,0,1,0, 1,0,1,0,1,0,1,0]
+rhy_ohat = [0,1,0,1,0,1,0,1, 0,1,0,1,0,1,0,1, 0,1,0,1,0,1,0,1, 0,1,0,1,0,1,0,1]
+R = [rhy_kick, rhy_snre, rhy_hhat, rhy_ohat];
+
+# Gains
+# g = [0.0, 0.0, 0.5, 0.2];
+g = [0.4, 0.99, 0.99, 0.3];
+p_L = [0.5, 0.5, 0.4, 0.4];
+p_R = [1-p_L[0], 1-p_L[1], 1-p_L[2], 1-p_L[3]];
+
+# Lengths
+L_subb, L_bar = set_length(fs,tempo,bars,beats, subbeats);
+
+# Drum One-shots
+Kick = make_drum(L_subb, envelope(L_subb,0.1,500,25), envelope(L_subb,0.7), 0)
+Kick = fill_zeros(Kick,L_subb)
+Kick = np.tanh(Kick).tolist()
+
+Snare = make_drum(L_subb, envelope(L_subb,0.2,300,150), envelope(L_subb,0.8), 1)
+Snare = fill_zeros(Snare,L_subb)
+Snare = np.tanh(Snare).tolist()
+
+HH = make_cymb(L_subb,envelope(L_subb,0.01),0.080)
+HH = fill_zeros(HH,L_subb)
+HH = np.tanh(HH).tolist()
+
+OH = make_cymb(L_subb,envelope(L_subb,0.8,0.,0.12),0.001)
+OH = fill_zeros(OH,L_subb)
+OH = np.tanh(OH).tolist()
+
+# Drum Kit
+W = [Kick, Snare, HH, OH]
+Kit_L = drum_kit(fs, bars, L_bar, W, R, g, p_L); plt.title(&quot;Left channel&quot;);
+Kit_R = drum_kit(fs, bars, L_bar, W, R, g, p_R); plt.title(&quot;Right channel&quot;);
+Kit_stereo_1 = np.array([Kit_L,Kit_R])
+# play(Kit_stereo_1,fs)</code></pre>
+<div class="md">### Michelle Jackson - Billie Jean</div>
+<pre><code># User parameters
+tempo = 117
+bars = 2;
+beats = 8;
+subbeats = 4;
+
+# Grooves
+rhy_kick = [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0]
+rhy_snre = [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0]
+rhy_hhat = [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0]
+rhy_ohat = [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0]
+R = [rhy_kick, rhy_snre, rhy_hhat, rhy_ohat];
+
+# Gains
+# g = [0.0, 0.0, 0., 0.2];
+g = [0.7, 0.99, 0.5, 0.7];
+p_L = [0.5, 0.5, 0.8, 0.2];
+p_R = [1-p_L[0], 1-p_L[1], 1-p_L[2], 1-p_L[3]];
+
+# Lengths
+L_subb, L_bar = set_length(fs,tempo,bars,beats,subbeats);
+
+# Drum One-shots
+Kick = make_drum(L_subb, envelope(L_subb,0.1,500,25), envelope(L_subb,0.2), 0)
+Kick = fill_zeros(Kick,L_subb)
+Kick = np.tanh(Kick).tolist()
+
+Snare = make_drum(L_subb, envelope(L_subb,0.2,300,150), envelope(L_subb,0.4), 1)
+Snare = fill_zeros(Snare,L_subb)
+Snare = np.tanh(Snare).tolist()
+
+HH = make_cymb(L_subb,envelope(L_subb,0.05),0.00002)
+HH = fill_zeros(HH,L_subb)
+HH = np.tanh(HH).tolist()
+
+OH1 = make_cymb(L_subb,envelope(L_subb,0.6,0.3,0.),0.4)
+OH1 = fill_zeros(OH1,L_subb)
+
+
+# Drum Kit
+W = [Kick, Snare, HH, OH1]
+Kit_L = drum_kit(fs, bars, L_bar, W, R, g, p_L); plt.title(&quot;Left channel&quot;);
+Kit_R = drum_kit(fs, bars, L_bar, W, R, g, p_R); plt.title(&quot;Right channel&quot;);
+Kit_stereo_2 = np.array([Kit_L,Kit_R])
+# play(Kit_stereo_2,fs)</code></pre>
+<div class="md">### Queen - Another One Bites the Dust</div>
+<pre><code># User parameters
+tempo = 112
+bars = 4;
+beats = 4;
+subbeats = 4;
+
+# Grooves
+rhy_kick = [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0]
+rhy_snre = [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0]
+rhy_hhat = [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0]
+R = [rhy_kick, rhy_snre, rhy_hhat];
+
+# Gains
+g = [0.7, 0.99, 0.7];
+p_L = [0.5, 0.5, 0.5];
+p_R = [1-p_L[0], 1-p_L[1], 1-p_L[2]];
+
+# Lengths
+L_subb, L_bar = set_length(fs,tempo,bars,beats,subbeats);
+
+# Drum One-shots
+Kick = make_drum(L_subb, envelope(L_subb,0.1,500,25), envelope(L_subb,0.2), 0)
+Kick = fill_zeros(Kick,L_subb)
+Kick = np.tanh(Kick).tolist()
+
+Snare = make_drum(L_subb, envelope(L_subb,0.15,240,80), envelope(L_subb,0.2), 1)
+Snare = fill_zeros(Snare,L_subb)
+Snare = np.tanh(Snare).tolist()
+
+HH = make_cymb(L_subb,envelope(L_subb,0.04),0.00002)
+HH = fill_zeros(HH,L_subb)
+HH = np.tanh(HH).tolist()
+
+# Drum Kit
+W = [Kick, Snare, HH]
+Kit_L = drum_kit(fs, bars, L_bar, W, R, g, p_L); plt.title(&quot;Left channel&quot;);
+Kit_R = drum_kit(fs, bars, L_bar, W, R, g, p_R); plt.title(&quot;Right channel&quot;);
+Kit_stereo_3 = np.array([Kit_L,Kit_R])
+# play(Kit_stereo_3,fs)</code></pre>
+<div class="md">### Stevie Wonder - Superstition</div>
+<pre><code># User parameters
+tempo = 100
+bars = 2;
+beats = 8;
+subbeats = 8;
+
+# Grooves
+rhy_kick = [1,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 1,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 1,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 1,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0]
+rhy_snre = [0,0,0,0,0,0,0,0, 1,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 1,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 1,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 1,0,0,0,0,0,0,0]
+rhy_hhat = [1,0,0,0,1,0,0,0, 1,0,0,0,1,0,0,1, 1,0,0,1,1,0,0,0, 1,0,0,0,1,0,0,1, 1,0,0,0,1,0,0,0, 1,0,0,0,1,0,0,1, 1,0,0,0,1,0,0,1, 1,0,0,1,1,0,0,0]
+R = [rhy_kick, rhy_snre, rhy_hhat,];
+
+# Gains
+g = [0.7, 0.99, 0.5];
+p_L = [0.5, 0.3, 0.6];
+p_R = [1-p_L[0], 1-p_L[1], 1-p_L[2]];
+
+# Lengths
+L_subb, L_bar = set_length(fs,tempo,bars,beats,subbeats);
+
+# Drum One-shots
+Kick = make_drum(L_subb, envelope(L_subb,0.05,1020,35), envelope(L_subb,0.2), 0)
+Kick = fill_zeros(Kick,L_subb)
+Kick = np.tanh(Kick).tolist()
+
+Snare = make_drum(L_subb, envelope(L_subb,0.1,520,130), envelope(L_subb,0.75), 1)
+Snare = fill_zeros(Snare,L_subb)
+Snare = np.tanh(Snare).tolist()
+
+HH = make_cymb(L_subb,envelope(L_subb,0.25),0.05)
+HH = fill_zeros(HH,L_subb)
+HH = np.tanh(HH).tolist()
+
+# Drum Kit
+W = [Kick, Snare, HH]
+Kit_L = drum_kit(fs, bars, L_bar, W, R, g, p_L); plt.title(&quot;Left channel&quot;);
+Kit_R = drum_kit(fs, bars, L_bar, W, R, g, p_R); plt.title(&quot;Right channel&quot;);
+Kit_stereo_4 = np.array([Kit_L,Kit_R])
+# play(Kit_stereo_4,fs)</code></pre>
+<div class="md">### Led Zeppelin - When the Levee Breaks (Intro)</div>
+<pre><code># User parameters
+tempo = 72
+bars = 4;
+beats = 4;
+subbeats = 4;
+
+# Grooves
+rhy_kick = [1,0,0,0, 0,0,0,1, 0,0,1,1, 0,0,0,0]
+rhy_snre = [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0]
+rhy_hhat = [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0]
+rhy_ohat = [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0]
+R = [rhy_kick, rhy_snre, rhy_hhat, rhy_ohat];
+
+# Gains
+g = [0.7, 0.99, 0.1, 0.1];
+p_L = [0.5, 0.3, 0.6, 0.];
+p_R = [1-p_L[0], 1-p_L[1], 1-p_L[2], 1-p_L[3]];
+
+# Lengths
+L_subb, L_bar = set_length(fs,tempo,bars,beats,subbeats);
+
+# Drum One-shots
+Kick = make_drum(L_subb, envelope(L_subb,0.05,1020,35), envelope(L_subb,0.05), 0)
+Kick = fill_zeros(Kick,L_subb)
+Kick = np.tanh(Kick).tolist()
+
+Snare = make_drum(L_subb, envelope(L_subb,0.1,520,130), envelope(L_subb,0.05), 1)
+Snare = fill_zeros(Snare,L_subb)
+Snare = np.tanh(Snare).tolist()
+
+HH = make_cymb(L_subb,envelope(L_subb,0.2),0.01)
+HH = fill_zeros(HH,L_subb)
+HH = np.tanh(HH).tolist()
+
+OH = make_cymb(L_subb,envelope(L_subb,0.25),0.3)
+OH = fill_zeros(OH,L_subb)
+OH = np.tanh(OH).tolist()
+
+# Drum Kit
+W = [Kick, Snare, HH, OH]
+Kit_L = drum_kit(fs, bars, L_bar, W, R, g, p_L); plt.title(&quot;Left channel&quot;);
+Kit_R = drum_kit(fs, bars, L_bar, W, R, g, p_R); plt.title(&quot;Right channel&quot;);
+Kit_stereo_5 = np.array([Kit_L,Kit_R])
+# play(Kit_stereo_5,fs)</code></pre>
+<div class="md">### Led Zeppelin - When the Levee Breaks (Break)</div>
+<pre><code># User parameters
+tempo = 72
+bars = 1;
+beats = 8;
+subbeats = 4;
+
+# Grooves
+rhy_kick = [0,1,0,0, 0,1,0,0, 0,1,0,0, 0,1,0,0, 1,0,0,0, 0,0,0,1, 0,0,1,1, 0,0,0,0]
+rhy_snre = [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,1,1, 0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0]
+rhy_hhat = [0,1,0,0, 0,1,0,0, 0,1,0,0, 1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0]
+rhy_ohat = [0,0,0,0, 0,0,0,0, 0,0,0,0, 1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0]
+R = [rhy_kick, rhy_snre, rhy_hhat, rhy_ohat];
+
+# Gains
+g = [0.7, 0.8, 0.1, 0.1];
+p_L = [0.5, 0.3, 0.6, 0.];
+p_R = [1-p_L[0], 1-p_L[1], 1-p_L[2], 1-p_L[3]];
+
+# Lengths
+L_subb, L_bar = set_length(fs,tempo,bars,beats,subbeats);
+
+# Drum One-shots
+Kick = make_drum(L_subb, envelope(L_subb,0.05,1020,35), envelope(L_subb,0.05), 0)
+Kick = fill_zeros(Kick,L_subb)
+Kick = np.tanh(Kick).tolist()
+
+Snare = make_drum(L_subb, envelope(L_subb,0.1,520,130), envelope(L_subb,0.05), 0)
+Snare = fill_zeros(Snare,L_subb)
+Snare = np.tanh(Snare).tolist()
+
+HH = make_cymb(L_subb,envelope(L_subb,0.2),0.01)
+HH = fill_zeros(HH,L_subb)
+HH = np.tanh(HH).tolist()
+
+OH = make_cymb(L_subb,envelope(L_subb,0.25),0.3)
+OH = fill_zeros(OH,L_subb)
+OH = np.tanh(OH).tolist()
+
+# Drum Kit
+W = [Kick, Snare, HH, OH]
+Kit_L = drum_kit(fs, bars, L_bar, W, R, g, p_L); plt.title(&quot;Left channel&quot;);
+Kit_R = drum_kit(fs, bars, L_bar, W, R, g, p_R); plt.title(&quot;Right channel&quot;);
+Kit_stereo_6 = np.array([Kit_L,Kit_R])
+# play(Kit_stereo_6,fs)</code></pre>
+<div class="md">### Prince and the Revolution - When Doves Cry</div>
+<pre><code># User parameters
+tempo = 64
+bars = 2;
+beats = 8;
+subbeats = 4;
+
+# Grooves
+rhy_kick = [1,0,0,1, 0,0,0,0, 1,0,0,1, 0,0,0,0, 1,0,0,1, 0,0,0,0, 1,0,0,1, 0,0,0,0]
+rhy_snre = [0,1,1,0, 0,0,0,0, 0,0,1,0, 0,0,0,0, 0,1,1,0, 0,0,0,0, 0,0,1,0, 0,0,0,0]
+rhy_hhat = [0,0,1,0, 0,1,1,0, 0,0,1,0, 0,0,0,0, 0,0,1,0, 0,1,1,0, 0,0,1,0, 0,0,0,0]
+rhy_ltom = [0,1,0,0, 1,0,0,0, 0,1,0,0, 1,1,1,0, 0,1,0,0, 1,0,0,0, 0,1,0,0, 1,1,1,0]
+R = [rhy_kick, rhy_snre, rhy_hhat, rhy_ltom];
+
+# Gains
+g = [0.5, 0.15, 0.3, 0.1];
+p_L = [0.5, 0.5, 0.6, 0.5];
+p_R = [1-p_L[0], 1-p_L[1], 1-p_L[2], 1-p_L[3]];
+
+# Lengths
+L_subb, L_bar = set_length(fs,tempo,bars,beats,subbeats);
+
+# Drum One-shots
+Kick = make_drum(L_subb, envelope(L_subb,0.05,1020,35), envelope(L_subb,0.2), 0)
+Kick = fill_zeros(Kick,L_subb)
+Kick = np.tanh(Kick).tolist()
+
+Snare = make_drum(L_subb, envelope(L_subb,0.25,450,440), envelope(L_subb,0.3), 1)
+Snare = fill_zeros(Snare,L_subb)
+
+HH = make_cymb(L_subb,envelope(L_subb,0.01),0.05)
+HH = fill_zeros(HH,L_subb)
+HH = np.tanh(HH).tolist()
+
+Tom = make_drum(L_subb, envelope(L_subb,0.05,280,35), envelope(L_subb,0.2), 0)
+Tom = fill_zeros(Tom,L_subb)
+
+# Drum Kit
+W = [Kick, Snare, HH, Tom]
+Kit_L = drum_kit(fs, bars, L_bar, W, R, g, p_L); plt.title(&quot;Left channel&quot;);
+Kit_R = drum_kit(fs, bars, L_bar, W, R, g, p_R); plt.title(&quot;Right channel&quot;);
+Kit_stereo_7 = np.array([Kit_L,Kit_R])
+# play(Kit_stereo_7,fs)</code></pre>
+<div class="md">### Toto - Rosanna</div>
+<pre><code># User parameters
+tempo = 86;
+bars = 4;
+beats = 4;
+subbeats = 8;
+
+# Grooves                   |
+rhy_kick = [1,0,0,0,0,0,0,1, 0,0,0,0,1,0,0,0, 0,0,0,0,1,0,0,0, 0,0,0,0,0,0,0,0]
+rhy_snre = [0,0,0,0,0,0,0,0, 1,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 1,0,0,0,0,0,0,0]
+rhy_hhat = [1,0,0,0,1,0,0,0, 1,0,0,0,1,0,0,0, 1,0,0,0,1,0,0,0, 1,0,0,0,1,0,0,0]
+rhy_ohat = [0,0,0,1,0,0,0,1, 0,0,0,1,0,0,0,1, 0,0,0,1,0,0,0,1, 0,0,0,1,0,0,0,1]
+R = [rhy_kick, rhy_snre, rhy_hhat, rhy_ohat];
+
+# Gains
+g = [0.99, 0.7, 0.3, 0.3];
+p_L = [0.5, 0.5, 0.5, 0.5];
+p_R = [1-p_L[0], 1-p_L[1], 1-p_L[2], 1-p_L[3]];
+
+# Lengths
+L_subb, L_bar = set_length(fs,tempo,bars,beats,subbeats);
+
+# Drum One-shots
+Kick = make_drum(L_subb, envelope(L_subb,0.05,1020,35), envelope(L_subb,0.2), 0)
+Kick = fill_zeros(Kick,L_subb)
+Kick = np.tanh(Kick).tolist()
+
+Snare = make_drum(L_subb, envelope(L_subb,0.1,520,130), envelope(L_subb,0.5), 1)
+Snare = fill_zeros(Snare,L_subb)
+Snare = np.tanh(Snare).tolist()
+
+OH = make_cymb(L_subb,envelope(L_subb,0.2),0.25)
+OH = fill_zeros(OH,L_subb)
+OH = np.tanh(OH).tolist()
+
+HH = make_cymb(L_subb,envelope(L_subb,0.1),0.5)
+HH = fill_zeros(HH,L_subb)
+HH = np.tanh(HH).tolist()
+
+# Drum Kit
+W = [Kick, Snare, OH, HH]
+Kit_L = drum_kit(fs, bars, L_bar, W, R, g, p_L); plt.title(&quot;Left channel&quot;);
+Kit_R = drum_kit(fs, bars, L_bar, W, R, g, p_R); plt.title(&quot;Right channel&quot;);
+Kit_stereo_8 = np.array([Kit_L,Kit_R])
+# play(Kit_stereo_8,fs)</code></pre>
+<div class="md">### Envelope formula derivation
+- Linear fractional transformation function
+
+    $$ y(x) = \frac{a \cdot x +b}{c \cdot x + d} $$
+    
+    Let $x = n/L$, where $n \in [0, L-1]$ is an array of integers. This is equivalent to t = n/fs.
+
+- Boundary conditions
+
+    To be a fade out function, it must met the following conditions
+    - Condition 1: $y(0) = 1$
+        $$ \frac{a \cdot (0/L)+b}{c \cdot (0/L)+d} = 1 \longrightarrow \frac{b}{d} = 1 \therefore b = d $$
+    - Condition 2: $y(L) = 0$
+        $$ \frac{a \cdot (L/L)+b}{c \cdot (L/L)+b} = 0 \longrightarrow a+b = 0 \therefore a = -b $$
+    So our function can be rewriten as
+        $$ y(n) = \frac{1 - n/L}{\alpha \cdot n/L + 1} \qquad \alpha = \frac{c}{b} $$
+
+- Decay parameter $k$
+
+    We add a decay parameter $k$ as $y(n) \to y(n,k)$ with the following constrains
+    1) it affects the free parameter so that $\alpha \to \alpha(k)$,
+    2) the function is fixed to k at halfpoint, i.e. $ y(L/2,k) = k $, and
+    3) its values are $k \in [0,1]$ so that
+        $$
+        y(n,k) = \begin{cases}
+        \text{Exponential} &amp; 0.5 &lt; k \leq 1 \\
+        \text{Linear} &amp; k = 0.5 \\
+        \text{Logarithmic} &amp; 0 \leq k &lt; 0.5
+        \end{cases}
+        $$
+
+    Setting the linear case
+        $$ y(L/2,0.5) = 0.5 \longrightarrow 0.5 = \frac{1-0.5}{\alpha \cdot 0.5 + 1} \longrightarrow \frac{1}{\alpha + 2} \therefore \alpha = \frac{1-2 \cdot k}{k} $$
+    
+    yields the final fade-out function
+        $$ y(n,k) = \frac{k \cdot (1 - n/L)}{(1-2 k) \cdot (n/L) + k} $$
+    
+    &lt;!-- so that becomes
+        $$
+        y(n,k) = \begin{cases}
+        \text{1} &amp; k = 1 \\
+        \text{Exponential} &amp; 0.5 &lt; k &lt; 1 \\
+        \text{(1 - n/L)} &amp; k = 0.5 \\
+        \text{Logarithmic} &amp; 0 &lt; k &lt; 0.5 \\
+        \text{0} &amp; k = 0
+        \end{cases}
+        \qquad \forall n [0,L]
+        $$ --&gt;
+
+- Start and End amplitudes $A$, $B$
+
+    If a custom starting &quot;A&quot; and/or ending &quot;B&quot; points are desired, perform a simple interpolation, as
+        $$ y(n,k,A,B) = (A - B)  \cdot y(n,k) + B $$
+
+    therefore allowing fade-in/attack capabilities</div>
+<pre><code>plt.figure(figsize=(15,3))
+L = 4000
+
+plt.subplot(1,3,1)
+plt.plot(envelope(L,0.1))
+plt.plot(envelope(L,0.5))
+plt.plot(envelope(L,0.9))
+plt.title(f&quot;Fade-Out with A = 1 and B = 0&quot;);
+plt.legend([&quot;k = 0.1&quot;,&quot;k = 0.5&quot;,&quot;k = 0.9&quot;]);
+plt.ylim(0,1.1);
+plt.grid(True);
+
+plt.subplot(1,3,2)
+A = 1; B = 0.5;
+plt.plot(envelope(L,0.1,A,B))
+plt.plot(envelope(L,0.5,A,B))
+plt.plot(envelope(L,0.9,A,B))
+plt.title(f&quot;Fade-Out with A = {A} and B = {B}&quot;);
+plt.legend([&quot;k = 0.1&quot;,&quot;k = 0.5&quot;,&quot;k = 0.9&quot;]);
+plt.ylim(0,1.1);
+plt.grid(True);
+
+plt.subplot(1,3,3)
+A = 0.0; B = 0.8;
+plt.plot(envelope(L,0.1,A,B))
+plt.plot(envelope(L,0.5,A,B))
+plt.plot(envelope(L,0.9,A,B))
+plt.title(f&quot;Fade-In with A = {A} and B = {B}&quot;);
+plt.legend([&quot;k = 0.1&quot;,&quot;k = 0.5&quot;,&quot;k = 0.9&quot;]);
+plt.ylim(0,1.1);
+plt.grid(True);</code></pre>
+<pre><code>All_kits = [Kit_stereo_1, Kit_stereo_2, Kit_stereo_3, Kit_stereo_4, Kit_stereo_5, Kit_stereo_6, Kit_stereo_7, Kit_stereo_8]
+Full_kit_L = [sample for signal in All_kits for sample in signal[0]]
+Full_kit_R = [sample for signal in All_kits for sample in signal[1]]
+
+save_wav_stereo(&quot;solution.wav&quot;,[Full_kit_L, Full_kit_R],fs)
+
+play(Full_kit,2*fs)</code></pre>
+  </details>
 </article>
 </main>
   <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"f0427f56e626492fad6cdcf05fbce5bb","spa":false}'></script>
