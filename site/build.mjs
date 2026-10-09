@@ -116,6 +116,7 @@ buildSlides(
 
 await cp(lesson04Pages, path.join(dist, 'lesson-04'), { recursive: true })
 await cp(lesson05Pages, path.join(dist, 'lesson-05'), { recursive: true })
+await cp(path.join(lesson05, 'class-notebook.ipynb'), path.join(dist, 'lesson-05', 'class-notebook.ipynb'))
 
 if (process.env.SITE_ANALYTICS_TOKEN) {
   const token = process.env.SITE_ANALYTICS_TOKEN
