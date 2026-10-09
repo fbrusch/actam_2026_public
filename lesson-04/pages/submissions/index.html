@@ -1,0 +1,625 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f5ef">
+  <title>Submissions · ACTAM 04</title>
+  <style>
+    :root { color-scheme: light; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #182f3a; background: #f7f5ef; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f7f5ef; }
+    main { max-width: 960px; margin: auto; padding: 56px 24px 80px; }
+    .eyebrow { color: #42666a; font-size: .85rem; letter-spacing: .12em; }
+    h1 { font-size: clamp(2.5rem, 7vw, 4.5rem); letter-spacing: -.065em; margin: 24px 0 16px; line-height: 1.06; }
+    p { line-height: 1.7; }
+    article { border-top: 1px solid #ccd4cf; padding: 28px 0 8px; }
+    h2 { font-size: 1.5rem; letter-spacing: -.03em; margin: 0 0 6px; }
+    .meta { color: #42666a; font-size: .85rem; margin: 0 0 14px; }
+    .note { white-space: pre-wrap; border-left: 3px solid #087e83; padding-left: 14px; margin: 14px 0; }
+    .error { color: #a03b28; border-left: 3px solid #cb4f38; padding-left: 14px; margin: 14px 0; }
+    audio { width: 100%; margin: 6px 0 4px; }
+    .links { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: .85rem; margin: 10px 0; }
+    .links a { color: #087e83; }
+    details { margin: 10px 0 18px; }
+    summary { cursor: pointer; color: #087e83; font-size: .85rem; }
+    pre { max-width: 100%; margin: 10px 0 0; padding: 14px; overflow-x: auto; background: #182f3a; color: #eef2ef; font-size: .78rem; line-height: 1.5; }
+    .md { white-space: pre-wrap; background: #edf0eb; padding: 12px 14px; margin: 10px 0 0; font-size: .8rem; line-height: 1.55; }
+    @media (max-width: 620px) { main { padding: 32px 16px; } }
+  </style>
+</head>
+<body>
+<main>
+  <style>.crumbs ol { display: flex; flex-wrap: wrap; gap: 0 .6em; margin: 0; padding: 0; list-style: none; }.crumbs li + li::before { content: '›'; margin-right: .6em; }.crumbs { text-transform: uppercase; margin: 1em 0; }nav.crumbs a { color: inherit; text-decoration: none; padding: 0; border: 0; background: none; }nav.crumbs a:hover { text-decoration: underline; text-underline-offset: 3px; }</style><nav class="eyebrow crumbs" aria-label="Breadcrumb"><ol><li><a href="../../">ACTAM</a></li><li><a href="../../#lesson-04">Lesson 04</a></li><li><a href="../drum-links/">Rebuild the groove</a></li><li><span aria-current="page">Submissions</span></li></ol></nav>
+  <h1>Submissions.</h1>
+  <p>Each notebook was run as submitted, at the submitted commit. The audio is the result of its final <code>play(...)</code>.</p>
+<article id="group-01">
+  <h2>Group 01 · When the Levee Breaks</h2>
+  <p class="meta">fidelity · 2026-09-30</p>
+  <audio controls preload="none" src="audio/group-01.mp3"></audio>
+  <p class="links"><a href="https://github.com/cherkasovtech-byte/Lesson-04-Rebuild-the-groove/tree/aa4bbc1e25f144edaad706618075b061db98c256">Repository at aa4bbc1</a><a href="https://github.com/cherkasovtech-byte/Lesson-04-Rebuild-the-groove/blob/aa4bbc1e25f144edaad706618075b061db98c256/solution.ipynb">Notebook on GitHub</a><a href="notebooks/group-01.ipynb" download="group-01.ipynb">Download notebook</a></p>
+  <details><summary>Show the notebook</summary>
+<div class="md"># Rebuild the groove
+
+**Groove id:** …  
+**Category:** fidelity / remix / mashup  
+**Group:** [removed]
+
+Use `drumkit.py` and the Python standard library. Keep `play(...)` as the **last cell**: it is what we listen to.</div>
+<pre><code>from IPython.display import Audio
+from drumkit import *
+
+def play(wave, sample_rate=SR):
+    return Audio(wave, rate=sample_rate, normalize=False, autoplay=False)</code></pre>
+<div class="md">## Tempo and grid</div>
+<pre><code>bpm = 100
+step_s = 60 / bpm / 4   # one step = one sixteenth</code></pre>
+<div class="md">## Patterns
+
+One track per instrument. Replace this example with what you hear.</div>
+<pre><code>#          1 e &amp; a 2 e &amp; a 3 e &amp; a 4 e &amp; a
+tracks = [
+    (&quot;x.......x.......&quot;, kick, step_s),
+    (&quot;....x.......x...&quot;, snare, step_s),
+    (&quot;x.x.x.x.x.x.x.x.&quot;, closed_hat, step_s),
+]
+
+bar = render_tracks(tracks)</code></pre>
+<div class="md">## Listen</div>
+<pre><code>play(bar * 4)</code></pre>
+  </details>
+</article>
+<article id="group-02">
+  <h2>Group 02 · Rosanna</h2>
+  <p class="meta">fidelity · 2026-09-30</p>
+  <p class="note">The anacrusis at the beginning feels a bit off: it is approximate in timing and timbre.
+The kit has no toms or crash, so I simulated them with kick and open_hat. The rest of the groove follows a transcription I found online.</p>
+  <audio controls preload="none" src="audio/group-02.mp3"></audio>
+  <p class="links"><a href="https://github.com/DanieleAmodio04/Rosanna_ACTAM2026/tree/45cfbe8e270fe5f410deeb2aef1633ef737b1878">Repository at 45cfbe8</a><a href="https://github.com/DanieleAmodio04/Rosanna_ACTAM2026/blob/45cfbe8e270fe5f410deeb2aef1633ef737b1878/solution.ipynb">Notebook on GitHub</a><a href="notebooks/group-02.ipynb" download="group-02.ipynb">Download notebook</a></p>
+  <details><summary>Show the notebook</summary>
+<div class="md"># Rebuild the groove
+
+**Groove id:** rosanna  
+**Category:** fidelity  
+**Group:** [removed]
+
+Use `drumkit.py` and the Python standard library. Keep `play(...)` as the **last cell**: it is what we listen to.</div>
+<pre><code>from IPython.display import Audio
+from drumkit import *
+
+def play(wave, sample_rate=SR):
+    return Audio(wave, rate=sample_rate, normalize=False, autoplay=False)</code></pre>
+<div class="md">## Tempo and grid</div>
+<pre><code>bpm = 85
+step_s = 60 / bpm / 12 # 12 steps per bar
+step_samples = round(step_s * SR)</code></pre>
+<div class="md">## Patterns
+
+One track per instrument. Replace this example with what you hear.</div>
+<pre><code>def ghost(sample_rate=SR):
+    return snare(amplitude=0.04, noise_gain=0.4, sample_rate=sample_rate)
+
+
+def short_kick(sample_rate=SR):
+    return kick(duration=0.085, sample_rate=sample_rate)
+
+
+def short_snare(sample_rate=SR):
+    return snare(duration=0.05, sample_rate=sample_rate)
+
+
+def crash(sample_rate=SR):
+    return open_hat(duration=0.5, tau=0.15, amplitude=0.10, sample_rate=sample_rate)
+
+
+def tom(f, dur):
+    def hit(sample_rate=SR):
+        body = kick(
+            duration=dur, start_hz=f * 1.6, end_hz=f,
+            pitch_tau=0.02, amp_tau=0.04,
+            amplitude=0.18, sample_rate=sample_rate,
+        )
+        stick = edge_fade(
+            vca(
+                noise(dur, amplitude=0.10, sample_rate=sample_rate),
+                envelope_exp(dur, tau=0.004, sample_rate=sample_rate),
+            ),
+            sample_rate=sample_rate,
+        )
+        return mix(body, stick)
+    return hit
+
+
+high_tom = tom(150, 0.055)
+
+hat_pattern =        (&quot;x...x.x...x.&quot; + &quot;x...x.x...x.&quot; + &quot;x...x.x...x.&quot; + &quot;x...x.x...x.&quot;)
+kick_pattern =       (&quot;x........x..&quot; + &quot;......x.....&quot; + &quot;...x........&quot; + &quot;............&quot;)
+short_kick_pattern = (&quot;............&quot; + &quot;............&quot; + &quot;............&quot; + &quot;.........x..&quot;)
+snare_pattern =      (&quot;............&quot; + &quot;x...........&quot; + &quot;............&quot; + &quot;x...........&quot;)
+ghost_pattern =      (&quot;............&quot; + &quot;............&quot; + &quot;............&quot; + &quot;........x...&quot;)
+crash_pattern =      (&quot;x...........&quot; + &quot;............&quot; + &quot;............&quot; + &quot;............&quot;)
+
+tracks = [
+    ring_track(hat_pattern, closed_hat, step_samples),
+    ring_track(kick_pattern, kick, step_samples),
+    ring_track(short_kick_pattern, short_kick, step_samples),
+    ring_track(snare_pattern, snare, step_samples),
+    ring_track(ghost_pattern, ghost, step_samples),
+]
+
+bar = render_timed_tracks(tracks)
+
+bar_crash = render_timed_tracks(tracks + [ring_track(crash_pattern, crash, step_samples)])
+
+pickup = render_timed_tracks([
+    ring_track(&quot;..x.....&quot;, short_snare, step_samples),
+    ring_track(&quot;....x...&quot;, short_snare, step_samples),
+    ring_track(&quot;......x.&quot;, high_tom, step_samples),
+])</code></pre>
+<div class="md">## Listen</div>
+<pre><code>play(pickup + bar_crash + bar + bar_crash + bar*3)</code></pre>
+  </details>
+</article>
+<article id="group-03">
+  <h2>Group 03 · Superstition</h2>
+  <p class="meta">fidelity · 2026-10-01</p>
+  <p class="note">I defined my own pitched_snare function because I want to have different pitches for the snare sound.
+In the tracks definition, I used lambda syntax because I wanted to pass arguments to the instrument function handlers, like frequency and amplitude.</p>
+  <audio controls preload="none" src="audio/group-03.mp3"></audio>
+  <p class="links"><a href="https://github.com/quocanhlam-polimi/actam-groove/tree/391588a9a751c1492eebb69b7fd8f12a89f2fe05">Repository at 391588a</a><a href="https://github.com/quocanhlam-polimi/actam-groove/blob/391588a9a751c1492eebb69b7fd8f12a89f2fe05/solution.ipynb">Notebook on GitHub</a><a href="notebooks/group-03.ipynb" download="group-03.ipynb">Download notebook</a></p>
+  <details><summary>Show the notebook</summary>
+<div class="md"># Rebuild the groove
+
+**Groove id:** superstition  
+**Category:** fidelity  
+**Group:** [removed]
+
+Use `drumkit.py` and the Python standard library. Keep `play(...)` as the **last cell**: it is what we listen to.</div>
+<pre><code>from IPython.display import Audio
+from drumkit import *
+
+def play(wave, sample_rate=SR):
+    return Audio(wave, rate=sample_rate, normalize=False, autoplay=False)
+
+def pitched_snare(
+    frequency=180,
+    duration=0.20, amplitude=0.15, noise_gain=0.5,
+    sample_rate=SR,
+):
+    pitch = [
+        frequency + (frequency + 120) * value
+        for value in envelope_exp(duration, tau=0.010, sample_rate=sample_rate)
+    ]
+    body = vca(
+        square_wave_f(pitch, amplitude=amplitude, sample_rate=sample_rate),
+        envelope_exp(duration, tau=0.025, sample_rate=sample_rate),
+    )
+    wires = vca(
+        noise(duration, amplitude=amplitude, sample_rate=sample_rate),
+        envelope_exp(duration, tau=0.055, sample_rate=sample_rate),
+    )
+    return edge_fade(
+        mix(body, wires, ga=1.0, gb=noise_gain),
+        sample_rate=sample_rate,
+    )</code></pre>
+<div class="md">## Tempo and grid</div>
+<pre><code>bpm = 90
+step_s = 60 / bpm / 4   # one step = one sixteenth</code></pre>
+<div class="md">## Patterns
+
+One track per instrument. Replace this example with what you hear.</div>
+<pre><code>#          1 e &amp; a 2 e &amp; a 3 e &amp; a 4 e &amp; a
+intro = [
+    (&quot;x...x.xx&quot;, lambda sample_rate: pitched_snare(sample_rate=sample_rate, frequency=98), step_s),
+]
+
+tracks = [
+    (&quot;x.......x.......&quot;, lambda sample_rate: pitched_snare(sample_rate=sample_rate, frequency=98), step_s),
+    (&quot;....x.......x...&quot;, lambda sample_rate: pitched_snare(sample_rate=sample_rate, frequency=65), step_s),
+    (&quot;..xxx.x..xxxx.x.&quot;, lambda sample_rate: closed_hat(sample_rate=sample_rate, amplitude=.05), step_s),
+    (&quot;x.......x.......&quot;, lambda sample_rate: open_hat(sample_rate=sample_rate, amplitude=.05, tau=0.1), step_s),
+]
+
+intro_bar = render_tracks(intro)
+bar = render_tracks(tracks)</code></pre>
+<div class="md">## Listen</div>
+<pre><code>play(intro_bar + bar * 4)</code></pre>
+  </details>
+</article>
+<article id="group-04">
+  <h2>Group 04 · Superstition</h2>
+  <p class="meta">fidelity · 2026-10-01</p>
+  <p class="note">Since the hihat pattern changes at each bar we decided to take only the first bar&#x27;s pattern.
+Instead of using the provided functions inside drumkit.py, we put our own in the drumkit.py file. We thoroughly commented each function.</p>
+  <audio controls preload="none" src="audio/group-04.mp3"></audio>
+  <p class="links"><a href="https://github.com/riccardo-tomada/actam-groove-template/tree/d11ece3fa45859116c298c98fd639be697dab527">Repository at d11ece3</a><a href="https://github.com/riccardo-tomada/actam-groove-template/blob/d11ece3fa45859116c298c98fd639be697dab527/solution.ipynb">Notebook on GitHub</a><a href="notebooks/group-04.ipynb" download="group-04.ipynb">Download notebook</a></p>
+  <details><summary>Show the notebook</summary>
+<div class="md"># Rebuild the groove
+
+**Groove id:** …  
+**Category:** fidelity / remix / mashup  
+**Group:** [removed]
+
+Use `drumkit.py` and the Python standard library. Keep `play(...)` as the **last cell**: it is what we listen to.</div>
+<pre><code>from IPython.display import Audio
+from drumkit import *
+
+def play(wave, sample_rate=48000):
+    return Audio(wave, rate=sample_rate, normalize=False, autoplay=False)</code></pre>
+<div class="md">## Tempo and grid</div>
+<pre><code>bpm = 100</code></pre>
+<div class="md">## Patterns
+
+One track per instrument. Replace this example with what you hear.</div>
+<pre><code>hh = fit_4(hihat(&#x27;closed&#x27;), 2, bpm)
+ps = pause(10)
+hh_sw = swing(hh, hh, 16, 0.66, bpm)
+kck = fit_4(kick(), 4, bpm)
+snr = fit_4(snare(), 4, bpm)
+play(hh_sw*64)
+
+kck_patt = render_pattern_4(&#x27;xxxx&#x27;, kck, 4, bpm)
+snr_patt = render_pattern_4(&#x27;.x.x&#x27;, snr, 4, bpm)
+hh_patt = render_pattern_4(&#x27;xxx..xx.&#x27;, hh, 8, bpm)
+hh_patt_sw = render_pattern_4(&#x27;...xx..x&#x27;, hh_sw, 8, bpm)
+
+intro = snr + fit_4(snr, 2, bpm) + swing(snr, snr, 16, 0.66, bpm)
+
+bar = mix(kck_patt, snr_patt, 0.6, 1)
+hh_patt_tot = mix(hh_patt, hh_patt_sw)
+bar = mix(bar, hh_patt_tot, 1, 0.7)</code></pre>
+<div class="md">## Listen</div>
+<pre><code>play(intro + bar * 4)</code></pre>
+  </details>
+</article>
+<article id="group-05">
+  <h2>Group 05 · Another One Bites the Dust</h2>
+  <p class="meta">fidelity · 2026-10-02</p>
+  <p class="error">Not rendered yet: the notebook was shared as a OneDrive link.</p>
+</article>
+<article id="group-06">
+  <h2>Group 06 · Billie Jean + Another One Bites the Dust</h2>
+  <p class="meta">mashup · 2026-10-04</p>
+  <p class="note">A maracas sound function has been created using the open_hat() function with a shorter duration, faster decay, and lower amplitude.</p>
+  <audio controls preload="none" src="audio/group-06.mp3"></audio>
+  <p class="links"><a href="https://github.com/eceeaksoy/actam-groove/tree/4c84e5363dddd1c119274c5af7fb3876b8671feb">Repository at 4c84e53</a><a href="https://github.com/eceeaksoy/actam-groove/blob/4c84e5363dddd1c119274c5af7fb3876b8671feb/solution.ipynb">Notebook on GitHub</a><a href="notebooks/group-06.ipynb" download="group-06.ipynb">Download notebook</a></p>
+  <details><summary>Show the notebook</summary>
+<div class="md"># Rebuild the groove
+
+**Groove id:** …  
+**Category:** fidelity / remix / mashup  
+**Group:** [removed]
+
+Use `drumkit.py` and the Python standard library. Keep `play(...)` as the **last cell**: it is what we listen to.</div>
+<pre><code>from IPython.display import Audio
+from drumkit import *
+
+def play(wave, sample_rate=SR):
+    return Audio(wave, rate=sample_rate, normalize=False, autoplay=False)</code></pre>
+<div class="md">## Tempo and grid</div>
+<pre><code>bpm_mj = 117
+bpm_queen = 110
+step_mj = 60 / bpm_mj / 2
+step_queen = 60 / bpm_queen / 2</code></pre>
+<div class="md">## Patterns
+
+One track per instrument. Replace this example with what you hear.</div>
+<pre><code># Michael Jackson - Billie Jean
+
+def maracas(sample_rate):
+  return open_hat(duration=0.07, tau=0.025, amplitude=0.10, sample_rate=sample_rate)
+
+track_mj_1 = [
+    (&quot;x...x...&quot;, kick, step_mj),
+    (&quot;..x...x.&quot;, snare, step_mj),
+    (&quot;xxxxxxxx&quot;, closed_hat, step_mj),
+]*2
+
+track_mj_2 = [
+    (&quot;x...x...&quot;, kick, step_mj),
+    (&quot;..x...x.&quot;, snare, step_mj),
+    (&quot;xxxxxxxx&quot;, closed_hat, step_mj),
+    (&quot;xxxxxxxx&quot;, maracas, step_mj),
+]*2
+
+bar_mj = (render_tracks(track_mj_1)*2) + (render_tracks(track_mj_2)*2)</code></pre>
+<pre><code># Queen - Another One Bites the Dust
+
+track_queen = [
+    (&quot;x.x.x.x.&quot;, kick, step_queen),
+    (&quot;..x...x.&quot;, snare, step_queen),
+    (&quot;xxxxxxxx&quot;, closed_hat, step_queen),
+]
+
+bar_queen = (render_tracks(track_queen)*2)</code></pre>
+<pre><code># Mashup| Billie Jean &amp; Another One Bites the Dust
+
+bpm_mashup = 117
+step_mashup = 60 / bpm_mashup / 2
+
+track_queen_mashup = [
+    (&quot;x.x.x.x.&quot;, kick, step_mashup),
+    (&quot;..x...x.&quot;, snare, step_mashup),
+    (&quot;xxxxxxxx&quot;, closed_hat, step_mashup),
+]
+
+bar_queen_mashup = render_tracks(track_queen_mashup)</code></pre>
+<div class="md">## Listen</div>
+<pre><code>play(bar_mj)</code></pre>
+<pre><code>play(bar_queen)</code></pre>
+<pre><code>play(bar_queen_mashup+ bar_mj)</code></pre>
+  </details>
+</article>
+<article id="group-07">
+  <h2>Group 07 · Billie Jean</h2>
+  <p class="meta">rhythm-bass-melody · 2026-10-05</p>
+  <p class="note">added notation feature (only goes from -9 to 9 because I&#x27;m bad at coding)</p>
+  <audio controls preload="none" src="audio/group-07.mp3"></audio>
+  <p class="links"><a href="https://github.com/ilBonusCultura/actam-groove-template-bonusCultura/tree/fbeb3dcacd0f3c96944b23aa046f4be06839fa70">Repository at fbeb3dc</a><a href="https://github.com/ilBonusCultura/actam-groove-template-bonusCultura/blob/fbeb3dcacd0f3c96944b23aa046f4be06839fa70/solution.ipynb">Notebook on GitHub</a><a href="notebooks/group-07.ipynb" download="group-07.ipynb">Download notebook</a></p>
+  <details><summary>Show the notebook</summary>
+<div class="md"># Rebuild the groove
+
+**Groove id:** …  
+**Category:** fidelity / remix / mashup  
+**Group:** [removed]
+
+Use `drumkit.py` and the Python standard library. Keep `play(...)` as the **last cell**: it is what we listen to.</div>
+<pre><code>from IPython.display import Audio
+from drumkit import *
+
+def play(wave, sample_rate=SR):
+    return Audio(wave, rate=sample_rate, normalize=False, autoplay=False)</code></pre>
+<div class="md">## Tempo and grid</div>
+<pre><code>bpm = 117
+step_s = 60 / bpm / 4   # one step = one sixteenth</code></pre>
+<div class="md">## Patterns
+
+One track per instrument. Replace this example with what you hear.</div>
+<pre><code>#          1 e &amp; a 2 e &amp; a 3 e &amp; a 4 e &amp; a
+tracks = [
+    (&quot;x.......x.......&quot;, kick, step_s),
+    (&quot;....x.......x...&quot;, snare, step_s),
+    (&quot;x.x.x.x.x.x.x.x.&quot;, closed_hat, step_s),
+    
+]
+
+tracks2 = [
+    (&quot;x.......x.......&quot;, kick, step_s),
+    (&quot;....x.......x...&quot;, snare, step_s),
+    (&quot;x.x.x.x.x.x.x.x.&quot;, maracas, step_s),
+    (&quot;x.x.x.x.x.x.x.x.&quot;, closed_hat, step_s),
+    (&quot;-2.-7.-4.-2.-4.-7.-9.-7.&quot;, bass, step_s),
+    
+]
+
+tracks4 = [
+    (&quot;x.......x.......&quot;, kick, step_s),
+    (&quot;....x.......x...&quot;, snare, step_s),
+    (&quot;x.x.x.x.x.x.x.x.&quot;, maracas, step_s),
+    (&quot;x.x.x.x.x.x.x.x.&quot;, closed_hat, step_s),
+    (&quot;-2.-7.-4.-2.-4.-7.-9.-7.&quot;, bass, step_s),
+    (&quot;0.....-1.........&quot;, melody, step_s),
+    (&quot;-5.....-6.........&quot;, melody, step_s),
+    
+]
+
+tracks3 = [
+    (&quot;x.......x.......&quot;, kick, step_s),
+    (&quot;....x.......x...&quot;, snare, step_s),
+    (&quot;x.x.x.x.x.x.x.x.&quot;, maracas, step_s),
+    (&quot;x.x.x.x.x.x.x.x.&quot;, closed_hat, step_s),
+    (&quot;-2.-7.-4.-2.-4.-7.-9.-7.&quot;, bass, step_s),
+    (&quot;-3.....-1.........&quot;, melody, step_s),
+    (&quot;-8.....-6.........&quot;, melody, step_s),
+    
+]
+
+bar = render_tracks(tracks)
+bar2 = render_tracks(tracks2)
+bar3 = render_tracks(tracks3)
+bar4 = render_tracks(tracks4)</code></pre>
+<div class="md">## Listen</div>
+<pre><code>play(bar * 2 + bar2 * 4 + (bar3+bar4)*4)</code></pre>
+  </details>
+</article>
+<article id="group-08">
+  <h2>Group 08 · When the Levee Breaks</h2>
+  <p class="meta">fidelity · 2026-10-06</p>
+  <p class="note">We tried recreating 3 different grooves, from easiest to most difficult.</p>
+  <audio controls preload="none" src="audio/group-08.mp3"></audio>
+  <p class="links"><a href="https://github.com/lidia-curti-polimi/groove-challenge/tree/4cb7457029ad57113771734ce3ecc7ecb36e2378">Repository at 4cb7457</a><a href="https://github.com/lidia-curti-polimi/groove-challenge/blob/4cb7457029ad57113771734ce3ecc7ecb36e2378/solution.ipynb">Notebook on GitHub</a><a href="notebooks/group-08.ipynb" download="group-08.ipynb">Download notebook</a></p>
+  <details><summary>Show the notebook</summary>
+<div class="md"># Rebuild the groove
+
+**Groove id:** another_one_bites, be_my_baby, superstition
+**Category:** fidelity   
+**Group:** [removed]
+
+
+Use `drumkit.py` and the Python standard library. Keep `play(...)` as the **last cell**: it is what we listen to.</div>
+<pre><code>from IPython.display import Audio
+from drumkit import *
+
+def play(wave, sample_rate=SR):
+    return Audio(wave, rate=sample_rate, normalize=False, autoplay=False)</code></pre>
+<div class="md">## Tempo and grid</div>
+<pre><code>bpm = 114
+
+step_s = 60 / bpm / 4   # one step = one sixteenth</code></pre>
+<div class="md">## Patterns
+
+One track per instrument. Replace this example with what you hear.</div>
+<pre><code># id: another_one_bites
+bpm = 110
+step_s = 60 / bpm / 4
+#          1 e &amp; a 2 e &amp; a 3 e &amp; a 4 e &amp; a
+tracks = [(&#x27;x...x...x...x...&#x27;,kick,step_s),
+          (&#x27;....x.......x...&#x27;,snare,step_s),
+          (&#x27;x.x.x.x.x.x.x.x.&#x27;,closed_hat,step_s),
+          (&#x27;................&#x27;,open_hat,step_s)]
+
+another_one_bites = render_tracks(tracks)</code></pre>
+<pre><code># id: be_my_baby
+bpm = 114
+step_s = 60 / bpm / 4
+tracks = [(&#x27;............x...&#x27;,kick,step_s),
+          (&#x27;x.....x.x...x...&#x27;,snare,step_s),
+          (&#x27;............x...&#x27;,closed_hat,step_s),
+          (&#x27;............x...&#x27;,open_hat,step_s)]
+
+be_my_baby = render_tracks(tracks)</code></pre>
+<pre><code># id: superstition
+bpm = 100
+step_s = 60 / bpm / 4
+#           1 e &amp; a 2 e &amp; a 3 e &amp; a 4 e &amp; a
+tracks = [(&#x27;........x...x...x...x...x...x...x...x...x...x...x...x...x...x...x...x...&#x27;,kick,step_s),
+          (&#x27;x...x.xx....x.......x.......x.......x.......x.......x.......x.......x...&#x27;,snare,step_s),
+          (&#x27;........x.x.x.xxxxx.x.xxx.x.x.xxx.xxxxx.x.xxx.xxx.xxxxxxx.x.x.xxx.x.xxxx&#x27;,closed_hat,step_s),
+          (&#x27;............x.......x.......x.......x.......x.......x.......x.......x...&#x27;,open_hat,step_s)]
+
+superstition = render_tracks(tracks)</code></pre>
+<div class="md">## Listen</div>
+<pre><code>play(another_one_bites * 4)</code></pre>
+<pre><code>play(be_my_baby * 4)</code></pre>
+<pre><code>play(superstition * 4)</code></pre>
+  </details>
+</article>
+<article id="group-09">
+  <h2>Group 09 · Blue Monday</h2>
+  <p class="meta">fidelity · 2026-10-06</p>
+  <p class="note">I really wanted to pan hihats on the left and the hi snare on the right, like in the record</p>
+  <audio controls preload="none" src="audio/group-09.mp3"></audio>
+  <p class="links"><a href="https://github.com/MarcoIntroini/actam-groove/tree/32a2be692ed005a48075a6f00f0eac6057d6181f">Repository at 32a2be6</a><a href="https://github.com/MarcoIntroini/actam-groove/blob/32a2be692ed005a48075a6f00f0eac6057d6181f/solution.ipynb">Notebook on GitHub</a><a href="notebooks/group-09.ipynb" download="group-09.ipynb">Download notebook</a></p>
+  <details><summary>Show the notebook</summary>
+<div class="md"># Rebuild the groove
+
+**Groove id:** …  
+**Category:** fidelity / remix / mashup  
+**Group:** [removed]
+
+Use `drumkit.py` and the Python standard library. Keep `play(...)` as the **last cell**: it is what we listen to.</div>
+<pre><code>from IPython.display import Audio
+from drumkit import *
+from other_stuff import *
+
+def play(wave, sample_rate=SR):
+    return Audio(wave, rate=sample_rate, normalize=True, autoplay=True)</code></pre>
+<div class="md">## Tempo and grid</div>
+<pre><code>bpm = 130
+step_s = 60 / bpm / 4   # one step = one sixteenth</code></pre>
+<div class="md">## Patterns
+
+One track per instrument. Replace this example with what you hear.</div>
+<pre><code>#  1 e &amp; a 2 e &amp; a 3 e &amp; a 4 e &amp; a
+intro_tracks = [
+    ((&quot;x...x...xxxxxxxx&quot; + &quot;x...&quot; * 4) * 2, kick, step_s)
+]
+
+tracks = [
+    ((&quot;x.&quot; * 2) * 4, kick, step_s * 4),
+    ((&quot;.x&quot; * 2) * 4, snare_mid, step_s * 4),
+    ((&quot;..x.....&quot; + &quot;x..x.x.x.&quot; + &quot;.xx...x&quot; + &quot;...xx.x.&quot; + &quot;..............x.&quot; + &quot;.xx...x...xx.x.&quot;), snare, step_s),
+    ((&quot;xx.x.x.x&quot; * 2) * 4, closed_hat, step_s),
+    ((&quot;..x...x.&quot; * 2) * 4, open_hat, step_s)
+]
+
+bridge_tracks = [
+    ((&quot;xxxxx.x.&quot; + &quot;xxxxx.xx&quot; + &quot;xxx.xxxx&quot; + &quot;x.x.....&quot;), kick, step_s),
+    ((&quot;xxxxx.x.&quot; + &quot;xxxxx.xx&quot; + &quot;xxx.xxxx&quot; + &quot;x.x.....&quot;), snare, step_s),
+    ((&quot;......xx&quot;), snare_deep, step_s * 4)
+]
+
+# define bass sequence
+bass_sequence = [
+    0, 12, 0, 12, 7, 19, 7, 19, 9, 21, 9, 21, 9, 21, 9, 21, 
+    2, 15, 2, 15, 7, 19, 7, 19, 9, 21, 9, 21, 9, 21, 9, 21,
+    0, 12, 0, 12, 7, 19, 7, 19, 9, 21, 9, 21, 9, 21, 9, 21,
+    2, 15, 2, 15, 0, 12, 0, 12, -1, 11, -1, 11, -1, 11, -1, 11
+]
+step_bass = step_s * 2
+
+bassline = render_bass(43.65, bass_sequence, step_bass)
+
+bar = render_tracks(intro_tracks) + mix(bassline, render_tracks(tracks) * 2, 1, 0.8) + render_tracks(bridge_tracks)</code></pre>
+<div class="md">## Listen</div>
+<pre><code>play(bar)</code></pre>
+  </details>
+</article>
+<article id="group-10">
+  <h2>Group 10 · When Doves Cry</h2>
+  <p class="meta">fidelity · 2026-10-07</p>
+  <audio controls preload="none" src="audio/group-10.mp3"></audio>
+  <p class="links"><a href="https://github.com/g-luca23/actam-2026/tree/fe226660369c339070a378db6538865676ebdeb1">Repository at fe22666</a><a href="https://github.com/g-luca23/actam-2026/blob/fe226660369c339070a378db6538865676ebdeb1/actam-groove-template/solution.ipynb">Notebook on GitHub</a><a href="notebooks/group-10.ipynb" download="group-10.ipynb">Download notebook</a></p>
+  <details><summary>Show the notebook</summary>
+<div class="md"># Rebuild the groove
+
+**Groove id:** when_doves_cry  
+**Category:** fidelity   
+**Group:** [removed]
+
+Use `drumkit.py` and the Python standard library. Keep `play(...)` as the **last cell**: it is what we listen to.</div>
+<pre><code>from IPython.display import Audio
+from drumkit import *
+
+def play(wave, sample_rate=SR):
+    return Audio(wave, rate=sample_rate, normalize=False, autoplay=False)
+
+def rimshot(sample_rate=SR):
+    duration = 0.02 
+    n = round(duration * sample_rate)
+    
+    pitch_high = [1500] * n  
+    pitch_low = [500] * n  
+    wave_high = square_wave_f(pitch_high)
+    wave_low = square_wave_f(pitch_low)
+    body_wave = mix(wave_high, wave_low, ga=0.7, gb=0.8)
+    
+    body = edge_fade(body_wave, attack=0.001, release=0.02, sample_rate=sample_rate)
+    
+    noise_dry = noise(duration, sample_rate=sample_rate)
+    le_molle_sotto_il_rullante = edge_fade(noise_dry, attack=0.001, release=0.03, sample_rate=sample_rate) 
+    #TERRIBLE variable name but idk the name of the cordiera in english 
+    return mix(body, le_molle_sotto_il_rullante, ga=1.0, gb=0.3)
+
+
+#i had thought of this rimshot while in class and worked better with a triangular wave, but im already adding
+#one function to this and idek if it&#x27;s possible but since i picked fidelity i went with this
+#this track NEEDS the rimshot, so i tried to write a similar sound </code></pre>
+<div class="md">## Tempo and grid</div>
+<pre><code>bpm = 126 #tracks bpm
+step_s = 60 / bpm / 2   # half step = one eight</code></pre>
+<div class="md">## Patterns
+
+One track per instrument. Replace this example with what you hear.</div>
+<pre><code>#          1 e &amp; a 2 e &amp; a 3 e &amp; a 4 e &amp; a
+
+tracks_intro = [
+    (&quot;x..x....xx..xxx.&quot;, kick, step_s),
+    (&quot;..x.............&quot;, open_hat, step_s),
+    (&quot;.xx.......xx....&quot;, rimshot, step_s),
+]
+tracks_drop = [
+    (&quot;x..x....xx..xxx.&quot;, kick, step_s),
+    (&quot;...x......xx..x.&quot;, snare, step_s),
+    (&quot;..x.............&quot;, open_hat, step_s),
+    (&quot;.xx.......xx....&quot;, rimshot, step_s),
+]
+
+bar1 = render_tracks(tracks_intro)*4
+bar2 = render_tracks(tracks_drop)*4</code></pre>
+<div class="md">## Listen</div>
+<pre><code>play(bar1+bar2, SR)</code></pre>
+  </details>
+</article>
+<article id="group-11">
+  <h2>Group 11 · Be My Baby + Billie Jean + Another One Bites the Dust + Superstition + When the Levee Breaks + When Doves Cry + Rosanna</h2>
+  <p class="meta">fidelity · 2026-10-09</p>
+  <p class="note">Tried to use check.py but it does not accept stereo arrays. As I can&#x27;t change check.py, the solution.ipynb is self-contained and will output a stereo .wav file.
+The solution.ipynb is different because I started adding features before the challenge lecture, but it&#x27;s essentially the same.
+Used numpy for basic tanh(.) wave shaping, floor function, and a simpler way to do stereo but is converted as an interleaved list at the end.
+Also, I developed a custom envelope formula, the derivation is a markdown before the final cell.</p>
+  <p class="error">Not rendered yet: the notebook was sent as a mail attachment.</p>
+</article>
+</main>
+</body>
+</html>

@@ -133,6 +133,7 @@ if (process.env.SITE_ANALYTICS_TOKEN) {
     'lesson-04/challenges/index.html',
     'lesson-04/drum-links/index.html',
     'lesson-04/drum-submit/index.html',
+    'lesson-04/submissions/index.html',
     'lesson-05/tools/index.html',
   ]
   for (const file of pages) {
