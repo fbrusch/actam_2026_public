@@ -3,6 +3,7 @@ import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import { parseSync } from '@slidev/parser'
+import { publishNotebooks } from './notebooks/publish.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const dist = path.join(root, 'dist')
@@ -117,6 +118,10 @@ buildSlides(
 await cp(lesson04Pages, path.join(dist, 'lesson-04'), { recursive: true })
 await cp(lesson05Pages, path.join(dist, 'lesson-05'), { recursive: true })
 await cp(path.join(lesson05, 'class-notebook.ipynb'), path.join(dist, 'lesson-05', 'class-notebook.ipynb'))
+
+// Every notebook copied above gets a read-only page next to it, and the
+// trusted ones can run in the browser with JupyterLite. See site/notebooks/.
+await publishNotebooks({ root, dist })
 
 if (process.env.SITE_ANALYTICS_TOKEN) {
   const token = process.env.SITE_ANALYTICS_TOKEN
