@@ -1,0 +1,696 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+  <meta name="theme-color" content="#f7f5ef">
+  <title>Lesson 04 · Reference notebook · ACTAM</title>
+  <link rel="stylesheet" href="../../assets/katex/katex.min.css">
+  <style>
+:root { color-scheme: light; color: #182f3a; background: #f7f5ef; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+* { box-sizing: border-box; }
+body { margin: 0; background: #f7f5ef; }
+main { max-width: 900px; margin: auto; padding: 40px 24px 80px; }
+.crumbs ol { display: flex; flex-wrap: wrap; gap: 0 .6em; margin: 0; padding: 0; list-style: none; font: .8rem ui-monospace, Menlo, monospace; letter-spacing: .12em; text-transform: uppercase; color: #42666a; }
+.crumbs li + li::before { content: '›'; margin-right: .6em; }
+.crumbs a { color: inherit; text-decoration: none; }
+.crumbs a:hover { text-decoration: underline; }
+h1 { font: 700 clamp(2rem, 6vw, 3.4rem)/1.08 ui-monospace, Menlo, monospace; letter-spacing: -.05em; margin: 22px 0 18px; }
+.bar { display: flex; flex-wrap: wrap; gap: 10px; }
+.button { font: .9rem ui-monospace, Menlo, monospace; padding: 9px 14px; border: 1px solid #087e83; color: #087e83; text-decoration: none; background: #fff; }
+.button.primary { background: #087e83; color: #fff; }
+.button:focus-visible { outline: 3px solid #cb4f38; outline-offset: 3px; }
+.hint { color: #42666a; font-size: .85rem; line-height: 1.5; margin: 12px 0 28px; max-width: 640px; }
+.cell { margin: 0 0 14px; }
+.markdown { line-height: 1.65; }
+.markdown h1, .markdown h2, .markdown h3 { font-family: ui-monospace, Menlo, monospace; letter-spacing: -.02em; line-height: 1.2; margin: 1.6em 0 .5em; }
+.markdown h1 { font-size: 1.8rem; } .markdown h2 { font-size: 1.4rem; } .markdown h3 { font-size: 1.1rem; }
+.markdown code { font: .88em ui-monospace, Menlo, monospace; background: #e5ece6; color: #0b5f63; padding: 1px 4px; }
+.markdown pre code { background: none; color: inherit; padding: 0; }
+.markdown table { border-collapse: collapse; margin: 12px 0; }
+.markdown th, .markdown td { border: 1px solid #ccd4cf; padding: 5px 10px; text-align: left; }
+.markdown img { max-width: 100%; }
+.markdown a { color: #087e83; }
+.markdown details { margin: 12px 0; }
+.markdown summary { cursor: pointer; color: #087e83; }
+.markdown blockquote { margin: 0; padding-left: 14px; border-left: 3px solid #087e83; color: #42666a; }
+pre { margin: 0; padding: 14px 16px; overflow-x: auto; font: .82rem/1.55 ui-monospace, Menlo, monospace; border: 1px solid #d5ddd8; }
+pre.shiki { background: #fbfcfa !important; }
+pre.plain { background: #fbfcfa; }
+.code pre { border-left: 3px solid #087e83; }
+.katex-display { overflow-x: auto; overflow-y: hidden; }
+@media (max-width: 620px) { main { padding: 28px 16px 60px; } }
+</style>
+</head>
+<body>
+<main>
+  <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../../">ACTAM</a></li><li><a href="../../#lesson-04">Lesson 04</a></li><li><span aria-current="page">Reference notebook</span></li></ol></nav>
+  <h1>Reference notebook</h1>
+  <div class="bar">
+    <a class="button" href="../notebook.ipynb" download="actam-lesson-04-notebook.ipynb">Download .ipynb</a>
+    <a class="button primary" href="../../lite/notebooks/index.html?path=lesson-04%2Fnotebook.ipynb">Open in the browser</a>
+  </div>
+  <p class="hint">“Open in the browser” runs the notebook on your computer with JupyterLite: no installation, no account. Your changes stay in that browser: download the notebook to keep them.</p>
+  <article class="notebook">
+<section class="cell markdown"><h1>From sounds to a rhythmic language</h1>
+<h2>Lesson 04 · ACTAM 2026</h2>
+<p>We have a small drum kit. How can we describe a rhythm without writing out every sample?</p>
+<p>We will start by placing sounds in time, then invent a small notation for hits and rests. A pattern will become a track; several tracks will become a piece. Our functions still return ordinary lists of samples.</p>
+</section>
+<section class="cell markdown"><h3>How to use this notebook</h3>
+<p>Run the cells from top to bottom. At each <strong>Your turn</strong>, predict or try before reading the worked example. Click the players to listen, starting at a low volume. Playback is only a renderer; automatic normalisation and autoplay are disabled.</p>
+<p><strong>Recall:</strong> lists, slicing, repetition, comprehensions, functions, loops, tuples, <code>zip</code>, conditionals and mixing come from lessons01–03. We explain string notation locally, so the text workshop is not a prerequisite.</p>
+<p><strong>New or made explicit here:</strong> passing a function as an argument, describing tracks as data, and reading a small pattern language. Functions stored as values appeared in the live lesson03 draft; the refined lesson03 notebook did not develop them. We will revisit that idea step by step.</p>
+<p>The final sections are optional: a character-to-function dictionary, a compact mixer, and ten listening challenges. You do not need to finish them all in one session.</p>
+</section>
+<section class="cell markdown"><h2>1. Bring back the kit</h2>
+<p>This is the kit from lesson03: sources, envelopes, a VCA, a two-input mixer and four instruments. Run the following cell; there is no need to rebuild the instruments today.</p>
+<p>Keep one distinction in mind: <code>mix(a, b, ga, gb)</code> adds equally long signals with independent gains. We will keep that function unchanged and give the future multitrack mixer a different name.</p>
+<p>The square-wave source is still a simple, non-band-limited model. These are sound-design recipes, not complete physical models.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#005CC5">SR</span><span style="color:#D73A49"> =</span><span style="color:#005CC5"> 48000</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">from</span><span style="color:#24292E"> math </span><span style="color:#D73A49">import</span><span style="color:#24292E"> exp</span></span>
+<span class="line"><span style="color:#D73A49">from</span><span style="color:#24292E"> random </span><span style="color:#D73A49">import</span><span style="color:#24292E"> random</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> vca</span><span style="color:#24292E">(wave, signal):</span></span>
+<span class="line"><span style="color:#D73A49">    if</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(wave) </span><span style="color:#D73A49">!=</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(signal):</span></span>
+<span class="line"><span style="color:#D73A49">        raise</span><span style="color:#005CC5"> ValueError</span><span style="color:#24292E">(</span><span style="color:#032F62">"The sound and control signal must have equal lengths."</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> [x </span><span style="color:#D73A49">*</span><span style="color:#24292E"> gain </span><span style="color:#D73A49">for</span><span style="color:#24292E"> x, gain </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> zip</span><span style="color:#24292E">(wave, signal)]</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> noise</span><span style="color:#24292E">(duration</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.05</span><span style="color:#24292E">, amplitude</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.15</span><span style="color:#24292E">, sample_rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#24292E">    n </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(duration </span><span style="color:#D73A49">*</span><span style="color:#24292E"> sample_rate)</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> [amplitude </span><span style="color:#D73A49">*</span><span style="color:#24292E"> (</span><span style="color:#005CC5">2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> random() </span><span style="color:#D73A49">-</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> _ </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> range</span><span style="color:#24292E">(n)]</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> envelope_lin</span><span style="color:#24292E">(duration</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.05</span><span style="color:#24292E">, sample_rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#24292E">    n </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(duration </span><span style="color:#D73A49">*</span><span style="color:#24292E"> sample_rate)</span></span>
+<span class="line"><span style="color:#24292E">    denominator </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> max</span><span style="color:#24292E">(</span><span style="color:#005CC5">1</span><span style="color:#24292E">, n </span><span style="color:#D73A49">-</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> [</span><span style="color:#005CC5">1</span><span style="color:#D73A49"> -</span><span style="color:#24292E"> i </span><span style="color:#D73A49">/</span><span style="color:#24292E"> denominator </span><span style="color:#D73A49">for</span><span style="color:#24292E"> i </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> range</span><span style="color:#24292E">(n)]</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> square_wave_f</span><span style="color:#24292E">(f, sample_rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">, amplitude</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.15</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#24292E">    phase </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 0.0</span></span>
+<span class="line"><span style="color:#24292E">    wave </span><span style="color:#D73A49">=</span><span style="color:#24292E"> []</span></span>
+<span class="line"><span style="color:#D73A49">    for</span><span style="color:#24292E"> frequency </span><span style="color:#D73A49">in</span><span style="color:#24292E"> f:</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#D73A49"> not</span><span style="color:#005CC5"> 0</span><span style="color:#D73A49"> &#x3C;</span><span style="color:#24292E"> frequency </span><span style="color:#D73A49">&#x3C;</span><span style="color:#24292E"> sample_rate </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> 2</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#D73A49">            raise</span><span style="color:#005CC5"> ValueError</span><span style="color:#24292E">(</span><span style="color:#032F62">"Each frequency must be positive and below half the sample rate."</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">        wave.append(</span><span style="color:#D73A49">-</span><span style="color:#24292E">amplitude </span><span style="color:#D73A49">if</span><span style="color:#24292E"> phase </span><span style="color:#D73A49">&#x3C;</span><span style="color:#005CC5"> 0.5</span><span style="color:#D73A49"> else</span><span style="color:#24292E"> amplitude)</span></span>
+<span class="line"><span style="color:#24292E">        phase </span><span style="color:#D73A49">=</span><span style="color:#24292E"> (phase </span><span style="color:#D73A49">+</span><span style="color:#24292E"> frequency </span><span style="color:#D73A49">/</span><span style="color:#24292E"> sample_rate) </span><span style="color:#D73A49">%</span><span style="color:#005CC5"> 1</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> wave</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> edge_fade</span><span style="color:#24292E">(wave, attack</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.001</span><span style="color:#24292E">, release</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.005</span><span style="color:#24292E">, sample_rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#24292E">    n </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(wave)</span></span>
+<span class="line"><span style="color:#24292E">    attack_samples </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> max</span><span style="color:#24292E">(</span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#005CC5">round</span><span style="color:#24292E">(attack </span><span style="color:#D73A49">*</span><span style="color:#24292E"> sample_rate))</span></span>
+<span class="line"><span style="color:#24292E">    release_samples </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> max</span><span style="color:#24292E">(</span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#005CC5">round</span><span style="color:#24292E">(release </span><span style="color:#D73A49">*</span><span style="color:#24292E"> sample_rate))</span></span>
+<span class="line"><span style="color:#24292E">    edge </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span></span>
+<span class="line"><span style="color:#005CC5">        min</span><span style="color:#24292E">(</span><span style="color:#005CC5">1.0</span><span style="color:#24292E">, i </span><span style="color:#D73A49">/</span><span style="color:#24292E"> attack_samples, (n </span><span style="color:#D73A49">-</span><span style="color:#005CC5"> 1</span><span style="color:#D73A49"> -</span><span style="color:#24292E"> i) </span><span style="color:#D73A49">/</span><span style="color:#24292E"> release_samples)</span></span>
+<span class="line"><span style="color:#D73A49">        for</span><span style="color:#24292E"> i </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> range</span><span style="color:#24292E">(n)</span></span>
+<span class="line"><span style="color:#24292E">    ]</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> vca(wave, edge)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> envelope_exp</span><span style="color:#24292E">(duration</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.05</span><span style="color:#24292E">, tau</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.012</span><span style="color:#24292E">, sample_rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#D73A49">    if</span><span style="color:#24292E"> tau </span><span style="color:#D73A49">&#x3C;=</span><span style="color:#005CC5"> 0</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#D73A49">        raise</span><span style="color:#005CC5"> ValueError</span><span style="color:#24292E">(</span><span style="color:#032F62">"tau must be positive."</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">    n </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(duration </span><span style="color:#D73A49">*</span><span style="color:#24292E"> sample_rate)</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> [exp(</span><span style="color:#D73A49">-</span><span style="color:#24292E">(i </span><span style="color:#D73A49">/</span><span style="color:#24292E"> sample_rate) </span><span style="color:#D73A49">/</span><span style="color:#24292E"> tau) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> i </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> range</span><span style="color:#24292E">(n)]</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> closed_hat</span><span style="color:#24292E">(duration</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.06</span><span style="color:#24292E">, tau</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.010</span><span style="color:#24292E">, amplitude</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.15</span><span style="color:#24292E">, sample_rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#24292E">    source </span><span style="color:#D73A49">=</span><span style="color:#24292E"> noise(duration, </span><span style="color:#E36209">amplitude</span><span style="color:#D73A49">=</span><span style="color:#24292E">amplitude, </span><span style="color:#E36209">sample_rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate)</span></span>
+<span class="line"><span style="color:#24292E">    shape </span><span style="color:#D73A49">=</span><span style="color:#24292E"> envelope_exp(duration, </span><span style="color:#E36209">tau</span><span style="color:#D73A49">=</span><span style="color:#24292E">tau, </span><span style="color:#E36209">sample_rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate)</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> edge_fade(vca(source, shape), </span><span style="color:#E36209">sample_rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> open_hat</span><span style="color:#24292E">(duration</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.30</span><span style="color:#24292E">, tau</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.070</span><span style="color:#24292E">, amplitude</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.15</span><span style="color:#24292E">, sample_rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#24292E">    source </span><span style="color:#D73A49">=</span><span style="color:#24292E"> noise(duration, </span><span style="color:#E36209">amplitude</span><span style="color:#D73A49">=</span><span style="color:#24292E">amplitude, </span><span style="color:#E36209">sample_rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate)</span></span>
+<span class="line"><span style="color:#24292E">    shape </span><span style="color:#D73A49">=</span><span style="color:#24292E"> envelope_exp(duration, </span><span style="color:#E36209">tau</span><span style="color:#D73A49">=</span><span style="color:#24292E">tau, </span><span style="color:#E36209">sample_rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate)</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> edge_fade(vca(source, shape), </span><span style="color:#E36209">sample_rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> kick_raw</span><span style="color:#24292E">(</span></span>
+<span class="line"><span style="color:#24292E">    duration</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.25</span><span style="color:#24292E">, start_hz</span><span style="color:#D73A49">=</span><span style="color:#005CC5">180</span><span style="color:#24292E">, end_hz</span><span style="color:#D73A49">=</span><span style="color:#005CC5">45</span><span style="color:#24292E">,</span></span>
+<span class="line"><span style="color:#24292E">    pitch_tau</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.025</span><span style="color:#24292E">, amp_tau</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.060</span><span style="color:#24292E">,</span></span>
+<span class="line"><span style="color:#24292E">    amplitude</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.20</span><span style="color:#24292E">, sample_rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">,</span></span>
+<span class="line"><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#24292E">    pitch_shape </span><span style="color:#D73A49">=</span><span style="color:#24292E"> envelope_exp(duration, </span><span style="color:#E36209">tau</span><span style="color:#D73A49">=</span><span style="color:#24292E">pitch_tau, </span><span style="color:#E36209">sample_rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate)</span></span>
+<span class="line"><span style="color:#24292E">    pitch </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [end_hz </span><span style="color:#D73A49">+</span><span style="color:#24292E"> (start_hz </span><span style="color:#D73A49">-</span><span style="color:#24292E"> end_hz) </span><span style="color:#D73A49">*</span><span style="color:#24292E"> value </span><span style="color:#D73A49">for</span><span style="color:#24292E"> value </span><span style="color:#D73A49">in</span><span style="color:#24292E"> pitch_shape]</span></span>
+<span class="line"><span style="color:#24292E">    body </span><span style="color:#D73A49">=</span><span style="color:#24292E"> square_wave_f(pitch, </span><span style="color:#E36209">sample_rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate, </span><span style="color:#E36209">amplitude</span><span style="color:#D73A49">=</span><span style="color:#24292E">amplitude)</span></span>
+<span class="line"><span style="color:#24292E">    shape </span><span style="color:#D73A49">=</span><span style="color:#24292E"> envelope_exp(duration, </span><span style="color:#E36209">tau</span><span style="color:#D73A49">=</span><span style="color:#24292E">amp_tau, </span><span style="color:#E36209">sample_rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate)</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> vca(body, shape)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> kick</span><span style="color:#24292E">(</span></span>
+<span class="line"><span style="color:#24292E">    duration</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.25</span><span style="color:#24292E">, start_hz</span><span style="color:#D73A49">=</span><span style="color:#005CC5">180</span><span style="color:#24292E">, end_hz</span><span style="color:#D73A49">=</span><span style="color:#005CC5">45</span><span style="color:#24292E">,</span></span>
+<span class="line"><span style="color:#24292E">    pitch_tau</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.025</span><span style="color:#24292E">, amp_tau</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.060</span><span style="color:#24292E">,</span></span>
+<span class="line"><span style="color:#24292E">    amplitude</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.20</span><span style="color:#24292E">, sample_rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">,</span></span>
+<span class="line"><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#24292E">    wave </span><span style="color:#D73A49">=</span><span style="color:#24292E"> kick_raw(</span></span>
+<span class="line"><span style="color:#E36209">        duration</span><span style="color:#D73A49">=</span><span style="color:#24292E">duration, </span><span style="color:#E36209">start_hz</span><span style="color:#D73A49">=</span><span style="color:#24292E">start_hz, </span><span style="color:#E36209">end_hz</span><span style="color:#D73A49">=</span><span style="color:#24292E">end_hz,</span></span>
+<span class="line"><span style="color:#E36209">        pitch_tau</span><span style="color:#D73A49">=</span><span style="color:#24292E">pitch_tau, </span><span style="color:#E36209">amp_tau</span><span style="color:#D73A49">=</span><span style="color:#24292E">amp_tau,</span></span>
+<span class="line"><span style="color:#E36209">        amplitude</span><span style="color:#D73A49">=</span><span style="color:#24292E">amplitude, </span><span style="color:#E36209">sample_rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate,</span></span>
+<span class="line"><span style="color:#24292E">    )</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> edge_fade(wave, </span><span style="color:#E36209">sample_rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> mix</span><span style="color:#24292E">(a, b, ga</span><span style="color:#D73A49">=</span><span style="color:#005CC5">1.0</span><span style="color:#24292E">, gb</span><span style="color:#D73A49">=</span><span style="color:#005CC5">1.0</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#D73A49">    if</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(a) </span><span style="color:#D73A49">!=</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(b):</span></span>
+<span class="line"><span style="color:#D73A49">        raise</span><span style="color:#005CC5"> ValueError</span><span style="color:#24292E">(</span><span style="color:#032F62">"Pad the shorter sound with silence before mixing."</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> [ga </span><span style="color:#D73A49">*</span><span style="color:#24292E"> x </span><span style="color:#D73A49">+</span><span style="color:#24292E"> gb </span><span style="color:#D73A49">*</span><span style="color:#24292E"> y </span><span style="color:#D73A49">for</span><span style="color:#24292E"> x, y </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> zip</span><span style="color:#24292E">(a, b)]</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> snare</span><span style="color:#24292E">(</span></span>
+<span class="line"><span style="color:#24292E">    duration</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.20</span><span style="color:#24292E">, amplitude</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.15</span><span style="color:#24292E">, noise_gain</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.5</span><span style="color:#24292E">,</span></span>
+<span class="line"><span style="color:#24292E">    sample_rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">,</span></span>
+<span class="line"><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#24292E">    pitch </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span></span>
+<span class="line"><span style="color:#005CC5">        180</span><span style="color:#D73A49"> +</span><span style="color:#005CC5"> 120</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> value</span></span>
+<span class="line"><span style="color:#D73A49">        for</span><span style="color:#24292E"> value </span><span style="color:#D73A49">in</span><span style="color:#24292E"> envelope_exp(duration, </span><span style="color:#E36209">tau</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.010</span><span style="color:#24292E">, </span><span style="color:#E36209">sample_rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate)</span></span>
+<span class="line"><span style="color:#24292E">    ]</span></span>
+<span class="line"><span style="color:#24292E">    body </span><span style="color:#D73A49">=</span><span style="color:#24292E"> vca(</span></span>
+<span class="line"><span style="color:#24292E">        square_wave_f(pitch, </span><span style="color:#E36209">amplitude</span><span style="color:#D73A49">=</span><span style="color:#24292E">amplitude, </span><span style="color:#E36209">sample_rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate),</span></span>
+<span class="line"><span style="color:#24292E">        envelope_exp(duration, </span><span style="color:#E36209">tau</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.025</span><span style="color:#24292E">, </span><span style="color:#E36209">sample_rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate),</span></span>
+<span class="line"><span style="color:#24292E">    )</span></span>
+<span class="line"><span style="color:#24292E">    wires </span><span style="color:#D73A49">=</span><span style="color:#24292E"> vca(</span></span>
+<span class="line"><span style="color:#24292E">        noise(duration, </span><span style="color:#E36209">amplitude</span><span style="color:#D73A49">=</span><span style="color:#24292E">amplitude, </span><span style="color:#E36209">sample_rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate),</span></span>
+<span class="line"><span style="color:#24292E">        envelope_exp(duration, </span><span style="color:#E36209">tau</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.055</span><span style="color:#24292E">, </span><span style="color:#E36209">sample_rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate),</span></span>
+<span class="line"><span style="color:#24292E">    )</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> edge_fade(</span></span>
+<span class="line"><span style="color:#24292E">        mix(body, wires, </span><span style="color:#E36209">ga</span><span style="color:#D73A49">=</span><span style="color:#005CC5">1.0</span><span style="color:#24292E">, </span><span style="color:#E36209">gb</span><span style="color:#D73A49">=</span><span style="color:#24292E">noise_gain),</span></span>
+<span class="line"><span style="color:#E36209">        sample_rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate,</span></span>
+<span class="line"><span style="color:#24292E">    )</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">from</span><span style="color:#24292E"> IPython.display </span><span style="color:#D73A49">import</span><span style="color:#24292E"> Audio</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> play</span><span style="color:#24292E">(wave, sample_rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> Audio(wave, </span><span style="color:#E36209">rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate, </span><span style="color:#E36209">normalize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">False</span><span style="color:#24292E">, </span><span style="color:#E36209">autoplay</span><span style="color:#D73A49">=</span><span style="color:#005CC5">False</span><span style="color:#24292E">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">play(snare())</span></span></code></pre></section>
+<section class="cell markdown"><h3>Your turn · A control we already know</h3>
+<p>Reuse the same body/noise balance idea from lesson03. Compare <code>snare(noise_gain=0)</code> with <code>snare(noise_gain=1)</code>.</p>
+<p>The first removes the noisy wires, not the pitched body. Repeated calls generate fresh noise, so the exact samples also vary. All generators and renderers must agree on the sample rate; a plain sample list does not store it.</p>
+</section>
+<section class="cell markdown"><h2>2. Give a sound a slot</h2>
+<p>A <strong>slot</strong> is the amount of time reserved for a hit or a rest. For now, a sound that is too long will be cut; one that is too short will be followed by silence. Preserving overlapping tails will need a different scheduler.</p>
+<p><strong>Recall:</strong> a slice keeps part of a list, <code>+</code> concatenates lists, and <code>[0] * n</code> makes silence. We use <code>max</code> to make the amount of padding explicitly nonnegative.</p>
+<p>Use a nonnegative integer number of samples. For these inputs, the helper returns a new list of exactly that length; we state the assumption rather than checking it in the function.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> fit</span><span style="color:#24292E">(wave, n_samples):</span></span>
+<span class="line"><span style="color:#24292E">    padding </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> max</span><span style="color:#24292E">(</span><span style="color:#005CC5">0</span><span style="color:#24292E">, n_samples </span><span style="color:#D73A49">-</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(wave))</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> wave[:n_samples] </span><span style="color:#D73A49">+</span><span style="color:#24292E"> [</span><span style="color:#005CC5">0</span><span style="color:#24292E">] </span><span style="color:#D73A49">*</span><span style="color:#24292E"> padding</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(fit([</span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">3</span><span style="color:#24292E">], </span><span style="color:#005CC5">5</span><span style="color:#24292E">))</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(fit([</span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">3</span><span style="color:#24292E">], </span><span style="color:#005CC5">2</span><span style="color:#24292E">))</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(fit([], </span><span style="color:#005CC5">4</span><span style="color:#24292E">))</span></span></code></pre></section>
+<section class="cell markdown"><h3>Your turn · Predict before listening</h3>
+<p>What will <code>fit([1, 2, 3], 0)</code> return? What is the difference between <code>[]</code> and <code>fit([], 4)</code>?</p>
+<p>An empty list occupies no time. Four zero samples occupy four sample periods. Cutting a sound can introduce an abrupt boundary; our slot model is intentionally simple.</p>
+</section>
+<section class="cell markdown"><h2>3. From tempo to sample counts</h2>
+<p>Here one beat is a quarter note. At 100 beats per minute, a beat lasts <code>60 / 100</code> seconds. An eighth note lasts half as long, and a sixteenth lasts a quarter as long.</p>
+<p>We will call the duration of one pattern character <strong>step_s</strong>, not beat_s: a step may represent an eighth, a sixteenth, or another subdivision.</p>
+<p>Round a duration in seconds times the sample rate to obtain an integer number of samples. Repeating rounded slots can introduce a tiny timing error; we use one consistent slot size throughout a pattern.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">bpm </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 100</span></span>
+<span class="line"><span style="color:#24292E">quarter_s </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 60</span><span style="color:#D73A49"> /</span><span style="color:#24292E"> bpm</span></span>
+<span class="line"><span style="color:#24292E">eighth_s </span><span style="color:#D73A49">=</span><span style="color:#24292E"> quarter_s </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> 2</span></span>
+<span class="line"><span style="color:#24292E">step_s </span><span style="color:#D73A49">=</span><span style="color:#24292E"> quarter_s </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> 4</span></span>
+<span class="line"><span style="color:#24292E">step_samples </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(step_s </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> SR</span><span style="color:#24292E">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(quarter_s, eighth_s, step_s)</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(step_samples)</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">one_hat </span><span style="color:#D73A49">=</span><span style="color:#24292E"> fit(closed_hat(), </span><span style="color:#005CC5">round</span><span style="color:#24292E">(quarter_s </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> SR</span><span style="color:#24292E">))</span></span>
+<span class="line"><span style="color:#24292E">four_hats </span><span style="color:#D73A49">=</span><span style="color:#24292E"> one_hat </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 4</span></span>
+<span class="line"><span style="color:#24292E">play(four_hats)</span></span></code></pre></section>
+<section class="cell markdown"><h3>Your turn · Same hit or another hit?</h3>
+<p><code>one_hat * 4</code> repeats exactly the same sample buffer. Calling <code>closed_hat()</code> four times produces four fresh noise realisations.</p>
+<p>Try the following version. Both have the same timing; what is reused in each case?</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">fresh_hats </span><span style="color:#D73A49">=</span><span style="color:#24292E"> []</span></span>
+<span class="line"><span style="color:#D73A49">for</span><span style="color:#24292E"> i </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> range</span><span style="color:#24292E">(</span><span style="color:#005CC5">4</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#24292E">    fresh_hats </span><span style="color:#D73A49">=</span><span style="color:#24292E"> fresh_hats </span><span style="color:#D73A49">+</span><span style="color:#24292E"> fit(closed_hat(), </span><span style="color:#005CC5">round</span><span style="color:#24292E">(quarter_s </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> SR</span><span style="color:#24292E">))</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">play(fresh_hats)</span></span></code></pre></section>
+<section class="cell markdown"><h2>4. After each other, or together?</h2>
+<p>Build a four-beat kick part using hits and rests. Build an eight-note hat part over the same duration.</p>
+<p>List <code>+</code> places signals <strong>after each other</strong>. Our <code>mix</code> adds their samples <strong>at the same time</strong>. Predict the lengths before listening.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">quarter_samples </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(quarter_s </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> SR</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">eighth_samples </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(eighth_s </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> SR</span><span style="color:#24292E">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">kick_slot </span><span style="color:#D73A49">=</span><span style="color:#24292E"> fit(kick(), quarter_samples)</span></span>
+<span class="line"><span style="color:#24292E">rest_slot </span><span style="color:#D73A49">=</span><span style="color:#24292E"> fit([], quarter_samples)</span></span>
+<span class="line"><span style="color:#24292E">kicks </span><span style="color:#D73A49">=</span><span style="color:#24292E"> kick_slot </span><span style="color:#D73A49">+</span><span style="color:#24292E"> rest_slot </span><span style="color:#D73A49">+</span><span style="color:#24292E"> kick_slot </span><span style="color:#D73A49">+</span><span style="color:#24292E"> rest_slot</span></span>
+<span class="line"><span style="color:#24292E">hats </span><span style="color:#D73A49">=</span><span style="color:#24292E"> fit(closed_hat(), eighth_samples) </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 8</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(</span><span style="color:#005CC5">len</span><span style="color:#24292E">(kicks), </span><span style="color:#005CC5">len</span><span style="color:#24292E">(hats))</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(</span><span style="color:#005CC5">len</span><span style="color:#24292E">(kicks </span><span style="color:#D73A49">+</span><span style="color:#24292E"> hats), </span><span style="color:#005CC5">len</span><span style="color:#24292E">(mix(kicks, hats)))</span></span>
+<span class="line"><span style="color:#24292E">play(mix(kicks, hats, </span><span style="color:#E36209">ga</span><span style="color:#D73A49">=</span><span style="color:#005CC5">1.0</span><span style="color:#24292E">, </span><span style="color:#E36209">gb</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.7</span><span style="color:#24292E">))</span></span></code></pre></section>
+<section class="cell markdown"><h3>Your turn · Change one relationship</h3>
+<p>Move the second kick to the fourth beat. Then make the hats quieter without changing their timing.</p>
+<p>At this tempo the rounded eighth-note and quarter-note lengths line up exactly. At other tempos, separately rounding different subdivisions need not give equal totals. A shared smallest step avoids that mismatch.</p>
+</section>
+<section class="cell markdown"><h2>5. Join a list of slots</h2>
+<p>Reuse <code>sum(parts, [])</code> from lesson02 to place sample lists one after another.</p>
+<p><strong>Recall:</strong> the empty list is the starting value. This behaves like <code>[] + parts[0] + parts[1] + ...</code>: concatenation, not simultaneous mixing.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">parts </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [[</span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">], [], [</span><span style="color:#005CC5">3</span><span style="color:#24292E">], [</span><span style="color:#005CC5">4</span><span style="color:#24292E">, </span><span style="color:#005CC5">5</span><span style="color:#24292E">]]</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(</span><span style="color:#005CC5">sum</span><span style="color:#24292E">(parts, []))</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">parts </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [kick(), [], kick(), []]</span></span>
+<span class="line"><span style="color:#24292E">slots </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [fit(part, quarter_samples) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> part </span><span style="color:#D73A49">in</span><span style="color:#24292E"> parts]</span></span>
+<span class="line"><span style="color:#24292E">play(</span><span style="color:#005CC5">sum</span><span style="color:#24292E">(slots, []))</span></span></code></pre></section>
+<section class="cell markdown"><p>Without <code>[]</code>, <code>sum</code> starts from 0, which cannot be added to a list. As in lesson02, repeated list addition is convenient for short examples but copies data; it is not an efficient long-track engine.</p>
+</section>
+<section class="cell markdown"><h2>6. A function is also a value</h2>
+<p>We have called <code>kick()</code> many times. What does <code>kick</code>, without parentheses, mean?</p>
+<ul>
+<li><code>kick</code> refers to the function: a recipe we can use later.</li>
+<li><code>kick()</code> calls that function now and returns samples.</li>
+<li>Assigning <code>instrument = kick</code> gives another name to the same function. It does not generate a sound.</li>
+</ul>
+<p>The live lesson03 draft stored functions inside a kit. Here we make the mechanism explicit before using it in a pattern reader.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">instrument </span><span style="color:#D73A49">=</span><span style="color:#24292E"> kick</span></span>
+<span class="line"><span style="color:#24292E">wave </span><span style="color:#D73A49">=</span><span style="color:#24292E"> instrument(</span><span style="color:#E36209">sample_rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(</span><span style="color:#005CC5">len</span><span style="color:#24292E">(wave))</span></span>
+<span class="line"><span style="color:#24292E">play(wave)</span></span></code></pre></section>
+<section class="cell markdown"><h3>Pass the recipe to another function</h3>
+<p>A parameter can receive a function just as it can receive a number or a list. Inside <code>make_hit</code>, the name <code>instrument</code> refers to whichever function the caller supplied.</p>
+<p>Our instrument contract is small: accept <code>sample_rate=...</code> and return a list of samples at that rate. The kit already does this.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> make_hit</span><span style="color:#24292E">(instrument, sample_rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> instrument(</span><span style="color:#E36209">sample_rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">play(make_hit(closed_hat))</span></span></code></pre></section>
+<section class="cell markdown"><h3>Your turn · Locate the call</h3>
+<p>Change <code>closed_hat</code> to <code>snare</code>. Point to the parentheses that actually generate the sound.</p>
+<p>Why is <code>make_hit(kick())</code> different? It would pass a sample list, then try to call that list as a function. Pass <code>kick</code> when the receiving function needs a recipe.</p>
+</section>
+<section class="cell markdown"><h2>7. A tiny language for hits and rests</h2>
+<p>Let <code>&quot;x&quot;</code> mean “make a hit” and <code>&quot;.&quot;</code> mean “leave a silent step”. For example, <code>&quot;x.x.&quot;</code> has four steps and two hits.</p>
+<p><strong>Text reminder:</strong> quotes make a string; a loop visits its characters in order; <code>len(pattern)</code> counts them; multiplying a string repeats it. The quotes themselves are not part of the pattern.</p>
+<p>Before generating audio, translate each symbol into a small decision: 1 for a hit, 0 for a rest. We call this <code>read_pattern</code>, rather than a generic <code>parse</code>, because its accepted language is deliberately narrow.</p>
+</section>
+<section class="cell markdown"><h3>Recall · Conditions and errors</h3>
+<p><code>==</code> compares values; <code>=</code> assigns a value. An <code>if</code> statement executes its indented body when the comparison is true.</p>
+<p><strong>New spelling:</strong> <code>elif</code> means “otherwise, if”. It tests another condition only when the earlier one failed. <code>else</code> handles the remaining case. <code>raise ValueError(...)</code> reports an invalid input and stops the call.</p>
+<p>The tempting rule “anything except x is silence” would hide typing mistakes. We accept exactly <code>x</code> and <code>.</code>; spaces, uppercase letters and other symbols are errors.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> read_pattern</span><span style="color:#24292E">(pattern):</span></span>
+<span class="line"><span style="color:#24292E">    steps </span><span style="color:#D73A49">=</span><span style="color:#24292E"> []</span></span>
+<span class="line"><span style="color:#D73A49">    for</span><span style="color:#24292E"> symbol </span><span style="color:#D73A49">in</span><span style="color:#24292E"> pattern:</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#24292E"> symbol </span><span style="color:#D73A49">==</span><span style="color:#032F62"> "x"</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#24292E">            steps.append(</span><span style="color:#005CC5">1</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#D73A49">        elif</span><span style="color:#24292E"> symbol </span><span style="color:#D73A49">==</span><span style="color:#032F62"> "."</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#24292E">            steps.append(</span><span style="color:#005CC5">0</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#D73A49">        else</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#D73A49">            raise</span><span style="color:#005CC5"> ValueError</span><span style="color:#24292E">(</span><span style="color:#032F62">"Use only x for a hit and . for a rest."</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> steps</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(read_pattern(</span><span style="color:#032F62">"x.x."</span><span style="color:#24292E">))</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(read_pattern(</span><span style="color:#032F62">"x."</span><span style="color:#D73A49"> *</span><span style="color:#005CC5"> 4</span><span style="color:#24292E">))</span></span></code></pre></section>
+<section class="cell markdown"><h3>Your turn · Read without sound</h3>
+<p>Predict the result of <code>read_pattern(&quot;.xx...&quot;)</code>. How many steps? How many hits?</p>
+<p>In a separate scratch cell, try <code>read_pattern(&quot;x X.&quot;)</code>. Read the error, then fix the input. What should an empty pattern produce?</p>
+<p>We validate the complete text before generating any audio, so a typo cannot leave us with a partly rendered result.</p>
+</section>
+<section class="cell markdown"><h2>8. Turn decisions into samples</h2>
+<p>The reader answers <strong>what happens at each step</strong>. The renderer answers <strong>how that becomes sound</strong>.</p>
+<p>For each decision, generate a fresh hit or an empty buffer, fit it to one step, and concatenate the slots. The same sample rate is passed to the instrument and used to calculate the slot length.</p>
+<p>For all the renderers below, use positive sample rates and step durations yielding at least one sample after rounding. We state these assumptions rather than checking them repeatedly. Checks for matching signal lengths and recognised pattern symbols remain because they explain the model.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> render_pattern</span><span style="color:#24292E">(pattern, instrument, step_s, sample_rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#24292E">    n </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(step_s </span><span style="color:#D73A49">*</span><span style="color:#24292E"> sample_rate)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">    steps </span><span style="color:#D73A49">=</span><span style="color:#24292E"> read_pattern(pattern)</span></span>
+<span class="line"><span style="color:#24292E">    slots </span><span style="color:#D73A49">=</span><span style="color:#24292E"> []</span></span>
+<span class="line"><span style="color:#D73A49">    for</span><span style="color:#24292E"> hit </span><span style="color:#D73A49">in</span><span style="color:#24292E"> steps:</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#24292E"> hit </span><span style="color:#D73A49">==</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#24292E">            wave </span><span style="color:#D73A49">=</span><span style="color:#24292E"> instrument(</span><span style="color:#E36209">sample_rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate)</span></span>
+<span class="line"><span style="color:#D73A49">        else</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#24292E">            wave </span><span style="color:#D73A49">=</span><span style="color:#24292E"> []</span></span>
+<span class="line"><span style="color:#24292E">        slots.append(fit(wave, n))</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#005CC5"> sum</span><span style="color:#24292E">(slots, [])</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">play(render_pattern(</span><span style="color:#032F62">"x.x.x.x."</span><span style="color:#24292E">, closed_hat, eighth_s))</span></span></code></pre></section>
+<section class="cell markdown"><h3>Your turn · One description, several interpretations</h3>
+<ol>
+<li>Keep the pattern but switch instrument.</li>
+<li>Keep the instrument but halve <code>step_s</code>.</li>
+<li>Change just one character.</li>
+<li>Predict the sample count before calling <code>len</code>.</li>
+</ol>
+<p>Each valid pattern produces <code>len(pattern) * round(step_s * sample_rate)</code> samples, even if every character is a rest. An empty pattern produces <code>[]</code>; there is nothing to send to a player.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">pattern </span><span style="color:#D73A49">=</span><span style="color:#032F62"> "x...x...x...x..."</span></span>
+<span class="line"><span style="color:#24292E">wave </span><span style="color:#D73A49">=</span><span style="color:#24292E"> render_pattern(pattern, kick, step_s)</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(</span><span style="color:#005CC5">len</span><span style="color:#24292E">(wave), </span><span style="color:#005CC5">len</span><span style="color:#24292E">(pattern) </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(step_s </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> SR</span><span style="color:#24292E">))</span></span>
+<span class="line"><span style="color:#24292E">play(wave)</span></span></code></pre></section>
+<section class="cell markdown"><h3>The sample rate must travel all the way</h3>
+<p>Changing the rate only for padding would put incorrectly generated samples on a new time scale. Use the same value for synthesis, scheduling and playback.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">rate </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 24000</span></span>
+<span class="line"><span style="color:#24292E">wave_at_24k </span><span style="color:#D73A49">=</span><span style="color:#24292E"> render_pattern(</span><span style="color:#032F62">"x.x."</span><span style="color:#24292E">, closed_hat, step_s, </span><span style="color:#E36209">sample_rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">rate)</span></span>
+<span class="line"><span style="color:#24292E">play(wave_at_24k, </span><span style="color:#E36209">sample_rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">rate)</span></span></code></pre></section>
+<section class="cell markdown"><h2>9. A separate mixer for many tracks</h2>
+<p>Keep <code>mix(a, b, ga, gb)</code> for two signals and their gain controls. In particular, <code>snare</code> still uses it for its body and wires.</p>
+<p>Our new <code>mix_tracks(waves)</code> takes a <strong>list of sample lists</strong>, pads shorter tracks with silence, and adds them. Padding extends a track; it does not repeat it.</p>
+<p>Python looks up global function names when a function runs. Redefining <code>mix</code> would therefore also change what <code>snare</code> calls. Different names let both contracts coexist.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> mix_tracks</span><span style="color:#24292E">(waves):</span></span>
+<span class="line"><span style="color:#D73A49">    if</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(waves) </span><span style="color:#D73A49">==</span><span style="color:#005CC5"> 0</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> []</span></span>
+<span class="line"><span style="color:#24292E">    longest </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> max</span><span style="color:#24292E">([</span><span style="color:#005CC5">len</span><span style="color:#24292E">(wave) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> wave </span><span style="color:#D73A49">in</span><span style="color:#24292E"> waves])</span></span>
+<span class="line"><span style="color:#24292E">    result </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#005CC5">0</span><span style="color:#24292E">] </span><span style="color:#D73A49">*</span><span style="color:#24292E"> longest</span></span>
+<span class="line"><span style="color:#D73A49">    for</span><span style="color:#24292E"> wave </span><span style="color:#D73A49">in</span><span style="color:#24292E"> waves:</span></span>
+<span class="line"><span style="color:#24292E">        result </span><span style="color:#D73A49">=</span><span style="color:#24292E"> mix(result, fit(wave, longest))</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> result</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(mix_tracks([[</span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">], [</span><span style="color:#005CC5">10</span><span style="color:#24292E">], []]))</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(mix_tracks([]))</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">kicks </span><span style="color:#D73A49">=</span><span style="color:#24292E"> render_pattern(</span><span style="color:#032F62">"x...x...x...x..."</span><span style="color:#24292E">, kick, step_s)</span></span>
+<span class="line"><span style="color:#24292E">snares </span><span style="color:#D73A49">=</span><span style="color:#24292E"> render_pattern(</span><span style="color:#032F62">"....x.......x..."</span><span style="color:#24292E">, snare, step_s)</span></span>
+<span class="line"><span style="color:#24292E">hats </span><span style="color:#D73A49">=</span><span style="color:#24292E"> render_pattern(</span><span style="color:#032F62">"x.x.x.x.x.x.x.x."</span><span style="color:#24292E">, closed_hat, step_s)</span></span>
+<span class="line"><span style="color:#24292E">play(mix_tracks([kicks, snares, hats]))</span></span></code></pre></section>
+<section class="cell markdown"><h3>Your turn · Ending and balance</h3>
+<p>Shorten the hat pattern. Does the mixer repeat the hats, truncate the other parts, or add silence?</p>
+<p>To change a whole track's gain, scale its samples before mixing: <code>[0.5 * x for x in hats]</code>. This uses the multiplication and comprehension we already know. Try it.</p>
+<p>Adding tracks can push samples outside −1 to +1. Keep source amplitudes and gains moderate. The player does not normalise the result, so gain changes remain meaningful.</p>
+</section>
+<section class="cell markdown"><h2>10. Describe a track as data</h2>
+<p>A track needs a pattern, an instrument and a step duration. Store those three values in a tuple.</p>
+<p><strong>Recall:</strong> tuples group related values; unpacking assigns each component to a name. Here one component happens to be a function. The three tracks below use the same step duration, but they need not have the same number of steps.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">kick_track </span><span style="color:#D73A49">=</span><span style="color:#24292E"> (</span><span style="color:#032F62">"x...x...x...x..."</span><span style="color:#24292E">, kick, step_s)</span></span>
+<span class="line"><span style="color:#24292E">snare_track </span><span style="color:#D73A49">=</span><span style="color:#24292E"> (</span><span style="color:#032F62">"....x.......x..."</span><span style="color:#24292E">, snare, step_s)</span></span>
+<span class="line"><span style="color:#24292E">hat_track </span><span style="color:#D73A49">=</span><span style="color:#24292E"> (</span><span style="color:#032F62">"x.x.x.x.x.x.x.x."</span><span style="color:#24292E">, closed_hat, step_s)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> render_track</span><span style="color:#24292E">(track, sample_rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#24292E">    pattern, instrument, step_s </span><span style="color:#D73A49">=</span><span style="color:#24292E"> track</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> render_pattern(pattern, instrument, step_s, </span><span style="color:#E36209">sample_rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> render_tracks</span><span style="color:#24292E">(tracks, sample_rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#24292E">    waves </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [render_track(track, </span><span style="color:#E36209">sample_rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> track </span><span style="color:#D73A49">in</span><span style="color:#24292E"> tracks]</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> mix_tracks(waves)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">tracks </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [kick_track, snare_track, hat_track]</span></span>
+<span class="line"><span style="color:#24292E">play(render_tracks(tracks))</span></span></code></pre></section>
+<section class="cell markdown"><h3>Your turn · Write a small piece</h3>
+<p>Build a one-bar rhythm on 16 sixteenth-note steps. Include a rest, a simultaneous hit, and one change in the second bar.</p>
+<p>Keep the musical description separate from the rendering call. Exchange track data with a neighbour: can they explain the rhythm without running the instrument definitions?</p>
+<p>Then render at 24,000 Hz and play at that same rate. Which parts of your musical description need to change?</p>
+</section>
+<section class="cell markdown"><h2>11. Extend the language: accents</h2>
+<p>So far every hit on a track has the same scale. We want <code>x</code> for an ordinary hit, <code>X</code> for an accent, and <code>.</code> for a rest.</p>
+<p>Before reading the worked example, propose two changes:</p>
+<ol>
+<li>What should the reader return instead of only 0 and 1?</li>
+<li>Where should the renderer apply that value?</li>
+</ol>
+<p>Choose 0.5 for an ordinary hit and 1.0 for an accent. These are relative sample gains, not a model of perceived loudness. Keeping the largest gain at 1 leaves more room for the mix.</p>
+</section>
+<section class="cell markdown"><h3>Worked example · Read gains, then apply them</h3>
+<p>We give the extended reader and renderer new names so the earlier two-symbol language remains available. <code>if gain &gt; 0</code> decides whether to call the instrument; multiplying the generated samples applies the requested gain.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> read_accents</span><span style="color:#24292E">(pattern):</span></span>
+<span class="line"><span style="color:#24292E">    gains </span><span style="color:#D73A49">=</span><span style="color:#24292E"> []</span></span>
+<span class="line"><span style="color:#D73A49">    for</span><span style="color:#24292E"> symbol </span><span style="color:#D73A49">in</span><span style="color:#24292E"> pattern:</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#24292E"> symbol </span><span style="color:#D73A49">==</span><span style="color:#032F62"> "x"</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#24292E">            gains.append(</span><span style="color:#005CC5">0.5</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#D73A49">        elif</span><span style="color:#24292E"> symbol </span><span style="color:#D73A49">==</span><span style="color:#032F62"> "X"</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#24292E">            gains.append(</span><span style="color:#005CC5">1.0</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#D73A49">        elif</span><span style="color:#24292E"> symbol </span><span style="color:#D73A49">==</span><span style="color:#032F62"> "."</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#24292E">            gains.append(</span><span style="color:#005CC5">0.0</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#D73A49">        else</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#D73A49">            raise</span><span style="color:#005CC5"> ValueError</span><span style="color:#24292E">(</span><span style="color:#032F62">"Use only x, X and . in an accented pattern."</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> gains</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> render_accents</span><span style="color:#24292E">(pattern, instrument, step_s, sample_rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#24292E">    n </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(step_s </span><span style="color:#D73A49">*</span><span style="color:#24292E"> sample_rate)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">    gains </span><span style="color:#D73A49">=</span><span style="color:#24292E"> read_accents(pattern)</span></span>
+<span class="line"><span style="color:#24292E">    slots </span><span style="color:#D73A49">=</span><span style="color:#24292E"> []</span></span>
+<span class="line"><span style="color:#D73A49">    for</span><span style="color:#24292E"> gain </span><span style="color:#D73A49">in</span><span style="color:#24292E"> gains:</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#24292E"> gain </span><span style="color:#D73A49">></span><span style="color:#005CC5"> 0</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#24292E">            hit </span><span style="color:#D73A49">=</span><span style="color:#24292E"> instrument(</span><span style="color:#E36209">sample_rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate)</span></span>
+<span class="line"><span style="color:#24292E">            wave </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [gain </span><span style="color:#D73A49">*</span><span style="color:#24292E"> sample </span><span style="color:#D73A49">for</span><span style="color:#24292E"> sample </span><span style="color:#D73A49">in</span><span style="color:#24292E"> hit]</span></span>
+<span class="line"><span style="color:#D73A49">        else</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#24292E">            wave </span><span style="color:#D73A49">=</span><span style="color:#24292E"> []</span></span>
+<span class="line"><span style="color:#24292E">        slots.append(fit(wave, n))</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#005CC5"> sum</span><span style="color:#24292E">(slots, [])</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(read_accents(</span><span style="color:#032F62">"X.x."</span><span style="color:#24292E">))</span></span>
+<span class="line"><span style="color:#24292E">play(render_accents(</span><span style="color:#032F62">"XxxxXxxxXxxxXxxx"</span><span style="color:#24292E">, closed_hat, step_s))</span></span></code></pre></section>
+<section class="cell markdown"><h3>Your turn · Let accents become track data</h3>
+<p>Make a quiet snare ghost note before a stronger hit. Then adapt the track renderer to use <code>render_accents</code>.</p>
+<p>Keep the original renderer working: give your new version a descriptive name. Can two patterns with identical hit positions suggest different phrasing just through accents?</p>
+<p>Notice that redefining a function is allowed, but callers using its global name will use the latest definition. Deliberate names make notebook state easier to reason about.</p>
+</section>
+<section class="cell markdown"><h2>What have we built?</h2>
+<p>The pattern is a description, the reader gives its symbols meaning, and the renderer turns those meanings into samples.</p>
+<p>We still have the same three operations:</p>
+<ul>
+<li>concatenation places sounds in time;</li>
+<li>multiplication scales their samples;</li>
+<li>mixing adds simultaneous signals.</li>
+</ul>
+<p>The new power comes from organising those operations, not from changing the audio representation. Keep one rhythm, an accented variation, and a short explanation of where text becomes decisions and where decisions become sound.</p>
+<p>The remaining sections are optional extensions and listening practice.</p>
+</section>
+<section class="cell markdown"><h2>Optional A · Choose instruments with a dictionary</h2>
+<p>What if <code>k</code> meant kick, <code>s</code> meant snare and <code>h</code> meant closed hat?</p>
+<p><strong>New tool: a dictionary.</strong> It associates keys with values. In <code>{&quot;k&quot;: kick}</code>, <code>&quot;k&quot;</code> is a key and <code>kick</code> is its value. Unlike list indexing by position, <code>kit[&quot;k&quot;]</code> looks up a value by key. That value is a function; adding parentheses calls it.</p>
+<p>This notation appeared in the live lesson03 draft. We explain it here so it is not a hidden prerequisite.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">kit </span><span style="color:#D73A49">=</span><span style="color:#24292E"> {</span><span style="color:#032F62">"k"</span><span style="color:#24292E">: kick, </span><span style="color:#032F62">"s"</span><span style="color:#24292E">: snare, </span><span style="color:#032F62">"h"</span><span style="color:#24292E">: closed_hat, </span><span style="color:#032F62">"o"</span><span style="color:#24292E">: open_hat}</span></span>
+<span class="line"><span style="color:#24292E">instrument </span><span style="color:#D73A49">=</span><span style="color:#24292E"> kit[</span><span style="color:#032F62">"k"</span><span style="color:#24292E">]</span></span>
+<span class="line"><span style="color:#24292E">play(instrument(</span><span style="color:#E36209">sample_rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">))</span></span></code></pre></section>
+<section class="cell markdown"><h3>Validate before looking up</h3>
+<p><strong>New use of membership:</strong> <code>symbol in kit</code> asks whether a dictionary contains that key. <code>not in</code> asks the opposite. <code>and</code> requires both conditions to be true.</p>
+<p>We reserve <code>.</code> for silence, outside the dictionary. Any other symbol must be a key. First validate the entire pattern; only then generate sound. Multiple instruments in one string still occur in successive slots: use separate tracks for simultaneous hits.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> render_kit</span><span style="color:#24292E">(pattern, kit, step_s, sample_rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#24292E">    n </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(step_s </span><span style="color:#D73A49">*</span><span style="color:#24292E"> sample_rate)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    for</span><span style="color:#24292E"> symbol </span><span style="color:#D73A49">in</span><span style="color:#24292E"> pattern:</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#24292E"> symbol </span><span style="color:#D73A49">!=</span><span style="color:#032F62"> "."</span><span style="color:#D73A49"> and</span><span style="color:#24292E"> symbol </span><span style="color:#D73A49">not</span><span style="color:#D73A49"> in</span><span style="color:#24292E"> kit:</span></span>
+<span class="line"><span style="color:#D73A49">            raise</span><span style="color:#005CC5"> ValueError</span><span style="color:#24292E">(</span><span style="color:#032F62">"A pattern symbol is missing from the kit."</span><span style="color:#24292E">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">    slots </span><span style="color:#D73A49">=</span><span style="color:#24292E"> []</span></span>
+<span class="line"><span style="color:#D73A49">    for</span><span style="color:#24292E"> symbol </span><span style="color:#D73A49">in</span><span style="color:#24292E"> pattern:</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#24292E"> symbol </span><span style="color:#D73A49">==</span><span style="color:#032F62"> "."</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#24292E">            wave </span><span style="color:#D73A49">=</span><span style="color:#24292E"> []</span></span>
+<span class="line"><span style="color:#D73A49">        else</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#24292E">            instrument </span><span style="color:#D73A49">=</span><span style="color:#24292E"> kit[symbol]</span></span>
+<span class="line"><span style="color:#24292E">            wave </span><span style="color:#D73A49">=</span><span style="color:#24292E"> instrument(</span><span style="color:#E36209">sample_rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate)</span></span>
+<span class="line"><span style="color:#24292E">        slots.append(fit(wave, n))</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#005CC5"> sum</span><span style="color:#24292E">(slots, [])</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">play(render_kit(</span><span style="color:#032F62">"k.h.s.h.k.h.s.o."</span><span style="color:#24292E">, kit, step_s))</span></span></code></pre></section>
+<section class="cell markdown"><h3>Your turn · Change the interpretation</h3>
+<p>Create another dictionary with the same keys but different instruments. Render the same string with it.</p>
+<p>To customise an instrument, use a named wrapper with the same sample-rate contract. The short form <code>lambda</code> would create an anonymous function, but we do not need it: a normal <code>def</code> makes the parameters and returned value visible.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> soft_snare</span><span style="color:#24292E">(sample_rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> snare(</span><span style="color:#E36209">amplitude</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.07</span><span style="color:#24292E">, </span><span style="color:#E36209">noise_gain</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.3</span><span style="color:#24292E">, </span><span style="color:#E36209">sample_rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">soft_kit </span><span style="color:#D73A49">=</span><span style="color:#24292E"> {</span><span style="color:#032F62">"k"</span><span style="color:#24292E">: kick, </span><span style="color:#032F62">"s"</span><span style="color:#24292E">: soft_snare, </span><span style="color:#032F62">"h"</span><span style="color:#24292E">: closed_hat, </span><span style="color:#032F62">"o"</span><span style="color:#24292E">: open_hat}</span></span>
+<span class="line"><span style="color:#24292E">play(render_kit(</span><span style="color:#032F62">"k.h.s.h.k.h.s.o."</span><span style="color:#24292E">, soft_kit, step_s))</span></span></code></pre></section>
+<section class="cell markdown"><h2>Optional B · Read a compact mixer</h2>
+<p>The main lesson does not require this version. First recall <code>zip</code>: it groups corresponding positions. With more than two inputs, each group contains more than two values.</p>
+<p><strong>New: two uses of <code>*</code>.</strong></p>
+<ul>
+<li>In <code>def mix_many(*waves)</code>, it collects positional arguments into a tuple named <code>waves</code>.</li>
+<li>In <code>zip(*padded)</code>, it expands a collection into separate positional arguments.</li>
+</ul>
+<p>These are not list repetition: the meaning depends on where <code>*</code> appears. We use a list comprehension, not a generator expression, to avoid introducing another construct at the same time.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">a </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">]</span></span>
+<span class="line"><span style="color:#24292E">b </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#005CC5">10</span><span style="color:#24292E">, </span><span style="color:#005CC5">20</span><span style="color:#24292E">]</span></span>
+<span class="line"><span style="color:#24292E">c </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#005CC5">100</span><span style="color:#24292E">, </span><span style="color:#005CC5">200</span><span style="color:#24292E">]</span></span>
+<span class="line"><span style="color:#24292E">padded </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [a, b, c]</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(</span><span style="color:#005CC5">list</span><span style="color:#24292E">(</span><span style="color:#005CC5">zip</span><span style="color:#24292E">(a, b, c)))</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(</span><span style="color:#005CC5">list</span><span style="color:#24292E">(</span><span style="color:#005CC5">zip</span><span style="color:#24292E">(</span><span style="color:#D73A49">*</span><span style="color:#24292E">padded)))</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> mix_many</span><span style="color:#24292E">(</span><span style="color:#D73A49">*</span><span style="color:#24292E">waves):</span></span>
+<span class="line"><span style="color:#D73A49">    if</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(waves) </span><span style="color:#D73A49">==</span><span style="color:#005CC5"> 0</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> []</span></span>
+<span class="line"><span style="color:#24292E">    longest </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> max</span><span style="color:#24292E">([</span><span style="color:#005CC5">len</span><span style="color:#24292E">(wave) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> wave </span><span style="color:#D73A49">in</span><span style="color:#24292E"> waves])</span></span>
+<span class="line"><span style="color:#24292E">    padded </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [fit(wave, longest) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> wave </span><span style="color:#D73A49">in</span><span style="color:#24292E"> waves]</span></span>
+<span class="line"><span style="color:#24292E">    columns </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> zip</span><span style="color:#24292E">(</span><span style="color:#D73A49">*</span><span style="color:#24292E">padded)</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> [</span><span style="color:#005CC5">sum</span><span style="color:#24292E">(column) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> column </span><span style="color:#D73A49">in</span><span style="color:#24292E"> columns]</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(mix_many(a, b, c))</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(mix_tracks([a, b, c]))</span></span></code></pre></section>
+<section class="cell markdown"><h3>Your turn · Explain the compact form</h3>
+<p>Compare the call <code>mix_many(a, b, c)</code> with <code>mix_tracks([a, b, c])</code>. Then explain what one <code>column</code> represents.</p>
+<p>The numerical <code>sum</code> here mixes one simultaneous sample from each track. It is not the list concatenation shortcut discussed earlier. Both mixers preserve the longest input and add silence to shorter ones; neither replaces the gain-controlled <code>mix</code> used by the snare.</p>
+</section>
+<section class="cell markdown"><h2>Optional C · Listening laboratory</h2>
+<p>Ten challenges expressed in our pattern language. Listen, sketch the onsets on a grid, then reconstruct the tracks before revealing the recipe.</p>
+<p>Each track contains a pattern, an instrument and a step duration. Most challenges use sixteenths; one uses thirds of a beat and another thirty-seconds. Accents use <code>x</code> and <code>X</code>. The last challenge extends the renderer to alternate long and short steps.</p>
+<p>These versions preserve the original onset patterns. They are not sample-identical recreations: the renderer makes fresh hits and cuts each sound to its step, so some tails are shorter than in the manually fitted draft. The accent challenge uses our standard 0.5/1.0 gains rather than the draft's individual amplitudes. Repeating the rendered bar then repeats that exact buffer.</p>
+<p>The source cells are marked hidden/collapsed for interfaces that support this metadata. Run a cell to create its player, then hide its code for listening. The code remains in the downloadable file; an audio-only quiz page is a separate publication step. Playback is unnormalised and never automatic.</p>
+</section>
+<section class="cell markdown"><h3>Listening challenge 1 · Four beats and the spaces between</h3>
+<p>Listen before expanding the code. Mark each instrument's attacks and identify the step duration.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">bpm </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 120</span></span>
+<span class="line"><span style="color:#24292E">step_s </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 60</span><span style="color:#D73A49"> /</span><span style="color:#24292E"> bpm </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> 4</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">tracks </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span></span>
+<span class="line"><span style="color:#24292E">    (</span><span style="color:#032F62">"x...x...x...x..."</span><span style="color:#24292E">, kick, step_s),</span></span>
+<span class="line"><span style="color:#24292E">    (</span><span style="color:#032F62">"..x...x...x...x."</span><span style="color:#24292E">, closed_hat, step_s),</span></span>
+<span class="line"><span style="color:#24292E">]</span></span>
+<span class="line"><span style="color:#24292E">phrase </span><span style="color:#D73A49">=</span><span style="color:#24292E"> render_tracks(tracks)</span></span>
+<span class="line"><span style="color:#24292E">play(phrase </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 4</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><h3>Listening challenge 2 · A second kick before the next beat</h3>
+<p>Listen before expanding the code. Mark each instrument's attacks and identify the step duration.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">bpm </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 110</span></span>
+<span class="line"><span style="color:#24292E">step_s </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 60</span><span style="color:#D73A49"> /</span><span style="color:#24292E"> bpm </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> 4</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">tracks </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span></span>
+<span class="line"><span style="color:#24292E">    (</span><span style="color:#032F62">"x.......x.x....."</span><span style="color:#24292E">, kick, step_s),</span></span>
+<span class="line"><span style="color:#24292E">    (</span><span style="color:#032F62">"....x.......x..."</span><span style="color:#24292E">, snare, step_s),</span></span>
+<span class="line"><span style="color:#24292E">    (</span><span style="color:#032F62">"x.x.x.x.x.x.x.x."</span><span style="color:#24292E">, closed_hat, step_s),</span></span>
+<span class="line"><span style="color:#24292E">]</span></span>
+<span class="line"><span style="color:#24292E">phrase </span><span style="color:#D73A49">=</span><span style="color:#24292E"> render_tracks(tracks)</span></span>
+<span class="line"><span style="color:#24292E">play(phrase </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 4</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><h3>Listening challenge 3 · Open and closed hats</h3>
+<p>Listen before expanding the code. Mark each instrument's attacks and identify the step duration.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">bpm </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 124</span></span>
+<span class="line"><span style="color:#24292E">step_s </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 60</span><span style="color:#D73A49"> /</span><span style="color:#24292E"> bpm </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> 4</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">tracks </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span></span>
+<span class="line"><span style="color:#24292E">    (</span><span style="color:#032F62">"x...x...x...x..."</span><span style="color:#24292E">, kick, step_s),</span></span>
+<span class="line"><span style="color:#24292E">    (</span><span style="color:#032F62">"....x.......x..."</span><span style="color:#24292E">, snare, step_s),</span></span>
+<span class="line"><span style="color:#24292E">    (</span><span style="color:#032F62">"x.x.x.x.x.x.x.x."</span><span style="color:#24292E">, closed_hat, step_s),</span></span>
+<span class="line"><span style="color:#24292E">    (</span><span style="color:#032F62">"..x...x...x...x."</span><span style="color:#24292E">, open_hat, step_s),</span></span>
+<span class="line"><span style="color:#24292E">]</span></span>
+<span class="line"><span style="color:#24292E">phrase </span><span style="color:#D73A49">=</span><span style="color:#24292E"> render_tracks(tracks)</span></span>
+<span class="line"><span style="color:#24292E">play(phrase </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 4</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><h3>Listening challenge 4 · An off-grid-looking kick</h3>
+<p>Listen before expanding the code. Mark each instrument's attacks and identify the step duration.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">bpm </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 90</span></span>
+<span class="line"><span style="color:#24292E">step_s </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 60</span><span style="color:#D73A49"> /</span><span style="color:#24292E"> bpm </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> 4</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">tracks </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span></span>
+<span class="line"><span style="color:#24292E">    (</span><span style="color:#032F62">"x......x..x....."</span><span style="color:#24292E">, kick, step_s),</span></span>
+<span class="line"><span style="color:#24292E">    (</span><span style="color:#032F62">"....x.......x..."</span><span style="color:#24292E">, snare, step_s),</span></span>
+<span class="line"><span style="color:#24292E">    (</span><span style="color:#032F62">"x.x.x.x.x.x.x.x."</span><span style="color:#24292E">, closed_hat, step_s),</span></span>
+<span class="line"><span style="color:#24292E">]</span></span>
+<span class="line"><span style="color:#24292E">phrase </span><span style="color:#D73A49">=</span><span style="color:#24292E"> render_tracks(tracks)</span></span>
+<span class="line"><span style="color:#24292E">play(phrase </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 4</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><h3>Listening challenge 5 · A displaced snare phrase</h3>
+<p>Listen before expanding the code. Mark each instrument's attacks and identify the step duration.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">bpm </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 95</span></span>
+<span class="line"><span style="color:#24292E">step_s </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 60</span><span style="color:#D73A49"> /</span><span style="color:#24292E"> bpm </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> 4</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">tracks </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span></span>
+<span class="line"><span style="color:#24292E">    (</span><span style="color:#032F62">"x...x...x...x..."</span><span style="color:#24292E">, kick, step_s),</span></span>
+<span class="line"><span style="color:#24292E">    (</span><span style="color:#032F62">"...x..x....x..x."</span><span style="color:#24292E">, snare, step_s),</span></span>
+<span class="line"><span style="color:#24292E">    (</span><span style="color:#032F62">"x.x.x.x.x.x.x.x."</span><span style="color:#24292E">, closed_hat, step_s),</span></span>
+<span class="line"><span style="color:#24292E">]</span></span>
+<span class="line"><span style="color:#24292E">phrase </span><span style="color:#D73A49">=</span><span style="color:#24292E"> render_tracks(tracks)</span></span>
+<span class="line"><span style="color:#24292E">play(phrase </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 4</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><h3>Listening challenge 6 · A three-part beat</h3>
+<p>Listen before expanding the code. Mark each instrument's attacks and identify the step duration. Three steps fit into one beat; this is not a sixteenth-note grid.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">bpm </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 100</span></span>
+<span class="line"><span style="color:#24292E">step_s </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 60</span><span style="color:#D73A49"> /</span><span style="color:#24292E"> bpm </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> 3</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">tracks </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span></span>
+<span class="line"><span style="color:#24292E">    (</span><span style="color:#032F62">"x.....x.x..."</span><span style="color:#24292E">, kick, step_s),</span></span>
+<span class="line"><span style="color:#24292E">    (</span><span style="color:#032F62">"...x.....x.."</span><span style="color:#24292E">, snare, step_s),</span></span>
+<span class="line"><span style="color:#24292E">    (</span><span style="color:#032F62">"x.xx.xx.xx.x"</span><span style="color:#24292E">, closed_hat, step_s),</span></span>
+<span class="line"><span style="color:#24292E">]</span></span>
+<span class="line"><span style="color:#24292E">phrase </span><span style="color:#D73A49">=</span><span style="color:#24292E"> render_tracks(tracks)</span></span>
+<span class="line"><span style="color:#24292E">play(phrase </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 4</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><h3>Listening challenge 7 · Ghost notes and accents</h3>
+<p>Listen before expanding the code. Mark each instrument's attacks and identify the step duration.</p>
+<p>This solution uses <code>render_accent_tracks</code>: unpack each track, call the existing <code>render_accents</code>, then mix the resulting waves. This is the adaptation proposed in section 11, using only familiar loops and unpacking. <code>X</code> is full gain and <code>x</code> is half gain. Compare hit positions separately from their strength.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> render_accent_tracks</span><span style="color:#24292E">(tracks, sample_rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#24292E">    waves </span><span style="color:#D73A49">=</span><span style="color:#24292E"> []</span></span>
+<span class="line"><span style="color:#D73A49">    for</span><span style="color:#24292E"> pattern, instrument, step_s </span><span style="color:#D73A49">in</span><span style="color:#24292E"> tracks:</span></span>
+<span class="line"><span style="color:#24292E">        wave </span><span style="color:#D73A49">=</span><span style="color:#24292E"> render_accents(pattern, instrument, step_s, </span><span style="color:#E36209">sample_rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate)</span></span>
+<span class="line"><span style="color:#24292E">        waves.append(wave)</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> mix_tracks(waves)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">bpm </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 100</span></span>
+<span class="line"><span style="color:#24292E">step_s </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 60</span><span style="color:#D73A49"> /</span><span style="color:#24292E"> bpm </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> 4</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">tracks </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span></span>
+<span class="line"><span style="color:#24292E">    (</span><span style="color:#032F62">"X.....x...X....."</span><span style="color:#24292E">, kick, step_s),</span></span>
+<span class="line"><span style="color:#24292E">    (</span><span style="color:#032F62">"..x.X.xx.x..X..x"</span><span style="color:#24292E">, snare, step_s),</span></span>
+<span class="line"><span style="color:#24292E">    (</span><span style="color:#032F62">"x.x.X.x.x.x.X.x."</span><span style="color:#24292E">, closed_hat, step_s),</span></span>
+<span class="line"><span style="color:#24292E">]</span></span>
+<span class="line"><span style="color:#24292E">phrase </span><span style="color:#D73A49">=</span><span style="color:#24292E"> render_accent_tracks(tracks)</span></span>
+<span class="line"><span style="color:#24292E">play(phrase </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 4</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><h3>Listening challenge 8 · A two-bar phrase</h3>
+<p>Listen before expanding the code. Mark each instrument's attacks and identify the step duration.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">bpm </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 136</span></span>
+<span class="line"><span style="color:#24292E">step_s </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 60</span><span style="color:#D73A49"> /</span><span style="color:#24292E"> bpm </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> 4</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">tracks </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span></span>
+<span class="line"><span style="color:#24292E">    (</span><span style="color:#032F62">"x.x.......xx....x.x.......x....."</span><span style="color:#24292E">, kick, step_s),</span></span>
+<span class="line"><span style="color:#24292E">    (</span><span style="color:#032F62">"....x..x.x..x..x....x..x.x....x."</span><span style="color:#24292E">, snare, step_s),</span></span>
+<span class="line"><span style="color:#24292E">    (</span><span style="color:#032F62">"x.x.x.x.x.x.x.x.x.x.x.x.x.x.x.x."</span><span style="color:#24292E">, closed_hat, step_s),</span></span>
+<span class="line"><span style="color:#24292E">]</span></span>
+<span class="line"><span style="color:#24292E">phrase </span><span style="color:#D73A49">=</span><span style="color:#24292E"> render_tracks(tracks)</span></span>
+<span class="line"><span style="color:#24292E">play(phrase </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 2</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><h3>Listening challenge 9 · A faster hat ending</h3>
+<p>Listen before expanding the code. Mark each instrument's attacks and identify the step duration.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">bpm </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 140</span></span>
+<span class="line"><span style="color:#24292E">step_s </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 60</span><span style="color:#D73A49"> /</span><span style="color:#24292E"> bpm </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> 8</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">tracks </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span></span>
+<span class="line"><span style="color:#24292E">    (</span><span style="color:#032F62">"x.............x...........x....."</span><span style="color:#24292E">, kick, step_s),</span></span>
+<span class="line"><span style="color:#24292E">    (</span><span style="color:#032F62">"................x..............."</span><span style="color:#24292E">, snare, step_s),</span></span>
+<span class="line"><span style="color:#24292E">    (</span><span style="color:#032F62">"x.x.x.x.x.x.x.x.x.x.x.x.xxxxx.x."</span><span style="color:#24292E">, closed_hat, step_s),</span></span>
+<span class="line"><span style="color:#24292E">]</span></span>
+<span class="line"><span style="color:#24292E">phrase </span><span style="color:#D73A49">=</span><span style="color:#24292E"> render_tracks(tracks)</span></span>
+<span class="line"><span style="color:#24292E">play(phrase </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 4</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><h3>Listening challenge 10 · Long and short subdivisions</h3>
+<p>The final rhythm alternates long and short sixteenths. Our constant-step renderer cannot express this directly.</p>
+<p><strong>Your turn:</strong> keep the hit/rest pattern, but propose a second list that describes the duration of each step. What must have the same length? How can <code>zip</code> pair each decision with its duration?</p>
+<p>The worked extension below uses <strong>sample counts</strong>, so every track shares exactly the same boundaries. A pair has <code>2 * s</code> samples: calculate the long part, then obtain the short part by subtraction. The pair keeps its total duration despite rounding.</p>
+<p><code>render_timed_pattern</code> pairs decisions and lengths, generates each hit and fits it to its assigned slot. A length check prevents <code>zip</code> from silently dropping steps. <code>render_timed_tracks</code> applies this to the familiar track tuples, whose third value is now the list of slot lengths. Use positive integer lengths and the same sample rate for instruments, timing and playback.</p>
+<p>This is a new rendering rule, not a new meaning for <code>x</code> or <code>.</code>. Compare it with the same patterns rendered with equal slots.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> render_timed_pattern</span><span style="color:#24292E">(pattern, instrument, step_lengths, sample_rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#24292E">    steps </span><span style="color:#D73A49">=</span><span style="color:#24292E"> read_pattern(pattern)</span></span>
+<span class="line"><span style="color:#D73A49">    if</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(steps) </span><span style="color:#D73A49">!=</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(step_lengths):</span></span>
+<span class="line"><span style="color:#D73A49">        raise</span><span style="color:#005CC5"> ValueError</span><span style="color:#24292E">(</span><span style="color:#032F62">"Give each pattern step one slot length."</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">    slots </span><span style="color:#D73A49">=</span><span style="color:#24292E"> []</span></span>
+<span class="line"><span style="color:#D73A49">    for</span><span style="color:#24292E"> hit, n </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> zip</span><span style="color:#24292E">(steps, step_lengths):</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#24292E"> hit </span><span style="color:#D73A49">==</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#24292E">            wave </span><span style="color:#D73A49">=</span><span style="color:#24292E"> instrument(</span><span style="color:#E36209">sample_rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate)</span></span>
+<span class="line"><span style="color:#D73A49">        else</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#24292E">            wave </span><span style="color:#D73A49">=</span><span style="color:#24292E"> []</span></span>
+<span class="line"><span style="color:#24292E">        slots.append(fit(wave, n))</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#005CC5"> sum</span><span style="color:#24292E">(slots, [])</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> render_timed_tracks</span><span style="color:#24292E">(tracks, sample_rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#24292E">    waves </span><span style="color:#D73A49">=</span><span style="color:#24292E"> []</span></span>
+<span class="line"><span style="color:#D73A49">    for</span><span style="color:#24292E"> pattern, instrument, step_lengths </span><span style="color:#D73A49">in</span><span style="color:#24292E"> tracks:</span></span>
+<span class="line"><span style="color:#24292E">        wave </span><span style="color:#D73A49">=</span><span style="color:#24292E"> render_timed_pattern(</span></span>
+<span class="line"><span style="color:#24292E">            pattern, instrument, step_lengths, </span><span style="color:#E36209">sample_rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate</span></span>
+<span class="line"><span style="color:#24292E">        )</span></span>
+<span class="line"><span style="color:#24292E">        waves.append(wave)</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> mix_tracks(waves)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">bpm </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 90</span></span>
+<span class="line"><span style="color:#24292E">s </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(</span><span style="color:#005CC5">60</span><span style="color:#D73A49"> /</span><span style="color:#24292E"> bpm </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> 4</span><span style="color:#D73A49"> *</span><span style="color:#005CC5"> SR</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#E36209">long</span><span style="color:#D73A49"> =</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(</span><span style="color:#005CC5">1.3</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> s)</span></span>
+<span class="line"><span style="color:#24292E">short </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> s </span><span style="color:#D73A49">-</span><span style="color:#E36209"> long</span></span>
+<span class="line"><span style="color:#24292E">step_lengths </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#E36209">long</span><span style="color:#24292E">, short] </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 8</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">tracks </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span></span>
+<span class="line"><span style="color:#24292E">    (</span><span style="color:#032F62">"x......x..x....."</span><span style="color:#24292E">, kick, step_lengths),</span></span>
+<span class="line"><span style="color:#24292E">    (</span><span style="color:#032F62">"....x.......x..."</span><span style="color:#24292E">, snare, step_lengths),</span></span>
+<span class="line"><span style="color:#24292E">    (</span><span style="color:#032F62">"xxxxxxxxxxxxxxxx"</span><span style="color:#24292E">, closed_hat, step_lengths),</span></span>
+<span class="line"><span style="color:#24292E">]</span></span>
+<span class="line"><span style="color:#24292E">phrase </span><span style="color:#D73A49">=</span><span style="color:#24292E"> render_timed_tracks(tracks)</span></span>
+<span class="line"><span style="color:#24292E">play(phrase </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 4</span><span style="color:#24292E">)</span></span></code></pre></section>
+  </article>
+</main>
+</body>
+</html>

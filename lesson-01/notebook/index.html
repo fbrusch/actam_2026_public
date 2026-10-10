@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+  <meta name="theme-color" content="#f7f5ef">
+  <title>Lesson 01 · Reference notebook · ACTAM</title>
+  <link rel="stylesheet" href="../../assets/katex/katex.min.css">
+  <style>
+:root { color-scheme: light; color: #182f3a; background: #f7f5ef; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+* { box-sizing: border-box; }
+body { margin: 0; background: #f7f5ef; }
+main { max-width: 900px; margin: auto; padding: 40px 24px 80px; }
+.crumbs ol { display: flex; flex-wrap: wrap; gap: 0 .6em; margin: 0; padding: 0; list-style: none; font: .8rem ui-monospace, Menlo, monospace; letter-spacing: .12em; text-transform: uppercase; color: #42666a; }
+.crumbs li + li::before { content: '›'; margin-right: .6em; }
+.crumbs a { color: inherit; text-decoration: none; }
+.crumbs a:hover { text-decoration: underline; }
+h1 { font: 700 clamp(2rem, 6vw, 3.4rem)/1.08 ui-monospace, Menlo, monospace; letter-spacing: -.05em; margin: 22px 0 18px; }
+.bar { display: flex; flex-wrap: wrap; gap: 10px; }
+.button { font: .9rem ui-monospace, Menlo, monospace; padding: 9px 14px; border: 1px solid #087e83; color: #087e83; text-decoration: none; background: #fff; }
+.button.primary { background: #087e83; color: #fff; }
+.button:focus-visible { outline: 3px solid #cb4f38; outline-offset: 3px; }
+.hint { color: #42666a; font-size: .85rem; line-height: 1.5; margin: 12px 0 28px; max-width: 640px; }
+.cell { margin: 0 0 14px; }
+.markdown { line-height: 1.65; }
+.markdown h1, .markdown h2, .markdown h3 { font-family: ui-monospace, Menlo, monospace; letter-spacing: -.02em; line-height: 1.2; margin: 1.6em 0 .5em; }
+.markdown h1 { font-size: 1.8rem; } .markdown h2 { font-size: 1.4rem; } .markdown h3 { font-size: 1.1rem; }
+.markdown code { font: .88em ui-monospace, Menlo, monospace; background: #e5ece6; color: #0b5f63; padding: 1px 4px; }
+.markdown pre code { background: none; color: inherit; padding: 0; }
+.markdown table { border-collapse: collapse; margin: 12px 0; }
+.markdown th, .markdown td { border: 1px solid #ccd4cf; padding: 5px 10px; text-align: left; }
+.markdown img { max-width: 100%; }
+.markdown a { color: #087e83; }
+.markdown details { margin: 12px 0; }
+.markdown summary { cursor: pointer; color: #087e83; }
+.markdown blockquote { margin: 0; padding-left: 14px; border-left: 3px solid #087e83; color: #42666a; }
+pre { margin: 0; padding: 14px 16px; overflow-x: auto; font: .82rem/1.55 ui-monospace, Menlo, monospace; border: 1px solid #d5ddd8; }
+pre.shiki { background: #fbfcfa !important; }
+pre.plain { background: #fbfcfa; }
+.code pre { border-left: 3px solid #087e83; }
+.katex-display { overflow-x: auto; overflow-y: hidden; }
+@media (max-width: 620px) { main { padding: 28px 16px 60px; } }
+</style>
+</head>
+<body>
+<main>
+  <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../../">ACTAM</a></li><li><a href="../../#lesson-01">Lesson 01</a></li><li><span aria-current="page">Reference notebook</span></li></ol></nav>
+  <h1>Reference notebook</h1>
+  <div class="bar">
+    <a class="button" href="../notebook.ipynb" download="actam-lesson-01-notebook.ipynb">Download .ipynb</a>
+    <a class="button primary" href="../../lite/notebooks/index.html?path=lesson-01%2Fnotebook.ipynb">Open in the browser</a>
+  </div>
+  <p class="hint">“Open in the browser” runs the notebook on your computer with JupyterLite: no installation, no account. Your changes stay in that browser: download the notebook to keep them.</p>
+  <article class="notebook">
+<section class="cell markdown"><h1>Python as a conversation</h1>
+<h2>Lesson 01 · ACTAM 2026</h2>
+<p>OK, so what is Python? What is a REPL? And what can we do with it?</p>
+<p>For our purposes, we can imagine Python as someone we ask to do things. Our requests use a particular language: a precise language that the Python interpreter can execute. This is a useful metaphor, as long as we remember that Python follows rules rather than guessing what we mean.</p>
+<p>We will begin with small expressions and work our way towards making a sound. Along the way, we will use names, lists, functions and a recipe for generating samples.</p>
+</section>
+<section class="cell markdown"><h3>How to use this notebook</h3>
+<p>Run the code cells from top to bottom with <strong>Shift+Enter</strong>. Pause at the questions, make a prediction, then try it. Markdown cells contain the discussion. Code cells contain instructions for Python.</p>
+<p>A notebook remembers the names created by earlier cells. If a result seems strange, restart the kernel and run all cells in order. Editing a cell does not change anything until you run it again.</p>
+<p>The examples use Matplotlib and IPython, available in the lesson's Jupyter environment. Audio appears as a player you can click, so running the notebook does not automatically play every sound. An optional section shows the original sounddevice approach.</p>
+</section>
+<section class="cell markdown"><h2>1. A conversation with Python</h2>
+<p>We often imagine programming like this: we write all the instructions for a program, then ask the computer to execute them. Think of a video game. This is a simplification, of course, but it is a familiar picture.</p>
+<p>There is also a more interactive way. We give Python a small instruction, look at the result, then decide what to ask next. It is a little like the difference between sending a long letter and having a conversation. The next thing we say can depend on the answer we just received.</p>
+<p>That makes an interactive environment useful for exploring. We do not have to know every instruction in advance.</p>
+</section>
+<section class="cell markdown"><h3>What is a REPL?</h3>
+<p>REPL stands for <strong>Read, Evaluate, Print, Loop</strong>. Python reads an input, evaluates it, displays a result and waits for the next input.</p>
+<p>A notebook gives us a related way of working, with saved cells, text, plots and other outputs. One cell can contain several instructions. Usually, the notebook automatically displays the value of the last expression in a code cell.</p>
+<p>OK, what can we ask our interlocutor to do? One of the main things is to <strong>evaluate an expression</strong>. Let's start with a very small one.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#005CC5">1</span></span></code></pre></section>
+<section class="cell markdown"><p>Here, <code>1</code> is already an expression. Its value is the integer one. What other expressions do we have?</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#005CC5">1</span><span style="color:#D73A49"> +</span><span style="color:#005CC5"> 1</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#005CC5">2</span><span style="color:#D73A49"> **</span><span style="color:#005CC5"> 3</span></span></code></pre></section>
+<section class="cell markdown"><p><code>**</code> means exponentiation. Python integers can grow much larger than the fixed-size integers used in many other settings. Let's try it.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#005CC5">2</span><span style="color:#D73A49"> **</span><span style="color:#005CC5"> 1000</span></span></code></pre></section>
+<section class="cell markdown"><h3>Parentheses and order</h3>
+<p>Before running the next two cells, predict the results. Multiplication takes precedence over addition. Parentheses let us choose a different grouping.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">(</span><span style="color:#005CC5">1</span><span style="color:#D73A49"> +</span><span style="color:#005CC5"> 2</span><span style="color:#24292E">) </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 3</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#005CC5">1</span><span style="color:#D73A49"> +</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> *</span><span style="color:#005CC5"> 3</span></span></code></pre></section>
+<section class="cell markdown"><h2>2. Giving values names</h2>
+<p>We can keep a value around by giving it a name. <code>=</code> is an assignment: evaluate the expression on the right, then bind the name on the left to its value.</p>
+<p>An assignment is a statement, so it does not automatically display a result.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">a </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 1</span></span>
+<span class="line"><span style="color:#24292E">b </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 2</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">a </span><span style="color:#D73A49">+</span><span style="color:#24292E"> b</span></span></code></pre></section>
+<section class="cell markdown"><p>A name is not a permanent equation. If we change <code>a</code>, later expressions use its new value. Earlier outputs remain a record of what happened when we ran those cells.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">a </span><span style="color:#D73A49">=</span><span style="color:#24292E"> a </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> 10</span></span>
+<span class="line"><span style="color:#24292E">a </span><span style="color:#D73A49">+</span><span style="color:#24292E"> b</span></span></code></pre></section>
+<section class="cell markdown"><p><strong>Try it.</strong> Run the previous cell again. Why does the result change? Reset <code>a</code> to <code>1</code> if you want to repeat the experiment from the beginning.</p>
+</section>
+<section class="cell markdown"><h2>3. A collection of related values</h2>
+<p>Now imagine we want to represent a series of related measurements, such as the temperature of a room over time. We could give each measurement its own name.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">t_0 </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 20.0</span></span>
+<span class="line"><span style="color:#24292E">t_1 </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 21.5</span></span>
+<span class="line"><span style="color:#24292E">t_2 </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 20.3</span></span></code></pre></section>
+<section class="cell markdown"><p>If we want the third measurement, we can write <code>t_2</code>. But what if the position comes from a calculation?</p>
+<p>Python does not turn a piece of a variable name into an expression. Something like <code>t_(1 + 1)</code> would mean a function call, not a request for the value named <code>t_2</code>.</p>
+<p>We need a collection whose elements we can retrieve by position. Python gives us <strong>lists</strong>.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">[</span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">3</span><span style="color:#24292E">, </span><span style="color:#005CC5">4</span><span style="color:#24292E">]</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">t </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#005CC5">20.1</span><span style="color:#24292E">, </span><span style="color:#005CC5">20.3</span><span style="color:#24292E">, </span><span style="color:#005CC5">20.5</span><span style="color:#24292E">, </span><span style="color:#005CC5">100.0</span><span style="color:#24292E">]</span></span></code></pre></section>
+<section class="cell markdown"><h3>Positions start at zero</h3>
+<p>The first element has index <code>0</code>, the second has index <code>1</code>, and so on. For our four-element list, the valid non-negative indices are <code>0</code>, <code>1</code>, <code>2</code> and <code>3</code>.</p>
+<p>The expression inside square brackets tells Python which element to retrieve.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">t[</span><span style="color:#005CC5">0</span><span style="color:#24292E">]</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">t[</span><span style="color:#005CC5">1</span><span style="color:#D73A49"> +</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">]</span></span></code></pre></section>
+<section class="cell markdown"><p>The index can come from a calculation. <code>%</code> gives the remainder after division. Here it gives us a position within this list.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">index </span><span style="color:#D73A49">=</span><span style="color:#24292E"> (</span><span style="color:#005CC5">2</span><span style="color:#D73A49"> **</span><span style="color:#005CC5"> 1234</span><span style="color:#24292E">) </span><span style="color:#D73A49">%</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(t)</span></span>
+<span class="line"><span style="color:#24292E">t[index]</span></span></code></pre></section>
+<section class="cell markdown"><p><code>len(t)</code> returns the number of elements. <code>t[4]</code> would raise an <code>IndexError</code>: there is no fifth element. An error message is useful feedback about our request.</p>
+<p><strong>Try it.</strong> Predict <code>t[-1]</code>. Negative indices count backwards from the end, so <code>-1</code> selects the last element.</p>
+</section>
+<section class="cell markdown"><h3>Calculating an average</h3>
+<p>We could add each measurement explicitly and divide by four.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">(t[</span><span style="color:#005CC5">0</span><span style="color:#24292E">] </span><span style="color:#D73A49">+</span><span style="color:#24292E"> t[</span><span style="color:#005CC5">1</span><span style="color:#24292E">] </span><span style="color:#D73A49">+</span><span style="color:#24292E"> t[</span><span style="color:#005CC5">2</span><span style="color:#24292E">] </span><span style="color:#D73A49">+</span><span style="color:#24292E"> t[</span><span style="color:#005CC5">3</span><span style="color:#24292E">]) </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> 4</span></span></code></pre></section>
+<section class="cell markdown"><p>We can also ask Python to sum the whole list.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#005CC5">sum</span><span style="color:#24292E">(t) </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> 4</span></span></code></pre></section>
+<section class="cell markdown"><p>This works, but the number <code>4</code> only makes sense while the list has four elements. Using its length expresses what we actually mean.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#005CC5">sum</span><span style="color:#24292E">(t) </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(t)</span></span></code></pre></section>
+<section class="cell markdown"><p>The list must contain at least one value, otherwise we would divide by zero. Also, look at the value <code>100.0</code>: the calculation is correct, but that reading strongly affects the average. Does it describe the room, or might it be a measurement problem?</p>
+</section>
+<section class="cell markdown"><h2>4. Functions and calls</h2>
+<p><code>sum</code> and <code>len</code> are <strong>functions</strong>. A function is something we can call to perform an operation. A call can take arguments and can return a value.</p>
+<p>The general shape is <code>function_name(argument_1, argument_2)</code>. Each argument can itself be an expression. Different functions expect different numbers and kinds of arguments.</p>
+<p>In <code>sum(t) / len(t)</code>, Python calls two functions and divides their results. The whole thing is another expression.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(</span><span style="color:#032F62">'Number of measurements:'</span><span style="color:#24292E">, </span><span style="color:#005CC5">len</span><span style="color:#24292E">(t))</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(</span><span style="color:#032F62">'Average temperature:'</span><span style="color:#24292E">, </span><span style="color:#005CC5">sum</span><span style="color:#24292E">(t) </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(t))</span></span></code></pre></section>
+<section class="cell markdown"><p><code>print</code> displays information explicitly. That is useful when we want several results from one cell. Its return value is <code>None</code>, which the notebook does not automatically show.</p>
+</section>
+<section class="cell markdown"><h2>5. What does adding lists mean?</h2>
+<p>OK, what do you think it means to add two lists? Make a prediction before running this.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">[</span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">3</span><span style="color:#24292E">] </span><span style="color:#D73A49">+</span><span style="color:#24292E"> [</span><span style="color:#005CC5">10</span><span style="color:#24292E">, </span><span style="color:#005CC5">20</span><span style="color:#24292E">, </span><span style="color:#005CC5">30</span><span style="color:#24292E">]</span></span></code></pre></section>
+<section class="cell markdown"><p>For Python lists, <code>+</code> means <strong>concatenation</strong>: put the second list after the first. It does not add corresponding elements.</p>
+<p>Given that, what might multiplying a list by an integer mean?</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">[</span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">3</span><span style="color:#24292E">] </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 2</span></span></code></pre></section>
+<section class="cell markdown"><p>It repeats the sequence. We could have guessed that, but the meaning comes from Python's rules for lists.</p>
+<p>We are using Python lists here. Numerical arrays, such as NumPy arrays, have different rules for these operators. We will keep that distinction in mind.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">[</span><span style="color:#005CC5">0</span><span style="color:#24292E">] </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 10</span><span style="color:#D73A49"> +</span><span style="color:#24292E"> [</span><span style="color:#005CC5">1</span><span style="color:#24292E">] </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 10</span></span></code></pre></section>
+<section class="cell markdown"><p><strong>Try it.</strong> Make a list containing five zeros, five ones and five zeros again. Then repeat the whole pattern three times. Where do the parentheses belong?</p>
+</section>
+<section class="cell markdown"><h2>6. Shall we draw it?</h2>
+<p>A little new machinery: we import the plotting part of Matplotlib and give it the short name <code>plt</code>. An import makes code from a library available to us.</p>
+<p>The <code>%matplotlib inline</code> line is an IPython instruction that asks for plots inside the notebook.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">%</span><span style="color:#24292E">matplotlib inline</span></span>
+<span class="line"><span style="color:#D73A49">from</span><span style="color:#24292E"> matplotlib </span><span style="color:#D73A49">import</span><span style="color:#24292E"> pyplot </span><span style="color:#D73A49">as</span><span style="color:#24292E"> plt</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">plt.plot</span></span></code></pre></section>
+<section class="cell markdown"><h3>What does the dot mean?</h3>
+<p>We have already called functions such as <code>sum(t)</code>. Now we encounter <code>plt.plot(...)</code>. What is that dot doing?</p>
+<p>The dot asks Python to look up a name on an object. That named value is called an <strong>attribute</strong>. Here, <code>plt</code> refers to the plotting module we imported, and <code>plot</code> is a function available in that module.</p>
+<p>In the previous cell, <code>plt.plot</code> retrieves the function without calling it. Adding parentheses, as in <code>plt.plot([0, 1, 0])</code>, calls that function and passes it an argument. The parentheses do the same job as before.</p>
+</section>
+<section class="cell markdown"><h3>An operation on a particular list</h3>
+<p>The same dot syntax also lets us find a <strong>method</strong>: an operation associated with a particular object. Let's ask a list to append one more value.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">notes </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#005CC5">440</span><span style="color:#24292E">, </span><span style="color:#005CC5">550</span><span style="color:#24292E">]</span></span>
+<span class="line"><span style="color:#24292E">notes.append(</span><span style="color:#005CC5">660</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">notes</span></span></code></pre></section>
+<section class="cell markdown"><p><code>append</code> is a method of the list. Calling it changes <code>notes</code> itself by adding a value at the end. It returns <code>None</code>, so we inspect <code>notes</code> on the next line to see the changed list.</p>
+<p>The distinction to keep is small but useful: the <strong>dot looks up an attribute</strong>, and the <strong>parentheses call it</strong> if it is callable. <code>plt.plot</code> is a function provided by a module; <code>notes.append</code> is a method of a list. Other attributes can simply hold data and cannot be called.</p>
+<p>OK, let's use that syntax to draw our pattern.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">step </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#005CC5">0</span><span style="color:#24292E">] </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 10</span><span style="color:#D73A49"> +</span><span style="color:#24292E"> [</span><span style="color:#005CC5">1</span><span style="color:#24292E">] </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 10</span></span>
+<span class="line"><span style="color:#24292E">plt.figure(</span><span style="color:#E36209">figsize</span><span style="color:#D73A49">=</span><span style="color:#24292E">(</span><span style="color:#005CC5">9</span><span style="color:#24292E">, </span><span style="color:#005CC5">2.5</span><span style="color:#24292E">))</span></span>
+<span class="line"><span style="color:#24292E">plt.plot(step, </span><span style="color:#E36209">marker</span><span style="color:#D73A49">=</span><span style="color:#032F62">'o'</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">plt.xlabel(</span><span style="color:#032F62">'Sample index'</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">plt.ylabel(</span><span style="color:#032F62">'Value'</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">plt.grid(</span><span style="color:#005CC5">True</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">plt.show()</span></span></code></pre></section>
+<section class="cell markdown"><p>We supplied only the vertical values. Matplotlib used the positions <code>0, 1, 2, ...</code> for the horizontal axis. The lines join the samples to help us see the pattern.</p>
+<p>What happens if we repeat that pattern?</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">plt.figure(</span><span style="color:#E36209">figsize</span><span style="color:#D73A49">=</span><span style="color:#24292E">(</span><span style="color:#005CC5">9</span><span style="color:#24292E">, </span><span style="color:#005CC5">2.5</span><span style="color:#24292E">))</span></span>
+<span class="line"><span style="color:#24292E">plt.plot(step </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 10</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">plt.xlabel(</span><span style="color:#032F62">'Sample index'</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">plt.ylabel(</span><span style="color:#032F62">'Value'</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">plt.grid(</span><span style="color:#005CC5">True</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">plt.show()</span></span></code></pre></section>
+<section class="cell markdown"><h2>7. Could this list be a sound?</h2>
+<p>OK, what else could we do with this list? We could interpret its numbers as a sequence of <strong>samples</strong> describing a waveform.</p>
+<p>To turn samples into sound, we also need a <strong>sample rate</strong>: how many samples to play each second. We will use 48,000 samples per second throughout the lesson.</p>
+<p>These examples use floating-point values and a small amplitude. Start with a low listening volume.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">from</span><span style="color:#24292E"> IPython.display </span><span style="color:#D73A49">import</span><span style="color:#24292E"> Audio, display</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#005CC5">SR</span><span style="color:#D73A49"> =</span><span style="color:#005CC5"> 48_000</span></span>
+<span class="line"><span style="color:#24292E">amplitude </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 0.15</span></span></code></pre></section>
+<section class="cell markdown"><p>Our earlier pattern moved between zero and one. For sound, let's use a square wave centred around zero: ten negative samples followed by ten positive samples.</p>
+<p>The period has 20 samples. Repeating it 2,400 times gives 48,000 samples, or one second of sound.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">square_period </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#D73A49">-</span><span style="color:#24292E">amplitude] </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 10</span><span style="color:#D73A49"> +</span><span style="color:#24292E"> [amplitude] </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 10</span></span>
+<span class="line"><span style="color:#24292E">square </span><span style="color:#D73A49">=</span><span style="color:#24292E"> square_period </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 2400</span></span>
+<span class="line"><span style="color:#24292E">Audio(square, </span><span style="color:#E36209">rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">, </span><span style="color:#E36209">normalize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">False</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><p>Click the player to listen. <code>normalize=False</code> keeps the amplitude we chose. Otherwise the audio widget would rescale the signal.</p>
+<p><strong>Try it.</strong> Make each half of the period 20 samples long instead of 10. What happens to the pitch? What happens if you only change the number of repetitions?</p>
+<p>A longer period lowers the frequency at a fixed sample rate. More repetitions extend the sound without changing its frequency.</p>
+</section>
+<section class="cell markdown"><h3>Optional: playing directly with sounddevice</h3>
+<p>The original experiment used <code>sounddevice</code>. You can run the following code in a new cell to send the samples directly to the computer's audio output:</p>
+<pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">import</span><span style="color:#24292E"> sounddevice </span><span style="color:#D73A49">as</span><span style="color:#24292E"> sd</span></span>
+<span class="line"><span style="color:#24292E">sd.play(square, </span><span style="color:#E36209">samplerate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">sd.wait()</span></span>
+<span class="line"></span></code></pre>
+<p><code>sd.wait()</code> waits until playback finishes. Use <code>sd.stop()</code> to stop playback early. This requires an available output device that supports the requested sample rate. The embedded players above are convenient when Python runs on another machine.</p>
+<p>A plain list of integers can become an unsupported <code>int64</code> array in sounddevice. This does <strong>not</strong> mean that sounddevice rejects every integer format: it supports specific integer formats as well as floating-point data. Using floats here keeps the examples straightforward. Python floats approximate real numbers with finite precision.</p>
+</section>
+<section class="cell markdown"><h2>8. A siren with two frequencies</h2>
+<p>Can we alternate two pitches? We already have the tools: repetition makes each note longer, and concatenation puts one note after another.</p>
+<p>Let's use periods of 120 and 80 samples. The next section will explain why those give 400 Hz and 600 Hz at our sample rate.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">low_period </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#D73A49">-</span><span style="color:#24292E">amplitude] </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 60</span><span style="color:#D73A49"> +</span><span style="color:#24292E"> [amplitude] </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 60</span></span>
+<span class="line"><span style="color:#24292E">high_period </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#D73A49">-</span><span style="color:#24292E">amplitude] </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 40</span><span style="color:#D73A49"> +</span><span style="color:#24292E"> [amplitude] </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 40</span></span>
+<span class="line"><span style="color:#24292E">low_note </span><span style="color:#D73A49">=</span><span style="color:#24292E"> low_period </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 200</span></span>
+<span class="line"><span style="color:#24292E">high_note </span><span style="color:#D73A49">=</span><span style="color:#24292E"> high_period </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 300</span></span>
+<span class="line"><span style="color:#24292E">siren </span><span style="color:#D73A49">=</span><span style="color:#24292E"> (low_note </span><span style="color:#D73A49">+</span><span style="color:#24292E"> high_note) </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 3</span></span>
+<span class="line"><span style="color:#24292E">Audio(siren, </span><span style="color:#E36209">rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">, </span><span style="color:#E36209">normalize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">False</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><p>Each note contains 24,000 samples, so each lasts half a second. The complete siren lasts three seconds.</p>
+<p><strong>Try it first.</strong> Change the alternation speed while keeping the pitches. Then change the pitches while keeping each note's duration close to half a second.</p>
+</section>
+<section class="cell markdown"><h2>9. Another shape: a rising ramp</h2>
+<p>Do we like that timbre? What other waveforms could we try?</p>
+<p>Let's write a sequence that rises in small steps.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">ramp_period </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#005CC5">0.0</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.1</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.2</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.3</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.4</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.5</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.6</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.7</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.8</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.9</span><span style="color:#24292E">]</span></span>
+<span class="line"><span style="color:#24292E">plt.figure(</span><span style="color:#E36209">figsize</span><span style="color:#D73A49">=</span><span style="color:#24292E">(</span><span style="color:#005CC5">9</span><span style="color:#24292E">, </span><span style="color:#005CC5">2.5</span><span style="color:#24292E">))</span></span>
+<span class="line"><span style="color:#24292E">plt.plot(ramp_period </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 3</span><span style="color:#24292E">, </span><span style="color:#E36209">marker</span><span style="color:#D73A49">=</span><span style="color:#032F62">'o'</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">plt.xlabel(</span><span style="color:#032F62">'Sample index'</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">plt.ylabel(</span><span style="color:#032F62">'Value'</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">plt.grid(</span><span style="color:#005CC5">True</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">plt.show()</span></span></code></pre></section>
+<section class="cell markdown"><p>Notice what happens at the boundary: the sequence jumps back down and starts rising again. This is a <strong>sawtooth</strong> waveform. A triangle would have a descending slope as well as an ascending one.</p>
+<p>This short period would make a high sound. Could we make it longer? The boring way is to write more values.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">longer_ramp_period </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#005CC5">0.0</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.05</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.10</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.15</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.20</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.25</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.30</span><span style="color:#24292E">,</span></span>
+<span class="line"><span style="color:#005CC5">                      0.35</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.40</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.45</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.50</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.55</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.60</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.65</span><span style="color:#24292E">,</span></span>
+<span class="line"><span style="color:#005CC5">                      0.70</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.75</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.80</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.85</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.90</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.95</span><span style="color:#24292E">]</span></span>
+<span class="line"><span style="color:#005CC5">len</span><span style="color:#24292E">(longer_ramp_period)</span></span></code></pre></section>
+<section class="cell markdown"><p>Can we go lower still? Ideally, we want to move from a literal list of samples to a <strong>recipe</strong> for calculating them.</p>
+</section>
+<section class="cell markdown"><h2>10. A recipe for samples</h2>
+<p><code>range(n)</code> produces the integers from <code>0</code> up to, but excluding, <code>n</code>. Let's inspect a small example.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#005CC5">list</span><span style="color:#24292E">(</span><span style="color:#005CC5">range</span><span style="color:#24292E">(</span><span style="color:#005CC5">10</span><span style="color:#24292E">))</span></span></code></pre></section>
+<section class="cell markdown"><p>A <strong>list comprehension</strong> applies an expression to each value in a sequence:</p>
+<pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">[expression </span><span style="color:#D73A49">for</span><span style="color:#24292E"> variable </span><span style="color:#D73A49">in</span><span style="color:#24292E"> sequence]</span></span>
+<span class="line"></span></code></pre>
+<p>Read <code>[x / n for x in range(n)]</code> as: for each <code>x</code> in <code>range(n)</code>, calculate <code>x / n</code>, and collect the results into a list.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">n </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 20</span></span>
+<span class="line"><span style="color:#24292E">ramp_period </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [x </span><span style="color:#D73A49">/</span><span style="color:#24292E"> n </span><span style="color:#D73A49">for</span><span style="color:#24292E"> x </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> range</span><span style="color:#24292E">(n)]</span></span>
+<span class="line"><span style="color:#24292E">ramp_period</span></span></code></pre></section>
+<section class="cell markdown"><p>The final value is <code>(n - 1) / n</code>, just below one. We can now change one number to make a much longer period.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">n </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 1000</span></span>
+<span class="line"><span style="color:#24292E">ramp_period </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [x </span><span style="color:#D73A49">/</span><span style="color:#24292E"> n </span><span style="color:#D73A49">for</span><span style="color:#24292E"> x </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> range</span><span style="color:#24292E">(n)]</span></span>
+<span class="line"><span style="color:#005CC5">len</span><span style="color:#24292E">(ramp_period)</span></span></code></pre></section>
+<section class="cell markdown"><p>For listening, we map the ramp into values around zero and scale it by our amplitude. The expression <code>2 * x / n - 1</code> starts at <code>-1</code> and approaches <code>+1</code>.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">n </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 300</span></span>
+<span class="line"><span style="color:#24292E">saw_period </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [amplitude </span><span style="color:#D73A49">*</span><span style="color:#24292E"> (</span><span style="color:#005CC5">2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> x </span><span style="color:#D73A49">/</span><span style="color:#24292E"> n </span><span style="color:#D73A49">-</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> x </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> range</span><span style="color:#24292E">(n)]</span></span>
+<span class="line"><span style="color:#24292E">saw </span><span style="color:#D73A49">=</span><span style="color:#24292E"> saw_period </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 160</span></span>
+<span class="line"><span style="color:#24292E">Audio(saw, </span><span style="color:#E36209">rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">, </span><span style="color:#E36209">normalize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">False</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><p>We could also write the recipe directly inside the audio call. Naming the period makes it easier to inspect and reuse.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">Audio([amplitude </span><span style="color:#D73A49">*</span><span style="color:#24292E"> (</span><span style="color:#005CC5">2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> x </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> 300</span><span style="color:#D73A49"> -</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> x </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> range</span><span style="color:#24292E">(</span><span style="color:#005CC5">300</span><span style="color:#24292E">)] </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 160</span><span style="color:#24292E">,</span></span>
+<span class="line"><span style="color:#E36209">      rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">, </span><span style="color:#E36209">normalize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">False</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><h2>11. What frequency are we hearing?</h2>
+<p>We need to relate samples to time. If the sample rate is <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span></span></span></span> samples per second and a period contains <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> samples, its duration is</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.7936em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1076em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:1em;"></span><span class="mord text"><span class="mord">seconds</span></span><span class="mord">.</span></span></span></span></span></p>
+<p>Frequency counts periods per second, so</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">n</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:1em;"></span><span class="mord text"><span class="mord">Hz</span></span><span class="mord">.</span></span></span></span></span></p>
+<p>For <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">300</span></span></span></span> and <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">48</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">000</span></span></span></span>, what do we get?</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">n </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 300</span></span>
+<span class="line"><span style="color:#005CC5">SR</span><span style="color:#D73A49"> /</span><span style="color:#24292E"> n</span></span></code></pre></section>
+<section class="cell markdown"><p>That gives 160 Hz. The duration of the <strong>whole sound</strong> is a separate calculation: divide its total number of samples by the sample rate.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#005CC5">len</span><span style="color:#24292E">(saw) </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> SR</span></span></code></pre></section>
+<section class="cell markdown"><h3>What if we want 440 Hz?</h3>
+<p>Rearranging the equation gives <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span></span></span></span>. Let's calculate the period length for A4.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#005CC5">SR</span><span style="color:#D73A49"> /</span><span style="color:#005CC5"> 440</span></span></code></pre></section>
+<section class="cell markdown"><p>A literal list cannot have a fractional number of samples. If we repeat a fixed list, we must choose an integer period length. Let's use the nearest integer and check the actual frequency.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">target_frequency </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 440</span></span>
+<span class="line"><span style="color:#24292E">n </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(</span><span style="color:#005CC5">SR</span><span style="color:#D73A49"> /</span><span style="color:#24292E"> target_frequency)</span></span>
+<span class="line"><span style="color:#24292E">actual_frequency </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> SR</span><span style="color:#D73A49"> /</span><span style="color:#24292E"> n</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(</span><span style="color:#032F62">'Samples per period:'</span><span style="color:#24292E">, n)</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(</span><span style="color:#032F62">'Actual frequency:'</span><span style="color:#24292E">, actual_frequency)</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(</span><span style="color:#032F62">'Difference in Hz:'</span><span style="color:#24292E">, actual_frequency </span><span style="color:#D73A49">-</span><span style="color:#24292E"> target_frequency)</span></span></code></pre></section>
+<section class="cell markdown"><p>The result is about 440.37 Hz, slightly above 440 Hz. This is a limitation of repeating a fixed integer-length period. Later, a phase-based oscillator can represent frequencies without restricting every period boundary to an integer sample.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">a4_period </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [amplitude </span><span style="color:#D73A49">*</span><span style="color:#24292E"> (</span><span style="color:#005CC5">2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> x </span><span style="color:#D73A49">/</span><span style="color:#24292E"> n </span><span style="color:#D73A49">-</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> x </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> range</span><span style="color:#24292E">(n)]</span></span>
+<span class="line"><span style="color:#24292E">a4 </span><span style="color:#D73A49">=</span><span style="color:#24292E"> a4_period </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(</span><span style="color:#005CC5">SR</span><span style="color:#D73A49"> /</span><span style="color:#24292E"> n)</span></span>
+<span class="line"><span style="color:#24292E">Audio(a4, </span><span style="color:#E36209">rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">, </span><span style="color:#E36209">normalize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">False</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><p><strong>Check your understanding.</strong> At a fixed sample rate, what happens to frequency if we double <code>n</code>? What happens to both pitch and duration if we play the same sample list at half the sample rate?</p>
+</section>
+<section class="cell markdown"><h2>12. A real triangle wave</h2>
+<p>Let's return to the triangle idea. We need a slope going up and a slope going down. We can build the two halves separately, then concatenate them.</p>
+<p>We use 150 samples for each half, so the complete period has 300 samples, just like our 160 Hz sawtooth.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">half_n </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 150</span></span>
+<span class="line"><span style="color:#24292E">up </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#D73A49">-</span><span style="color:#24292E">amplitude </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> amplitude </span><span style="color:#D73A49">*</span><span style="color:#24292E"> x </span><span style="color:#D73A49">/</span><span style="color:#24292E"> half_n </span><span style="color:#D73A49">for</span><span style="color:#24292E"> x </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> range</span><span style="color:#24292E">(half_n)]</span></span>
+<span class="line"><span style="color:#24292E">down </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [amplitude </span><span style="color:#D73A49">-</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> amplitude </span><span style="color:#D73A49">*</span><span style="color:#24292E"> x </span><span style="color:#D73A49">/</span><span style="color:#24292E"> half_n </span><span style="color:#D73A49">for</span><span style="color:#24292E"> x </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> range</span><span style="color:#24292E">(half_n)]</span></span>
+<span class="line"><span style="color:#24292E">triangle_period </span><span style="color:#D73A49">=</span><span style="color:#24292E"> up </span><span style="color:#D73A49">+</span><span style="color:#24292E"> down</span></span>
+<span class="line"><span style="color:#24292E">triangle </span><span style="color:#D73A49">=</span><span style="color:#24292E"> triangle_period </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 160</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">plt.figure(</span><span style="color:#E36209">figsize</span><span style="color:#D73A49">=</span><span style="color:#24292E">(</span><span style="color:#005CC5">9</span><span style="color:#24292E">, </span><span style="color:#005CC5">2.5</span><span style="color:#24292E">))</span></span>
+<span class="line"><span style="color:#24292E">plt.plot(saw_period </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 3</span><span style="color:#24292E">, </span><span style="color:#E36209">label</span><span style="color:#D73A49">=</span><span style="color:#032F62">'Sawtooth'</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">plt.plot(triangle_period </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 3</span><span style="color:#24292E">, </span><span style="color:#E36209">label</span><span style="color:#D73A49">=</span><span style="color:#032F62">'Triangle'</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">plt.xlabel(</span><span style="color:#032F62">'Sample index'</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">plt.ylabel(</span><span style="color:#032F62">'Amplitude'</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">plt.legend()</span></span>
+<span class="line"><span style="color:#24292E">plt.grid(</span><span style="color:#005CC5">True</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">plt.show()</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">display(Audio(saw, </span><span style="color:#E36209">rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">, </span><span style="color:#E36209">normalize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">False</span><span style="color:#24292E">))</span></span>
+<span class="line"><span style="color:#24292E">display(Audio(triangle, </span><span style="color:#E36209">rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">, </span><span style="color:#E36209">normalize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">False</span><span style="color:#24292E">))</span></span></code></pre></section>
+<section class="cell markdown"><p>Listen to the sawtooth first, then the triangle. They have the same period length, duration and peak amplitude. Does the triangle sound softer? The waveform shape changes the balance of harmonics, which contributes to timbre. Equal peak amplitudes do not guarantee equal perceived loudness.</p>
+<p>These direct recipes are useful first experiments. Sharp transitions introduce high harmonics, some of which can exceed half the sample rate and alias into the audible band. More careful oscillator design is a topic for a later lesson.</p>
+</section>
+<section class="cell markdown"><h2>13. Exercise: an A major arpeggio</h2>
+<p>Can you play an A major arpeggio in root position, starting at A4?</p>
+<p>The notes are <strong>A4, C♯5, E5</strong>, with <strong>A5</strong> as an optional octave ending. In twelve-tone equal temperament, moving up <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">s</span></span></span></span> semitones multiplies frequency by <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.888em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.888em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">s</span><span class="mord mtight">/12</span></span></span></span></span></span></span></span></span></span></span></span>. Relative to A4, the offsets are <code>0</code>, <code>4</code>, <code>7</code> and <code>12</code>.</p>
+<p>Try building it before looking at the worked example below:</p>
+<ol>
+<li>Calculate the target frequencies from 440 Hz.</li>
+<li>Turn each frequency into an integer period length.</li>
+<li>Generate a ramp period for each note.</li>
+<li>Repeat each period to make roughly half a second of sound.</li>
+<li>Concatenate the notes and listen.</li>
+</ol>
+<p>Use the same sample rate and amplitude for all notes.</p>
+</section>
+<section class="cell markdown"><h3>Worked example: the pitches</h3>
+<p>First, let's keep the target frequencies and inspect how rounding the period lengths changes them.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">offsets </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#005CC5">0</span><span style="color:#24292E">, </span><span style="color:#005CC5">4</span><span style="color:#24292E">, </span><span style="color:#005CC5">7</span><span style="color:#24292E">, </span><span style="color:#005CC5">12</span><span style="color:#24292E">]</span></span>
+<span class="line"><span style="color:#24292E">frequencies </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#005CC5">440</span><span style="color:#D73A49"> *</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> **</span><span style="color:#24292E"> (s </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> 12</span><span style="color:#24292E">) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> s </span><span style="color:#D73A49">in</span><span style="color:#24292E"> offsets]</span></span>
+<span class="line"><span style="color:#24292E">period_lengths </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#005CC5">round</span><span style="color:#24292E">(</span><span style="color:#005CC5">SR</span><span style="color:#D73A49"> /</span><span style="color:#24292E"> f) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> f </span><span style="color:#D73A49">in</span><span style="color:#24292E"> frequencies]</span></span>
+<span class="line"><span style="color:#24292E">realized_frequencies </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#005CC5">SR</span><span style="color:#D73A49"> /</span><span style="color:#24292E"> n </span><span style="color:#D73A49">for</span><span style="color:#24292E"> n </span><span style="color:#D73A49">in</span><span style="color:#24292E"> period_lengths]</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(</span><span style="color:#032F62">'Target frequencies:'</span><span style="color:#24292E">, frequencies)</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(</span><span style="color:#032F62">'Samples per period:'</span><span style="color:#24292E">, period_lengths)</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(</span><span style="color:#032F62">'Actual frequencies:'</span><span style="color:#24292E">, realized_frequencies)</span></span></code></pre></section>
+<section class="cell markdown"><h3>Worked example: the notes</h3>
+<p>We can write each note explicitly using the tools we already know. The number of repetitions is approximately <code>duration * SR / n</code>, rounded to an integer.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">duration </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 0.5</span></span>
+<span class="line"><span style="color:#24292E">n_a, n_cs, n_e, n_octave </span><span style="color:#D73A49">=</span><span style="color:#24292E"> period_lengths</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">note_a </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [amplitude </span><span style="color:#D73A49">*</span><span style="color:#24292E"> (</span><span style="color:#005CC5">2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> x </span><span style="color:#D73A49">/</span><span style="color:#24292E"> n_a </span><span style="color:#D73A49">-</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> x </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> range</span><span style="color:#24292E">(n_a)] </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(duration </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> SR</span><span style="color:#D73A49"> /</span><span style="color:#24292E"> n_a)</span></span>
+<span class="line"><span style="color:#24292E">note_cs </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [amplitude </span><span style="color:#D73A49">*</span><span style="color:#24292E"> (</span><span style="color:#005CC5">2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> x </span><span style="color:#D73A49">/</span><span style="color:#24292E"> n_cs </span><span style="color:#D73A49">-</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> x </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> range</span><span style="color:#24292E">(n_cs)] </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(duration </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> SR</span><span style="color:#D73A49"> /</span><span style="color:#24292E"> n_cs)</span></span>
+<span class="line"><span style="color:#24292E">note_e </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [amplitude </span><span style="color:#D73A49">*</span><span style="color:#24292E"> (</span><span style="color:#005CC5">2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> x </span><span style="color:#D73A49">/</span><span style="color:#24292E"> n_e </span><span style="color:#D73A49">-</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> x </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> range</span><span style="color:#24292E">(n_e)] </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(duration </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> SR</span><span style="color:#D73A49"> /</span><span style="color:#24292E"> n_e)</span></span>
+<span class="line"><span style="color:#24292E">note_octave </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [amplitude </span><span style="color:#D73A49">*</span><span style="color:#24292E"> (</span><span style="color:#005CC5">2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> x </span><span style="color:#D73A49">/</span><span style="color:#24292E"> n_octave </span><span style="color:#D73A49">-</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> x </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> range</span><span style="color:#24292E">(n_octave)] </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(duration </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> SR</span><span style="color:#D73A49"> /</span><span style="color:#24292E"> n_octave)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">arpeggio </span><span style="color:#D73A49">=</span><span style="color:#24292E"> note_a </span><span style="color:#D73A49">+</span><span style="color:#24292E"> note_cs </span><span style="color:#D73A49">+</span><span style="color:#24292E"> note_e </span><span style="color:#D73A49">+</span><span style="color:#24292E"> note_octave</span></span>
+<span class="line"><span style="color:#24292E">Audio(arpeggio </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 3</span><span style="color:#24292E">, </span><span style="color:#E36209">rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">, </span><span style="color:#E36209">normalize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">False</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><p><code>n_a, n_cs, n_e, n_octave = period_lengths</code> unpacks four values into four names. Rounding the repeat counts makes the note durations close to half a second, rather than exactly half a second.</p>
+<p><strong>Try it.</strong> Make the arpeggio descend. Then change it to A minor: which semitone offset needs to change? You may hear clicks at note boundaries because the samples change abruptly. Short amplitude fades are a useful next step.</p>
+</section>
+<section class="cell markdown"><h2>14. What can we now ask Python to do?</h2>
+<p>We started with <code>1</code>. Now we can describe a sequence of samples with a recipe, draw it and listen to it.</p>
+<p>The same small set of ideas keeps coming back: expressions calculate values, names let us reuse them, lists collect related values, and function calls ask for operations. A list comprehension gives us a compact recipe for an entire sequence.</p>
+<p>Keep the conversation going: make a prediction, run a small experiment and use the result to decide what to try next.</p>
+</section>
+<section class="cell markdown"><h3>Exercise notes</h3>
+<ul>
+<li>Five zeros, five ones and five zeros, repeated three times: <code>([0] * 5 + [1] * 5 + [0] * 5) * 3</code>.</li>
+<li>Doubling a period length halves its frequency at a fixed sample rate.</li>
+<li>Halving the playback sample rate halves frequency and doubles duration for the same samples.</li>
+<li>To alternate the siren faster, reduce each note's repetition count.</li>
+<li>A minor uses offsets <code>[0, 3, 7, 12]</code>.</li>
+</ul>
+<h3>Further reference</h3>
+<ul>
+<li><a href="https://docs.python.org/3/tutorial/introduction.html">Python tutorial: numbers and lists</a></li>
+<li><a href="https://docs.python.org/3/tutorial/datastructures.html#list-comprehensions">Python tutorial: list comprehensions</a></li>
+<li><a href="https://ipython.readthedocs.io/en/stable/api/generated/IPython.display.html#IPython.display.Audio">IPython Audio</a></li>
+<li><a href="https://python-sounddevice.readthedocs.io/en/latest/api/convenience-functions.html#sounddevice.play">sounddevice playback and supported formats</a></li>
+</ul>
+</section>
+
+  </article>
+</main>
+</body>
+</html>

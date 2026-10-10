@@ -1,0 +1,29 @@
+{
+  "content": [
+    {
+      "content": null,
+      "created": "2026-10-10T09:03:16.244602Z",
+      "format": null,
+      "hash": null,
+      "hash_algorithm": null,
+      "last_modified": "2026-10-10T09:03:16.244602Z",
+      "mimetype": null,
+      "name": "class-notebook.ipynb",
+      "path": "lesson-05/class-notebook.ipynb",
+      "size": 14621,
+      "type": "notebook",
+      "writable": true
+    }
+  ],
+  "created": "2026-10-10T09:03:17.000629Z",
+  "format": "json",
+  "hash": null,
+  "hash_algorithm": null,
+  "last_modified": "2026-10-10T09:03:17.000695Z",
+  "mimetype": null,
+  "name": "lesson-05",
+  "path": "lesson-05",
+  "size": null,
+  "type": "directory",
+  "writable": true
+}

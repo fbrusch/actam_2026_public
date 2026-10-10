@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+  <meta name="theme-color" content="#f7f5ef">
+  <title>Lesson 02 · Reference notebook · ACTAM</title>
+  <link rel="stylesheet" href="../../assets/katex/katex.min.css">
+  <style>
+:root { color-scheme: light; color: #182f3a; background: #f7f5ef; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+* { box-sizing: border-box; }
+body { margin: 0; background: #f7f5ef; }
+main { max-width: 900px; margin: auto; padding: 40px 24px 80px; }
+.crumbs ol { display: flex; flex-wrap: wrap; gap: 0 .6em; margin: 0; padding: 0; list-style: none; font: .8rem ui-monospace, Menlo, monospace; letter-spacing: .12em; text-transform: uppercase; color: #42666a; }
+.crumbs li + li::before { content: '›'; margin-right: .6em; }
+.crumbs a { color: inherit; text-decoration: none; }
+.crumbs a:hover { text-decoration: underline; }
+h1 { font: 700 clamp(2rem, 6vw, 3.4rem)/1.08 ui-monospace, Menlo, monospace; letter-spacing: -.05em; margin: 22px 0 18px; }
+.bar { display: flex; flex-wrap: wrap; gap: 10px; }
+.button { font: .9rem ui-monospace, Menlo, monospace; padding: 9px 14px; border: 1px solid #087e83; color: #087e83; text-decoration: none; background: #fff; }
+.button.primary { background: #087e83; color: #fff; }
+.button:focus-visible { outline: 3px solid #cb4f38; outline-offset: 3px; }
+.hint { color: #42666a; font-size: .85rem; line-height: 1.5; margin: 12px 0 28px; max-width: 640px; }
+.cell { margin: 0 0 14px; }
+.markdown { line-height: 1.65; }
+.markdown h1, .markdown h2, .markdown h3 { font-family: ui-monospace, Menlo, monospace; letter-spacing: -.02em; line-height: 1.2; margin: 1.6em 0 .5em; }
+.markdown h1 { font-size: 1.8rem; } .markdown h2 { font-size: 1.4rem; } .markdown h3 { font-size: 1.1rem; }
+.markdown code { font: .88em ui-monospace, Menlo, monospace; background: #e5ece6; color: #0b5f63; padding: 1px 4px; }
+.markdown pre code { background: none; color: inherit; padding: 0; }
+.markdown table { border-collapse: collapse; margin: 12px 0; }
+.markdown th, .markdown td { border: 1px solid #ccd4cf; padding: 5px 10px; text-align: left; }
+.markdown img { max-width: 100%; }
+.markdown a { color: #087e83; }
+.markdown details { margin: 12px 0; }
+.markdown summary { cursor: pointer; color: #087e83; }
+.markdown blockquote { margin: 0; padding-left: 14px; border-left: 3px solid #087e83; color: #42666a; }
+pre { margin: 0; padding: 14px 16px; overflow-x: auto; font: .82rem/1.55 ui-monospace, Menlo, monospace; border: 1px solid #d5ddd8; }
+pre.shiki { background: #fbfcfa !important; }
+pre.plain { background: #fbfcfa; }
+.code pre { border-left: 3px solid #087e83; }
+.katex-display { overflow-x: auto; overflow-y: hidden; }
+@media (max-width: 620px) { main { padding: 28px 16px 60px; } }
+</style>
+</head>
+<body>
+<main>
+  <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../../">ACTAM</a></li><li><a href="../../#lesson-02">Lesson 02</a></li><li><span aria-current="page">Reference notebook</span></li></ol></nav>
+  <h1>Reference notebook</h1>
+  <div class="bar">
+    <a class="button" href="../notebook.ipynb" download="actam-lesson-02-notebook.ipynb">Download .ipynb</a>
+    <a class="button primary" href="../../lite/notebooks/index.html?path=lesson-02%2Fnotebook.ipynb">Open in the browser</a>
+  </div>
+  <p class="hint">“Open in the browser” runs the notebook on your computer with JupyterLite: no installation, no account. Your changes stay in that browser: download the notebook to keep them.</p>
+  <article class="notebook">
+<section class="cell markdown"><h1>From samples to a musical language</h1>
+<h2>Lesson 02 · ACTAM 2026</h2>
+<p>Last time, a list of numbers became a sound. We could change its pitch, repeat it and put sounds one after another.</p>
+<p>Now we want to do less bookkeeping and say more with our code. We will build three notes, recognise a tune, and introduce functions when repeating the recipe becomes awkward. Then we will give the tune a rhythm and some breathing space.</p>
+<p>A second workshop explores a different sound: noise. Can a simple calculation become a percussion instrument?</p>
+</section>
+<section class="cell markdown"><h3>How to use this notebook</h3>
+<p>Run cells from top to bottom with <strong>Shift+Enter</strong>. At each “Your turn”, predict or try something before opening the worked example below it. Restart the kernel and run all cells to check that your work does not depend on old notebook state.</p>
+<p>We use the lists, arithmetic, comprehensions and function calls from lesson01. The new tools are function definitions and, in the noise workshop, a stateful <code>for</code> loop.</p>
+<p>The examples use IPython and Matplotlib from the lesson01 environment. <code>Audio</code> is just our convenient renderer for now; later we can send the same sample data to sounddevice. Click a player to listen, starting at a low volume.</p>
+</section>
+<section class="cell markdown"><h2>1. Pick up the thread</h2>
+<p>What frequency does this list produce? How long will it last?</p>
+<p>Count the samples in one period and in the whole sound before running the calculations.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">from</span><span style="color:#24292E"> IPython.display </span><span style="color:#D73A49">import</span><span style="color:#24292E"> Audio</span></span>
+<span class="line"><span style="color:#D73A49">from</span><span style="color:#24292E"> matplotlib </span><span style="color:#D73A49">import</span><span style="color:#24292E"> pyplot </span><span style="color:#D73A49">as</span><span style="color:#24292E"> plt</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">sample_rate </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 48_000</span></span>
+<span class="line"><span style="color:#24292E">square </span><span style="color:#D73A49">=</span><span style="color:#24292E"> ([</span><span style="color:#D73A49">-</span><span style="color:#005CC5">0.15</span><span style="color:#24292E">] </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 100</span><span style="color:#D73A49"> +</span><span style="color:#24292E"> [</span><span style="color:#005CC5">0.15</span><span style="color:#24292E">] </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 100</span><span style="color:#24292E">) </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 100</span></span>
+<span class="line"><span style="color:#24292E">Audio(square, </span><span style="color:#E36209">rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate, </span><span style="color:#E36209">normalize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">False</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">samples_per_period </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 200</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(</span><span style="color:#032F62">"Frequency:"</span><span style="color:#24292E">, sample_rate </span><span style="color:#D73A49">/</span><span style="color:#24292E"> samples_per_period, </span><span style="color:#032F62">"Hz"</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(</span><span style="color:#032F62">"Duration:"</span><span style="color:#24292E">, </span><span style="color:#005CC5">len</span><span style="color:#24292E">(square) </span><span style="color:#D73A49">/</span><span style="color:#24292E"> sample_rate, </span><span style="color:#032F62">"seconds"</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><p>One period contains 200 samples. At 48,000 samples per second:</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">48</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">000</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">200</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mord text"><span class="mord"> s</span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:2em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">200</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">48</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">000</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">240</span><span class="mord text"><span class="mord"> Hz</span></span><span class="mord">.</span></span></span></span></span></p>
+<p>The whole list contains 20,000 samples, so it lasts about 0.417 seconds. Period length and total sound length answer different questions.</p>
+</section>
+<section class="cell markdown"><h2>2. Ask for a pitch, a duration and an amplitude</h2>
+<p>Suppose we want A4, conventionally 440 Hz. Each half-period would need</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">h</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.2408em;vertical-align:-0.8804em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8804em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<p>samples. Our repeated-list recipe needs an integer, so we round. As in lesson01, this introduces a tuning approximation.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">amplitude </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 0.15</span></span>
+<span class="line"><span style="color:#24292E">duration </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 0.5</span></span>
+<span class="line"><span style="color:#24292E">f </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 440</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">half_period </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(sample_rate </span><span style="color:#D73A49">/</span><span style="color:#24292E"> (</span><span style="color:#005CC5">2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> f))</span></span>
+<span class="line"><span style="color:#24292E">period </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#D73A49">-</span><span style="color:#24292E">amplitude] </span><span style="color:#D73A49">*</span><span style="color:#24292E"> half_period </span><span style="color:#D73A49">+</span><span style="color:#24292E"> [amplitude] </span><span style="color:#D73A49">*</span><span style="color:#24292E"> half_period</span></span>
+<span class="line"><span style="color:#24292E">sample_count </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(duration </span><span style="color:#D73A49">*</span><span style="color:#24292E"> sample_rate)</span></span>
+<span class="line"><span style="color:#24292E">repeats </span><span style="color:#D73A49">=</span><span style="color:#24292E"> (sample_count </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(period) </span><span style="color:#D73A49">-</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">) </span><span style="color:#D73A49">//</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(period)</span></span>
+<span class="line"><span style="color:#24292E">wave </span><span style="color:#D73A49">=</span><span style="color:#24292E"> (period </span><span style="color:#D73A49">*</span><span style="color:#24292E"> repeats)[:sample_count]</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(</span><span style="color:#032F62">"Requested frequency:"</span><span style="color:#24292E">, f)</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(</span><span style="color:#032F62">"Actual frequency:"</span><span style="color:#24292E">, sample_rate </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(period))</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(</span><span style="color:#032F62">"Duration:"</span><span style="color:#24292E">, </span><span style="color:#005CC5">len</span><span style="color:#24292E">(wave) </span><span style="color:#D73A49">/</span><span style="color:#24292E"> sample_rate)</span></span>
+<span class="line"><span style="color:#24292E">Audio(wave, </span><span style="color:#E36209">rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate, </span><span style="color:#E36209">normalize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">False</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><h3>Two kinds of rounding</h3>
+<p>Here the period has 110 samples, giving about <strong>436.36 Hz</strong>, rather than exactly 440 Hz. Rounding the half-period is closer than truncating it: <code>int(48_000 / (2 * 440))</code> would give a 108-sample period, or about <strong>444.44 Hz</strong>. Neither is exact. This is a limit of our fixed-period recipe, not of digital audio in general.</p>
+<p>For duration, we choose a target number of samples. <code>//</code> is integer floor division; <code>(sample_count + len(period) - 1) // len(period)</code> gives enough whole periods to cover the target. The slice <code>[:sample_count]</code> keeps just the required samples. The last period may be incomplete.</p>
+<p>This makes duration accurate to the nearest sample. We will keep the pitch approximation visible and improve the oscillator recipe in a future lesson.</p>
+</section>
+<section class="cell markdown"><h3>Your turn · Three independent controls</h3>
+<ol>
+<li>Make the sound twice as long without changing its pitch.</li>
+<li>Restore its duration and make it quieter.</li>
+<li>Request a pitch one octave higher.</li>
+</ol>
+<p>Which quantities change the period? Which change the total number of samples? Check your predictions in the recipe above, then restore its original values.</p>
+</section>
+<section class="cell markdown"><h2>3. Does this sound familiar?</h2>
+<p>In twelve-tone equal temperament, going up one semitone multiplies frequency by <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.888em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.888em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1/12</span></span></span></span></span></span></span></span></span></span></span></span>. From A, offsets of 0, 2 and 4 semitones give <strong>A, B and C♯</strong>.</p>
+<p>Let's build those three notes with the recipe we already understand.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">amplitude </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 0.15</span></span>
+<span class="line"><span style="color:#24292E">duration </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 0.5</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">f </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 440</span></span>
+<span class="line"><span style="color:#24292E">half_period </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(sample_rate </span><span style="color:#D73A49">/</span><span style="color:#24292E"> (</span><span style="color:#005CC5">2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> f))</span></span>
+<span class="line"><span style="color:#24292E">period </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#D73A49">-</span><span style="color:#24292E">amplitude] </span><span style="color:#D73A49">*</span><span style="color:#24292E"> half_period </span><span style="color:#D73A49">+</span><span style="color:#24292E"> [amplitude] </span><span style="color:#D73A49">*</span><span style="color:#24292E"> half_period</span></span>
+<span class="line"><span style="color:#24292E">sample_count </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(duration </span><span style="color:#D73A49">*</span><span style="color:#24292E"> sample_rate)</span></span>
+<span class="line"><span style="color:#24292E">repeats </span><span style="color:#D73A49">=</span><span style="color:#24292E"> (sample_count </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(period) </span><span style="color:#D73A49">-</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">) </span><span style="color:#D73A49">//</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(period)</span></span>
+<span class="line"><span style="color:#24292E">wave1 </span><span style="color:#D73A49">=</span><span style="color:#24292E"> (period </span><span style="color:#D73A49">*</span><span style="color:#24292E"> repeats)[:sample_count]</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">f </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 440</span><span style="color:#D73A49"> *</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> **</span><span style="color:#24292E"> (</span><span style="color:#005CC5">2</span><span style="color:#D73A49"> /</span><span style="color:#005CC5"> 12</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">half_period </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(sample_rate </span><span style="color:#D73A49">/</span><span style="color:#24292E"> (</span><span style="color:#005CC5">2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> f))</span></span>
+<span class="line"><span style="color:#24292E">period </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#D73A49">-</span><span style="color:#24292E">amplitude] </span><span style="color:#D73A49">*</span><span style="color:#24292E"> half_period </span><span style="color:#D73A49">+</span><span style="color:#24292E"> [amplitude] </span><span style="color:#D73A49">*</span><span style="color:#24292E"> half_period</span></span>
+<span class="line"><span style="color:#24292E">sample_count </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(duration </span><span style="color:#D73A49">*</span><span style="color:#24292E"> sample_rate)</span></span>
+<span class="line"><span style="color:#24292E">repeats </span><span style="color:#D73A49">=</span><span style="color:#24292E"> (sample_count </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(period) </span><span style="color:#D73A49">-</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">) </span><span style="color:#D73A49">//</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(period)</span></span>
+<span class="line"><span style="color:#24292E">wave2 </span><span style="color:#D73A49">=</span><span style="color:#24292E"> (period </span><span style="color:#D73A49">*</span><span style="color:#24292E"> repeats)[:sample_count]</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">f </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 440</span><span style="color:#D73A49"> *</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> **</span><span style="color:#24292E"> (</span><span style="color:#005CC5">4</span><span style="color:#D73A49"> /</span><span style="color:#005CC5"> 12</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">half_period </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(sample_rate </span><span style="color:#D73A49">/</span><span style="color:#24292E"> (</span><span style="color:#005CC5">2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> f))</span></span>
+<span class="line"><span style="color:#24292E">period </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#D73A49">-</span><span style="color:#24292E">amplitude] </span><span style="color:#D73A49">*</span><span style="color:#24292E"> half_period </span><span style="color:#D73A49">+</span><span style="color:#24292E"> [amplitude] </span><span style="color:#D73A49">*</span><span style="color:#24292E"> half_period</span></span>
+<span class="line"><span style="color:#24292E">sample_count </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(duration </span><span style="color:#D73A49">*</span><span style="color:#24292E"> sample_rate)</span></span>
+<span class="line"><span style="color:#24292E">repeats </span><span style="color:#D73A49">=</span><span style="color:#24292E"> (sample_count </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(period) </span><span style="color:#D73A49">-</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">) </span><span style="color:#D73A49">//</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(period)</span></span>
+<span class="line"><span style="color:#24292E">wave3 </span><span style="color:#D73A49">=</span><span style="color:#24292E"> (period </span><span style="color:#D73A49">*</span><span style="color:#24292E"> repeats)[:sample_count]</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">Audio(wave1 </span><span style="color:#D73A49">+</span><span style="color:#24292E"> wave2 </span><span style="color:#D73A49">+</span><span style="color:#24292E"> wave3, </span><span style="color:#E36209">rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate, </span><span style="color:#E36209">normalize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">False</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><h3>Your turn · Sing the next note</h3>
+<p>Do those three notes suggest a tune? Sing or hum what comes next. Then add the next note using a list we have already calculated.</p>
+<p>Before writing more code, imagine completing the entire melody this way. What would be tedious? Where might a copy-and-paste mistake hide?</p>
+<details>
+<summary>A familiar continuation</summary>
+<p>A–B–C♯–A: the opening of <strong>Fra Martino</strong>, also known as <strong>Frère Jacques</strong>. Three notes alone can suggest more than one tune, but adding the return to A helps reveal this one.</p>
+</details></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">opening </span><span style="color:#D73A49">=</span><span style="color:#24292E"> wave1 </span><span style="color:#D73A49">+</span><span style="color:#24292E"> wave2 </span><span style="color:#D73A49">+</span><span style="color:#24292E"> wave3 </span><span style="color:#D73A49">+</span><span style="color:#24292E"> wave1</span></span>
+<span class="line"><span style="color:#24292E">Audio(opening </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 2</span><span style="color:#24292E">, </span><span style="color:#E36209">rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate, </span><span style="color:#E36209">normalize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">False</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><h2>4. Give the recipe a name</h2>
+<p>The three blocks do the same job with different frequencies. We can define that job once and give it a name.</p>
+<p>A function lets us ask for a square wave in terms of frequency, duration and amplitude. The sample construction still happens, but we no longer need to write it at every use.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> square_wave</span><span style="color:#24292E">(f</span><span style="color:#D73A49">=</span><span style="color:#005CC5">440</span><span style="color:#24292E">, duration</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.5</span><span style="color:#24292E">, amplitude</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.15</span><span style="color:#24292E">, sample_rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">48_000</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#24292E">    half_period </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(sample_rate </span><span style="color:#D73A49">/</span><span style="color:#24292E"> (</span><span style="color:#005CC5">2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> f))</span></span>
+<span class="line"><span style="color:#24292E">    period </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#D73A49">-</span><span style="color:#24292E">amplitude] </span><span style="color:#D73A49">*</span><span style="color:#24292E"> half_period </span><span style="color:#D73A49">+</span><span style="color:#24292E"> [amplitude] </span><span style="color:#D73A49">*</span><span style="color:#24292E"> half_period</span></span>
+<span class="line"><span style="color:#24292E">    sample_count </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(duration </span><span style="color:#D73A49">*</span><span style="color:#24292E"> sample_rate)</span></span>
+<span class="line"><span style="color:#24292E">    repeats </span><span style="color:#D73A49">=</span><span style="color:#24292E"> (sample_count </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(period) </span><span style="color:#D73A49">-</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">) </span><span style="color:#D73A49">//</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(period)</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> (period </span><span style="color:#D73A49">*</span><span style="color:#24292E"> repeats)[:sample_count]</span></span></code></pre></section>
+<section class="cell markdown"><h3>A small syntax corner</h3>
+<ul>
+<li><code>def</code> introduces the definition; <code>square_wave</code> is the name we choose.</li>
+<li>The names in parentheses are <strong>parameters</strong>. Values such as <code>duration=0.5</code> provide defaults.</li>
+<li>The colon starts the body. Indentation groups the instructions inside it.</li>
+<li><code>return</code> gives the calculated value back to the caller.</li>
+</ul>
+<p>Running the definition makes the function available. Calling it runs the recipe. Here the result is an ordinary <strong>list of samples</strong>.</p>
+<p>The names created inside a call, such as <code>period</code>, are local to that call. The function uses its parameters, including <code>sample_rate</code>, rather than depending on the earlier notebook recipe.</p>
+<p>For this introductory recipe, use positive sample rates, frequencies between zero and half the sample rate, nonnegative durations, and amplitudes between 0 and 1. These are the intended input limits; this short version does not validate them.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">note </span><span style="color:#D73A49">=</span><span style="color:#24292E"> square_wave()</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(</span><span style="color:#005CC5">type</span><span style="color:#24292E">(note))</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(</span><span style="color:#032F62">"Samples:"</span><span style="color:#24292E">, </span><span style="color:#005CC5">len</span><span style="color:#24292E">(note))</span></span>
+<span class="line"><span style="color:#24292E">Audio(note, </span><span style="color:#E36209">rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate, </span><span style="color:#E36209">normalize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">False</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">short_a </span><span style="color:#D73A49">=</span><span style="color:#24292E"> square_wave(</span><span style="color:#E36209">f</span><span style="color:#D73A49">=</span><span style="color:#005CC5">440</span><span style="color:#24292E">, </span><span style="color:#E36209">duration</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.25</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">long_b </span><span style="color:#D73A49">=</span><span style="color:#24292E"> square_wave(</span><span style="color:#E36209">f</span><span style="color:#D73A49">=</span><span style="color:#005CC5">440</span><span style="color:#D73A49"> *</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> **</span><span style="color:#24292E"> (</span><span style="color:#005CC5">2</span><span style="color:#D73A49"> /</span><span style="color:#005CC5"> 12</span><span style="color:#24292E">), </span><span style="color:#E36209">duration</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.75</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">Audio(short_a </span><span style="color:#D73A49">+</span><span style="color:#24292E"> long_b, </span><span style="color:#E36209">rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate, </span><span style="color:#E36209">normalize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">False</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><h3>Your turn · A value and a recipe</h3>
+<ol>
+<li>Call <code>square_wave</code> to make a quiet, one-second note.</li>
+<li>Make a second note with a different pitch and concatenate them.</li>
+<li>Predict: if you change the notebook variable <code>f</code>, does an already calculated <code>note</code> change? Does calling <code>square_wave()</code> use that variable or its default?</li>
+</ol>
+<p>A stored list is a result already calculated. A function is a recipe we can call again with new arguments. Its default frequency is 440; to use the current value of <code>f</code>, pass <code>f=f</code>.</p>
+</section>
+<section class="cell markdown"><h2>5. Describe the opening in notes</h2>
+<p>Now the four-note phrase fits in one expression. Read it aloud in musical terms.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">opening </span><span style="color:#D73A49">=</span><span style="color:#24292E"> (</span></span>
+<span class="line"><span style="color:#24292E">    square_wave(</span><span style="color:#E36209">f</span><span style="color:#D73A49">=</span><span style="color:#005CC5">440</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#D73A49">    +</span><span style="color:#24292E"> square_wave(</span><span style="color:#E36209">f</span><span style="color:#D73A49">=</span><span style="color:#005CC5">440</span><span style="color:#D73A49"> *</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> **</span><span style="color:#24292E"> (</span><span style="color:#005CC5">2</span><span style="color:#D73A49"> /</span><span style="color:#005CC5"> 12</span><span style="color:#24292E">))</span></span>
+<span class="line"><span style="color:#D73A49">    +</span><span style="color:#24292E"> square_wave(</span><span style="color:#E36209">f</span><span style="color:#D73A49">=</span><span style="color:#005CC5">440</span><span style="color:#D73A49"> *</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> **</span><span style="color:#24292E"> (</span><span style="color:#005CC5">4</span><span style="color:#D73A49"> /</span><span style="color:#005CC5"> 12</span><span style="color:#24292E">))</span></span>
+<span class="line"><span style="color:#D73A49">    +</span><span style="color:#24292E"> square_wave(</span><span style="color:#E36209">f</span><span style="color:#D73A49">=</span><span style="color:#005CC5">440</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">Audio(opening </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 2</span><span style="color:#24292E">, </span><span style="color:#E36209">rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate, </span><span style="color:#E36209">normalize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">False</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><p>We already know comprehensions. The offsets themselves can become data:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">offsets </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#005CC5">0</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">4</span><span style="color:#24292E">, </span><span style="color:#005CC5">0</span><span style="color:#24292E">]</span></span>
+<span class="line"><span style="color:#24292E">waves </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [square_wave(</span><span style="color:#E36209">f</span><span style="color:#D73A49">=</span><span style="color:#005CC5">440</span><span style="color:#D73A49"> *</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> **</span><span style="color:#24292E"> (n </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> 12</span><span style="color:#24292E">)) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> n </span><span style="color:#D73A49">in</span><span style="color:#24292E"> offsets]</span></span>
+<span class="line"><span style="color:#24292E">opening </span><span style="color:#D73A49">=</span><span style="color:#24292E"> waves[</span><span style="color:#005CC5">0</span><span style="color:#24292E">] </span><span style="color:#D73A49">+</span><span style="color:#24292E"> waves[</span><span style="color:#005CC5">1</span><span style="color:#24292E">] </span><span style="color:#D73A49">+</span><span style="color:#24292E"> waves[</span><span style="color:#005CC5">2</span><span style="color:#24292E">] </span><span style="color:#D73A49">+</span><span style="color:#24292E"> waves[</span><span style="color:#005CC5">3</span><span style="color:#24292E">]</span></span>
+<span class="line"><span style="color:#24292E">Audio(opening, </span><span style="color:#E36209">rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate, </span><span style="color:#E36209">normalize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">False</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><p><code>waves</code> is a <strong>list of lists</strong>: one sample list for each note. We need to join those lists into one sequence.</p>
+<p>For numbers, we used <code>sum</code>. For lists, we can give it an empty list as its starting value:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">opening </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> sum</span><span style="color:#24292E">(waves, [])</span></span>
+<span class="line"><span style="color:#24292E">Audio(opening </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 2</span><span style="color:#24292E">, </span><span style="color:#E36209">rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate, </span><span style="color:#E36209">normalize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">False</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><p>Here <code>sum(waves, [])</code> behaves like <code>[] + waves[0] + waves[1] + ...</code>. List addition places notes <strong>one after another</strong>; it does not mix them into a chord.</p>
+<p>Without <code>[]</code>, <code>sum</code> starts at the number <code>0</code>, and Python cannot add a number to a list. Try <code>sum(waves)</code> in a separate scratch cell if you want to inspect that error.</p>
+<p>For our short melodies, this is a convenient way to express concatenation. Repeated list addition copies data, so we would choose a different construction for long recordings.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">opening </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> sum</span><span style="color:#24292E">(</span></span>
+<span class="line"><span style="color:#24292E">    [square_wave(</span><span style="color:#E36209">f</span><span style="color:#D73A49">=</span><span style="color:#005CC5">440</span><span style="color:#D73A49"> *</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> **</span><span style="color:#24292E"> (n </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> 12</span><span style="color:#24292E">)) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> n </span><span style="color:#D73A49">in</span><span style="color:#24292E"> [</span><span style="color:#005CC5">0</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">4</span><span style="color:#24292E">, </span><span style="color:#005CC5">0</span><span style="color:#24292E">]],</span></span>
+<span class="line"><span style="color:#24292E">    [],</span></span>
+<span class="line"><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">Audio(opening, </span><span style="color:#E36209">rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate, </span><span style="color:#E36209">normalize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">False</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><details>
+<summary>Optional · A glimpse of reduction</summary>
+<p>We have combined many values into one result, starting from an initial value. This is an example of a <strong>reduction</strong>.</p>
+<p>For numbers, <code>sum([2, 3, 4], 0)</code> means <code>0 + 2 + 3 + 4</code>. For lists, <code>sum([[2], [3], [4]], [])</code> means <code>[] + [2] + [3] + [4]</code>. The starting value must make sense for the operation and the values being combined.</p>
+<p>More general reductions can use other binary operations. We do not need that machinery to finish our tune.</p>
+</details></section>
+<section class="cell markdown"><h2>6. Your turn · Finish Fra Martino</h2>
+<p>Continue the melody by ear. Start with the opening we have, then work one phrase at a time.</p>
+<ul>
+<li>Which semitone offsets come next?</li>
+<li>Which notes last longer or shorter?</li>
+<li>What happens when two equal notes touch?</li>
+<li>How can a short silence make the repeated notes distinct?</li>
+</ul>
+<p>First try pitches with a fixed duration. Then introduce rhythm. Keep your attempt before looking at the worked version below.</p>
+</section>
+<section class="cell markdown"><h3>Give silence a duration</h3>
+<p>Silence uses the same representation as a note: a list of samples. All its values are zero.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> silence</span><span style="color:#24292E">(duration</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.5</span><span style="color:#24292E">, sample_rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">48_000</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> [</span><span style="color:#005CC5">0.0</span><span style="color:#24292E">] </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(duration </span><span style="color:#D73A49">*</span><span style="color:#24292E"> sample_rate)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">joined </span><span style="color:#D73A49">=</span><span style="color:#24292E"> square_wave(</span><span style="color:#E36209">f</span><span style="color:#D73A49">=</span><span style="color:#005CC5">440</span><span style="color:#24292E">) </span><span style="color:#D73A49">+</span><span style="color:#24292E"> square_wave(</span><span style="color:#E36209">f</span><span style="color:#D73A49">=</span><span style="color:#005CC5">440</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">separated </span><span style="color:#D73A49">=</span><span style="color:#24292E"> (</span></span>
+<span class="line"><span style="color:#24292E">    square_wave(</span><span style="color:#E36209">f</span><span style="color:#D73A49">=</span><span style="color:#005CC5">440</span><span style="color:#24292E">, </span><span style="color:#E36209">duration</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.45</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#D73A49">    +</span><span style="color:#24292E"> silence(</span><span style="color:#005CC5">0.05</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#D73A49">    +</span><span style="color:#24292E"> square_wave(</span><span style="color:#E36209">f</span><span style="color:#D73A49">=</span><span style="color:#005CC5">440</span><span style="color:#24292E">, </span><span style="color:#E36209">duration</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.45</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#D73A49">    +</span><span style="color:#24292E"> silence(</span><span style="color:#005CC5">0.05</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">Audio(joined </span><span style="color:#D73A49">+</span><span style="color:#24292E"> silence(</span><span style="color:#005CC5">0.5</span><span style="color:#24292E">) </span><span style="color:#D73A49">+</span><span style="color:#24292E"> separated, </span><span style="color:#E36209">rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate, </span><span style="color:#E36209">normalize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">False</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><p>Both versions occupy one second before the comparison pause. In the second, each half-second slot contains 0.45 seconds of sound and 0.05 seconds of silence.</p>
+<p>Adding a pause after an unchanged note would make the phrase longer. Taking the pause from the note's allotted time keeps the rhythm.</p>
+<p>Abrupt beginnings and endings may click. The gap separates notes; a short fade at the edges is a further improvement, left for a later lesson.</p>
+</section>
+<section class="cell markdown"><h3>Worked example · A note has a pitch and a length</h3>
+<p>Reveal this after trying the melody.</p>
+<p>We will describe each note with a pair: <code>(semitone_offset, beats)</code>. This is a <strong>tuple</strong>: a small ordered group of values. Like a list, it can be indexed from zero. Here <code>event[0]</code> is the pitch offset and <code>event[1]</code> is the number of beats.</p>
+<p>A beat lasts half a second in this example. Change that one value to change the tempo.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">beat </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 0.5</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">phrase_1 </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [(</span><span style="color:#005CC5">0</span><span style="color:#24292E">, </span><span style="color:#005CC5">1</span><span style="color:#24292E">), (</span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">1</span><span style="color:#24292E">), (</span><span style="color:#005CC5">4</span><span style="color:#24292E">, </span><span style="color:#005CC5">1</span><span style="color:#24292E">), (</span><span style="color:#005CC5">0</span><span style="color:#24292E">, </span><span style="color:#005CC5">1</span><span style="color:#24292E">)]</span></span>
+<span class="line"><span style="color:#24292E">phrase_2 </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [(</span><span style="color:#005CC5">4</span><span style="color:#24292E">, </span><span style="color:#005CC5">1</span><span style="color:#24292E">), (</span><span style="color:#005CC5">5</span><span style="color:#24292E">, </span><span style="color:#005CC5">1</span><span style="color:#24292E">), (</span><span style="color:#005CC5">7</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">)]</span></span>
+<span class="line"><span style="color:#24292E">phrase_3 </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [(</span><span style="color:#005CC5">7</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.5</span><span style="color:#24292E">), (</span><span style="color:#005CC5">9</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.5</span><span style="color:#24292E">), (</span><span style="color:#005CC5">7</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.5</span><span style="color:#24292E">), (</span><span style="color:#005CC5">5</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.5</span><span style="color:#24292E">), (</span><span style="color:#005CC5">4</span><span style="color:#24292E">, </span><span style="color:#005CC5">1</span><span style="color:#24292E">), (</span><span style="color:#005CC5">0</span><span style="color:#24292E">, </span><span style="color:#005CC5">1</span><span style="color:#24292E">)]</span></span>
+<span class="line"><span style="color:#24292E">phrase_4 </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [(</span><span style="color:#005CC5">0</span><span style="color:#24292E">, </span><span style="color:#005CC5">1</span><span style="color:#24292E">), (</span><span style="color:#D73A49">-</span><span style="color:#005CC5">5</span><span style="color:#24292E">, </span><span style="color:#005CC5">1</span><span style="color:#24292E">), (</span><span style="color:#005CC5">0</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">)]</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">melody </span><span style="color:#D73A49">=</span><span style="color:#24292E"> phrase_1 </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> +</span><span style="color:#24292E"> phrase_2 </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> +</span><span style="color:#24292E"> phrase_3 </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> +</span><span style="color:#24292E"> phrase_4 </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 2</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(</span><span style="color:#032F62">"Total beats:"</span><span style="color:#24292E">, </span><span style="color:#005CC5">sum</span><span style="color:#24292E">([event[</span><span style="color:#005CC5">1</span><span style="color:#24292E">] </span><span style="color:#D73A49">for</span><span style="color:#24292E"> event </span><span style="color:#D73A49">in</span><span style="color:#24292E"> melody]))</span></span></code></pre></section>
+<section class="cell markdown"><p>We can name another musical idea: a note occupying a rhythmic slot, with a small gap at the end.</p>
+<p><code>gate</code> is the fraction of that slot occupied by sound. A value of 0.9 leaves ten percent for silence; a value of 1 leaves no gap. Use values from 0 to 1.</p>
+<p>We calculate the slot length once in samples, then divide it between sound and silence so that rounding does not add extra time.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> articulated_note</span><span style="color:#24292E">(</span></span>
+<span class="line"><span style="color:#24292E">    semitones</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0</span><span style="color:#24292E">, beats</span><span style="color:#D73A49">=</span><span style="color:#005CC5">1</span><span style="color:#24292E">, beat</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.5</span><span style="color:#24292E">, gate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.9</span><span style="color:#24292E">,</span></span>
+<span class="line"><span style="color:#24292E">    root</span><span style="color:#D73A49">=</span><span style="color:#005CC5">440</span><span style="color:#24292E">, amplitude</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.15</span><span style="color:#24292E">, sample_rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">48_000</span></span>
+<span class="line"><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#24292E">    slot_samples </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(beats </span><span style="color:#D73A49">*</span><span style="color:#24292E"> beat </span><span style="color:#D73A49">*</span><span style="color:#24292E"> sample_rate)</span></span>
+<span class="line"><span style="color:#24292E">    sound_samples </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(gate </span><span style="color:#D73A49">*</span><span style="color:#24292E"> slot_samples)</span></span>
+<span class="line"><span style="color:#24292E">    gap_samples </span><span style="color:#D73A49">=</span><span style="color:#24292E"> slot_samples </span><span style="color:#D73A49">-</span><span style="color:#24292E"> sound_samples</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> (</span></span>
+<span class="line"><span style="color:#24292E">        square_wave(</span></span>
+<span class="line"><span style="color:#E36209">            f</span><span style="color:#D73A49">=</span><span style="color:#24292E">root </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> **</span><span style="color:#24292E"> (semitones </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> 12</span><span style="color:#24292E">),</span></span>
+<span class="line"><span style="color:#E36209">            duration</span><span style="color:#D73A49">=</span><span style="color:#24292E">sound_samples </span><span style="color:#D73A49">/</span><span style="color:#24292E"> sample_rate,</span></span>
+<span class="line"><span style="color:#E36209">            amplitude</span><span style="color:#D73A49">=</span><span style="color:#24292E">amplitude,</span></span>
+<span class="line"><span style="color:#E36209">            sample_rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate,</span></span>
+<span class="line"><span style="color:#24292E">        )</span></span>
+<span class="line"><span style="color:#D73A49">        +</span><span style="color:#24292E"> silence(gap_samples </span><span style="color:#D73A49">/</span><span style="color:#24292E"> sample_rate, </span><span style="color:#E36209">sample_rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate)</span></span>
+<span class="line"><span style="color:#24292E">    )</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">song </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> sum</span><span style="color:#24292E">(</span></span>
+<span class="line"><span style="color:#24292E">    [</span></span>
+<span class="line"><span style="color:#24292E">        articulated_note(</span><span style="color:#E36209">semitones</span><span style="color:#D73A49">=</span><span style="color:#24292E">event[</span><span style="color:#005CC5">0</span><span style="color:#24292E">], </span><span style="color:#E36209">beats</span><span style="color:#D73A49">=</span><span style="color:#24292E">event[</span><span style="color:#005CC5">1</span><span style="color:#24292E">], </span><span style="color:#E36209">beat</span><span style="color:#D73A49">=</span><span style="color:#24292E">beat)</span></span>
+<span class="line"><span style="color:#D73A49">        for</span><span style="color:#24292E"> event </span><span style="color:#D73A49">in</span><span style="color:#24292E"> melody</span></span>
+<span class="line"><span style="color:#24292E">    ],</span></span>
+<span class="line"><span style="color:#24292E">    [],</span></span>
+<span class="line"><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(</span><span style="color:#032F62">"Duration:"</span><span style="color:#24292E">, </span><span style="color:#005CC5">len</span><span style="color:#24292E">(song) </span><span style="color:#D73A49">/</span><span style="color:#24292E"> sample_rate, </span><span style="color:#032F62">"seconds"</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">Audio(song, </span><span style="color:#E36209">rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate, </span><span style="color:#E36209">normalize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">False</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><h3>Your turn · Make an interpretation</h3>
+<ol>
+<li>Change <code>beat</code> to make the melody faster, then rebuild <code>song</code>.</li>
+<li>Pass a different <code>gate</code> to compare connected and detached notes.</li>
+<li>Transpose the tune by changing <code>root</code>.</li>
+<li>Change one phrase and let a neighbour listen.</li>
+</ol>
+<p>The melody data describes pitches and rhythm. The functions decide how to turn that description into samples. We have begun to extend our language: from manipulating half-periods to asking for articulated notes.</p>
+<p>Before moving on, save a version of the tune you can explain. The noise workshop is a separate second block.</p>
+</section>
+<section class="cell markdown"><h2>7. Second workshop · Can we make a percussion sound?</h2>
+<p>A melody gives us pitched notes. Could we add a short noisy sound?</p>
+<p>Let's begin with a tiny deterministic machine. It has a state, <code>x</code>, and a rule that calculates the next state. <code>%</code> keeps the remainder after division.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">x </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 1</span></span>
+<span class="line"><span style="color:#24292E">x </span><span style="color:#D73A49">=</span><span style="color:#24292E"> (</span><span style="color:#005CC5">5</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> x </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">) </span><span style="color:#D73A49">%</span><span style="color:#005CC5"> 16</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(x)</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">x </span><span style="color:#D73A49">=</span><span style="color:#24292E"> (</span><span style="color:#005CC5">5</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> x </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">) </span><span style="color:#D73A49">%</span><span style="color:#005CC5"> 16</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(x)</span></span></code></pre></section>
+<section class="cell markdown"><p>Run the second cell several times. Predict the next value before each run.</p>
+<p>The rule is deterministic: the same state always gives the same next state. With only 16 possible states, it must eventually repeat. This small example illustrates the mechanism; it is not a source of independent random numbers.</p>
+</section>
+<section class="cell markdown"><h3>Collect successive states with a loop</h3>
+<p>A comprehension was convenient when each sample came directly from its index. Here the next value depends on the previous value.</p>
+<p>A <code>for</code> loop repeats an indented block. <code>append</code>, which we met in lesson01, adds a value to the growing list. The name <code>_</code> is a convention for a loop value we do not need to use.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">states </span><span style="color:#D73A49">=</span><span style="color:#24292E"> []</span></span>
+<span class="line"><span style="color:#24292E">x </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 1</span></span>
+<span class="line"><span style="color:#D73A49">for</span><span style="color:#24292E"> _ </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> range</span><span style="color:#24292E">(</span><span style="color:#005CC5">32</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#24292E">    x </span><span style="color:#D73A49">=</span><span style="color:#24292E"> (</span><span style="color:#005CC5">5</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> x </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">) </span><span style="color:#D73A49">%</span><span style="color:#005CC5"> 16</span></span>
+<span class="line"><span style="color:#24292E">    states.append(x)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(states)</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(</span><span style="color:#032F62">"First block repeats:"</span><span style="color:#24292E">, states[:</span><span style="color:#005CC5">16</span><span style="color:#24292E">] </span><span style="color:#D73A49">==</span><span style="color:#24292E"> states[</span><span style="color:#005CC5">16</span><span style="color:#24292E">:])</span></span></code></pre></section>
+<section class="cell markdown"><p>Now enlarge the set of states and look at a short section before listening. Map the integers from 0…65,535 into the amplitude interval −0.15…+0.15, so the range is centred around zero.</p>
+<p>This avoids switching to automatic normalisation: the amplitude remains under our control, as it was for the notes.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">noise_samples </span><span style="color:#D73A49">=</span><span style="color:#24292E"> []</span></span>
+<span class="line"><span style="color:#24292E">x </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 0</span></span>
+<span class="line"><span style="color:#D73A49">for</span><span style="color:#24292E"> _ </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> range</span><span style="color:#24292E">(sample_rate):</span></span>
+<span class="line"><span style="color:#24292E">    x </span><span style="color:#D73A49">=</span><span style="color:#24292E"> (</span><span style="color:#005CC5">5</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> x </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">) </span><span style="color:#D73A49">%</span><span style="color:#005CC5"> 65_536</span></span>
+<span class="line"><span style="color:#24292E">    value </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 0.15</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> (</span><span style="color:#005CC5">2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> x </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> 65_535</span><span style="color:#D73A49"> -</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">    noise_samples.append(value)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">plt.figure(</span><span style="color:#E36209">figsize</span><span style="color:#D73A49">=</span><span style="color:#24292E">(</span><span style="color:#005CC5">9</span><span style="color:#24292E">, </span><span style="color:#005CC5">3</span><span style="color:#24292E">))</span></span>
+<span class="line"><span style="color:#24292E">plt.plot(noise_samples[:</span><span style="color:#005CC5">100</span><span style="color:#24292E">], </span><span style="color:#E36209">marker</span><span style="color:#D73A49">=</span><span style="color:#032F62">"."</span><span style="color:#24292E">, </span><span style="color:#E36209">linewidth</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.8</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">plt.xlabel(</span><span style="color:#032F62">"Sample index"</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">plt.ylabel(</span><span style="color:#032F62">"Amplitude"</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">plt.title(</span><span style="color:#032F62">"The first 100 samples of our deterministic generator"</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">plt.show()</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">Audio(noise_samples, </span><span style="color:#E36209">rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate, </span><span style="color:#E36209">normalize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">False</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><p>The samples look irregular at this scale, but the rule still has structure and repeats. Treat this as a <strong>toy pseudorandom generator</strong>, not a model of ideal white noise.</p>
+<p>Also, a centred amplitude range does not guarantee that every short excerpt has exactly zero mean.</p>
+<h3>Your turn · Follow the state</h3>
+<ol>
+<li>Explain the first two loop iterations, including what <code>append</code> changes.</li>
+<li>Change the initial <code>x</code> and compare the first ten values.</li>
+<li>Restore it and run the cell again. Do you recover the same sequence?</li>
+</ol>
+</section>
+<section class="cell markdown"><h2>8. Give noise a reusable recipe</h2>
+<p>As with the oscillator, we want to choose a duration and get a list of samples back. A <code>seed</code> supplies the initial state.</p>
+<p>Each call starts from its seed. Equal seeds produce the same sequence; shorter calls produce prefixes of longer calls with the same seed and amplitude.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> noise</span><span style="color:#24292E">(duration</span><span style="color:#D73A49">=</span><span style="color:#005CC5">1</span><span style="color:#24292E">, amplitude</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.15</span><span style="color:#24292E">, seed</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0</span><span style="color:#24292E">, sample_rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">48_000</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#24292E">    wave </span><span style="color:#D73A49">=</span><span style="color:#24292E"> []</span></span>
+<span class="line"><span style="color:#24292E">    x </span><span style="color:#D73A49">=</span><span style="color:#24292E"> seed</span></span>
+<span class="line"><span style="color:#D73A49">    for</span><span style="color:#24292E"> _ </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> range</span><span style="color:#24292E">(</span><span style="color:#005CC5">round</span><span style="color:#24292E">(sample_rate </span><span style="color:#D73A49">*</span><span style="color:#24292E"> duration)):</span></span>
+<span class="line"><span style="color:#24292E">        x </span><span style="color:#D73A49">=</span><span style="color:#24292E"> (</span><span style="color:#005CC5">5</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> x </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">) </span><span style="color:#D73A49">%</span><span style="color:#005CC5"> 65_536</span></span>
+<span class="line"><span style="color:#24292E">        wave.append(amplitude </span><span style="color:#D73A49">*</span><span style="color:#24292E"> (</span><span style="color:#005CC5">2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> x </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> 65_535</span><span style="color:#D73A49"> -</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">))</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> wave</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">Audio(noise(</span><span style="color:#E36209">duration</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.1</span><span style="color:#24292E">), </span><span style="color:#E36209">rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate, </span><span style="color:#E36209">normalize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">False</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><p>Short bursts separated by silence already suggest a rhythmic sound. At this point, every repeated hit is exactly the same sample data.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">hit </span><span style="color:#D73A49">=</span><span style="color:#24292E"> noise(</span><span style="color:#E36209">duration</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.05</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">pulse </span><span style="color:#D73A49">=</span><span style="color:#24292E"> hit </span><span style="color:#D73A49">+</span><span style="color:#24292E"> silence(</span><span style="color:#005CC5">0.20</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">Audio(pulse </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 8</span><span style="color:#24292E">, </span><span style="color:#E36209">rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate, </span><span style="color:#E36209">normalize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">False</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><h3>Optional · Let the hit decay</h3>
+<p>A percussion sound often loses amplitude over time. We can multiply successive samples by a decreasing factor. This sequence of gains is an <strong>envelope</strong>.</p>
+<p>The comprehension below starts near full gain and falls to zero. <code>max</code> keeps the denominator at least one, including for a one-sample hit.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> percussion</span><span style="color:#24292E">(duration</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.08</span><span style="color:#24292E">, amplitude</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.15</span><span style="color:#24292E">, seed</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0</span><span style="color:#24292E">, sample_rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">48_000</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#24292E">    samples </span><span style="color:#D73A49">=</span><span style="color:#24292E"> noise(</span></span>
+<span class="line"><span style="color:#E36209">        duration</span><span style="color:#D73A49">=</span><span style="color:#24292E">duration, </span><span style="color:#E36209">amplitude</span><span style="color:#D73A49">=</span><span style="color:#24292E">amplitude, </span><span style="color:#E36209">seed</span><span style="color:#D73A49">=</span><span style="color:#24292E">seed,</span></span>
+<span class="line"><span style="color:#E36209">        sample_rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate,</span></span>
+<span class="line"><span style="color:#24292E">    )</span></span>
+<span class="line"><span style="color:#24292E">    denominator </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> max</span><span style="color:#24292E">(</span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#005CC5">len</span><span style="color:#24292E">(samples) </span><span style="color:#D73A49">-</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> [</span></span>
+<span class="line"><span style="color:#24292E">        samples[n] </span><span style="color:#D73A49">*</span><span style="color:#24292E"> (</span><span style="color:#005CC5">1</span><span style="color:#D73A49"> -</span><span style="color:#24292E"> n </span><span style="color:#D73A49">/</span><span style="color:#24292E"> denominator)</span></span>
+<span class="line"><span style="color:#D73A49">        for</span><span style="color:#24292E"> n </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> range</span><span style="color:#24292E">(</span><span style="color:#005CC5">len</span><span style="color:#24292E">(samples))</span></span>
+<span class="line"><span style="color:#24292E">    ]</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">decaying_hit </span><span style="color:#D73A49">=</span><span style="color:#24292E"> percussion()</span></span>
+<span class="line"><span style="color:#24292E">plt.figure(</span><span style="color:#E36209">figsize</span><span style="color:#D73A49">=</span><span style="color:#24292E">(</span><span style="color:#005CC5">9</span><span style="color:#24292E">, </span><span style="color:#005CC5">3</span><span style="color:#24292E">))</span></span>
+<span class="line"><span style="color:#24292E">plt.plot(decaying_hit)</span></span>
+<span class="line"><span style="color:#24292E">plt.xlabel(</span><span style="color:#032F62">"Sample index"</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">plt.ylabel(</span><span style="color:#032F62">"Amplitude"</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">plt.title(</span><span style="color:#032F62">"A noise burst with a linear decay"</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">plt.show()</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">Audio(</span></span>
+<span class="line"><span style="color:#24292E">    (decaying_hit </span><span style="color:#D73A49">+</span><span style="color:#24292E"> silence(</span><span style="color:#005CC5">0.17</span><span style="color:#24292E">)) </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 8</span><span style="color:#24292E">,</span></span>
+<span class="line"><span style="color:#E36209">    rate</span><span style="color:#D73A49">=</span><span style="color:#24292E">sample_rate,</span></span>
+<span class="line"><span style="color:#E36209">    normalize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">False</span><span style="color:#24292E">,</span></span>
+<span class="line"><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><h3>Your turn · A rhythmic answer</h3>
+<p>Build a short rhythmic answer to the melody using noise hits and silence.</p>
+<ul>
+<li>Keep each rhythmic slot the same total length.</li>
+<li>Compare the raw burst and the decaying version.</li>
+<li>Try different seeds, then reuse one hit to make an exactly repeated pattern.</li>
+</ul>
+<p>Listen to your melody followed by the rhythm. Putting their sample lists together sequences them in time. Playing both simultaneously would require sample-by-sample mixing, which is a different operation and a future step.</p>
+</section>
+<section class="cell markdown"><h2>What can we say now?</h2>
+<p>We began with a repeated list. Now we can describe a note by its pitch and duration, organise a melody as data, and ask for a noise burst or a decaying hit.</p>
+<p>Each function gives a name to a computation and returns samples that other code can use. That common representation is what lets our small tools compose.</p>
+<p>Keep your melody, one rhythmic experiment, and a sentence explaining which detail each function lets you stop repeating.</p>
+</section>
+
+  </article>
+</main>
+</body>
+</html>
