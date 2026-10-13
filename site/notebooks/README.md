@@ -10,7 +10,7 @@ Every notebook (`.ipynb`) the site publishes gets its own page. Some notebooks c
 | **Read** the page: markdown, formulas, highlighted code | ✓ | ✓ |
 | **Download** the `.ipynb` | ✓ | ✓ |
 | **Open in the browser** (JupyterLite) | ✓ | — |
-| Outputs (sounds, plots) | made by the visitor, running the cells | — (submissions have their audio on the submissions page) |
+| Outputs (sounds, plots) | made by the visitor, running the cells | — |
 
 We never run notebooks to produce their outputs. A page shows the notebook as it is written.
 
