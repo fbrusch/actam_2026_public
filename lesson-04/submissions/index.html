@@ -17,8 +17,6 @@
     h2 { font-size: 1.5rem; letter-spacing: -.03em; margin: 0 0 6px; }
     .meta { color: #42666a; font-size: .85rem; margin: 0 0 14px; }
     .note { white-space: pre-wrap; border-left: 3px solid #087e83; padding-left: 14px; margin: 14px 0; }
-    .error { color: #a03b28; border-left: 3px solid #cb4f38; padding-left: 14px; margin: 14px 0; }
-    audio { width: 100%; margin: 6px 0 4px; }
     .links { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: .85rem; margin: 10px 0; }
     .links a { color: #087e83; }
     @media (max-width: 620px) { main { padding: 32px 16px; } }
@@ -28,11 +26,10 @@
 <main>
   <style>.crumbs ol { display: flex; flex-wrap: wrap; gap: 0 .6em; margin: 0; padding: 0; list-style: none; }.crumbs li + li::before { content: '›'; margin-right: .6em; }.crumbs { text-transform: uppercase; margin: 1em 0; }nav.crumbs a { color: inherit; text-decoration: none; padding: 0; border: 0; background: none; }nav.crumbs a:hover { text-decoration: underline; text-underline-offset: 3px; }</style><nav class="eyebrow crumbs" aria-label="Breadcrumb"><ol><li><a href="../../">ACTAM</a></li><li><a href="../../#lesson-04">Lesson 04</a></li><li><a href="../drum-links/">Rebuild the groove</a></li><li><span aria-current="page">Submissions</span></li></ol></nav>
   <h1>Submissions.</h1>
-  <p>Each notebook was run as submitted, at the submitted commit. The audio is the result of its final <code>play(...)</code>.</p>
+  <p>Every group's notebook, as submitted.</p>
 <article id="group-01">
   <h2>Group 01 · When the Levee Breaks</h2>
   <p class="meta">fidelity · 2026-09-30</p>
-  <audio controls preload="none" src="audio/group-01.mp3"></audio>
   <p class="links"><a href="https://github.com/cherkasovtech-byte/Lesson-04-Rebuild-the-groove/tree/aa4bbc1e25f144edaad706618075b061db98c256">Repository at aa4bbc1</a><a href="https://github.com/cherkasovtech-byte/Lesson-04-Rebuild-the-groove/blob/aa4bbc1e25f144edaad706618075b061db98c256/solution.ipynb">Notebook on GitHub</a><a href="notebooks/group-01/">Read the notebook</a></p>
 </article>
 <article id="group-02">
@@ -40,7 +37,6 @@
   <p class="meta">fidelity · 2026-09-30</p>
   <p class="note">The anacrusis at the beginning feels a bit off: it is approximate in timing and timbre.
 The kit has no toms or crash, so I simulated them with kick and open_hat. The rest of the groove follows a transcription I found online.</p>
-  <audio controls preload="none" src="audio/group-02.mp3"></audio>
   <p class="links"><a href="https://github.com/DanieleAmodio04/Rosanna_ACTAM2026/tree/45cfbe8e270fe5f410deeb2aef1633ef737b1878">Repository at 45cfbe8</a><a href="https://github.com/DanieleAmodio04/Rosanna_ACTAM2026/blob/45cfbe8e270fe5f410deeb2aef1633ef737b1878/solution.ipynb">Notebook on GitHub</a><a href="notebooks/group-02/">Read the notebook</a></p>
 </article>
 <article id="group-03">
@@ -48,7 +44,6 @@ The kit has no toms or crash, so I simulated them with kick and open_hat. The re
   <p class="meta">fidelity · 2026-10-01</p>
   <p class="note">I defined my own pitched_snare function because I want to have different pitches for the snare sound.
 In the tracks definition, I used lambda syntax because I wanted to pass arguments to the instrument function handlers, like frequency and amplitude.</p>
-  <audio controls preload="none" src="audio/group-03.mp3"></audio>
   <p class="links"><a href="https://github.com/quocanhlam-polimi/actam-groove/tree/391588a9a751c1492eebb69b7fd8f12a89f2fe05">Repository at 391588a</a><a href="https://github.com/quocanhlam-polimi/actam-groove/blob/391588a9a751c1492eebb69b7fd8f12a89f2fe05/solution.ipynb">Notebook on GitHub</a><a href="notebooks/group-03/">Read the notebook</a></p>
 </article>
 <article id="group-04">
@@ -56,47 +51,40 @@ In the tracks definition, I used lambda syntax because I wanted to pass argument
   <p class="meta">fidelity · 2026-10-01</p>
   <p class="note">Since the hihat pattern changes at each bar we decided to take only the first bar&#x27;s pattern.
 Instead of using the provided functions inside drumkit.py, we put our own in the drumkit.py file. We thoroughly commented each function.</p>
-  <audio controls preload="none" src="audio/group-04.mp3"></audio>
   <p class="links"><a href="https://github.com/riccardo-tomada/actam-groove-template/tree/d11ece3fa45859116c298c98fd639be697dab527">Repository at d11ece3</a><a href="https://github.com/riccardo-tomada/actam-groove-template/blob/d11ece3fa45859116c298c98fd639be697dab527/solution.ipynb">Notebook on GitHub</a><a href="notebooks/group-04/">Read the notebook</a></p>
 </article>
 <article id="group-05">
   <h2>Group 05 · Another One Bites the Dust</h2>
   <p class="meta">fidelity · 2026-10-02</p>
-  <p class="error">Not rendered: Cell 11 failed: NameError: name &#x27;parse&#x27; is not defined</p>
   <p class="links"><a href="notebooks/group-05/">Read the notebook</a></p>
 </article>
 <article id="group-06">
   <h2>Group 06 · Billie Jean + Another One Bites the Dust</h2>
   <p class="meta">mashup · 2026-10-04</p>
   <p class="note">A maracas sound function has been created using the open_hat() function with a shorter duration, faster decay, and lower amplitude.</p>
-  <audio controls preload="none" src="audio/group-06.mp3"></audio>
   <p class="links"><a href="https://github.com/eceeaksoy/actam-groove/tree/4c84e5363dddd1c119274c5af7fb3876b8671feb">Repository at 4c84e53</a><a href="https://github.com/eceeaksoy/actam-groove/blob/4c84e5363dddd1c119274c5af7fb3876b8671feb/solution.ipynb">Notebook on GitHub</a><a href="notebooks/group-06/">Read the notebook</a></p>
 </article>
 <article id="group-07">
   <h2>Group 07 · Billie Jean</h2>
   <p class="meta">rhythm-bass-melody · 2026-10-05</p>
   <p class="note">added notation feature (only goes from -9 to 9 because I&#x27;m bad at coding)</p>
-  <audio controls preload="none" src="audio/group-07.mp3"></audio>
   <p class="links"><a href="https://github.com/ilBonusCultura/actam-groove-template-bonusCultura/tree/fbeb3dcacd0f3c96944b23aa046f4be06839fa70">Repository at fbeb3dc</a><a href="https://github.com/ilBonusCultura/actam-groove-template-bonusCultura/blob/fbeb3dcacd0f3c96944b23aa046f4be06839fa70/solution.ipynb">Notebook on GitHub</a><a href="notebooks/group-07/">Read the notebook</a></p>
 </article>
 <article id="group-08">
   <h2>Group 08 · When the Levee Breaks</h2>
   <p class="meta">fidelity · 2026-10-06</p>
   <p class="note">We tried recreating 3 different grooves, from easiest to most difficult.</p>
-  <audio controls preload="none" src="audio/group-08.mp3"></audio>
   <p class="links"><a href="https://github.com/lidia-curti-polimi/groove-challenge/tree/4cb7457029ad57113771734ce3ecc7ecb36e2378">Repository at 4cb7457</a><a href="https://github.com/lidia-curti-polimi/groove-challenge/blob/4cb7457029ad57113771734ce3ecc7ecb36e2378/solution.ipynb">Notebook on GitHub</a><a href="notebooks/group-08/">Read the notebook</a></p>
 </article>
 <article id="group-09">
   <h2>Group 09 · Blue Monday</h2>
   <p class="meta">fidelity · 2026-10-06</p>
   <p class="note">I really wanted to pan hihats on the left and the hi snare on the right, like in the record</p>
-  <audio controls preload="none" src="audio/group-09.mp3"></audio>
   <p class="links"><a href="https://github.com/MarcoIntroini/actam-groove/tree/32a2be692ed005a48075a6f00f0eac6057d6181f">Repository at 32a2be6</a><a href="https://github.com/MarcoIntroini/actam-groove/blob/32a2be692ed005a48075a6f00f0eac6057d6181f/solution.ipynb">Notebook on GitHub</a><a href="notebooks/group-09/">Read the notebook</a></p>
 </article>
 <article id="group-10">
   <h2>Group 10 · When Doves Cry</h2>
   <p class="meta">fidelity · 2026-10-07</p>
-  <audio controls preload="none" src="audio/group-10.mp3"></audio>
   <p class="links"><a href="https://github.com/g-luca23/actam-2026/tree/fe226660369c339070a378db6538865676ebdeb1">Repository at fe22666</a><a href="https://github.com/g-luca23/actam-2026/blob/fe226660369c339070a378db6538865676ebdeb1/actam-groove-template/solution.ipynb">Notebook on GitHub</a><a href="notebooks/group-10/">Read the notebook</a></p>
 </article>
 <article id="group-11">
@@ -106,7 +94,6 @@ Instead of using the provided functions inside drumkit.py, we put our own in the
 The solution.ipynb is different because I started adding features before the challenge lecture, but it&#x27;s essentially the same.
 Used numpy for basic tanh(.) wave shaping, floor function, and a simpler way to do stereo but is converted as an interleaved list at the end.
 Also, I developed a custom envelope formula, the derivation is a markdown before the final cell.</p>
-  <p class="error">Not rendered: Cell 23 failed: NameError: name &#x27;Full_kit&#x27; is not defined</p>
   <p class="links"><a href="notebooks/group-11/">Read the notebook</a></p>
 </article>
 </main>
