@@ -26,6 +26,9 @@ const lesson04 = publicLayout
 const lesson05 = publicLayout
   ? path.join(root, 'lesson-05')
   : path.join(root, 'lesson_05', 'publish', 'lesson-05')
+const lesson06 = publicLayout
+  ? path.join(root, 'lesson-06')
+  : path.join(root, 'lesson_06', 'publish', 'lesson-06')
 // Lessons 04 and 05 also publish ready-made static pages (kit, challenges, …).
 const lesson04Pages = path.join(lesson04, 'pages')
 const lesson05Pages = path.join(lesson05, 'pages')
@@ -83,11 +86,12 @@ for (const [slug, folder, includeExercise] of [
   ['lesson-02', lesson02, false],
   ['lesson-03', lesson03, false],
   ['lesson-04', lesson04, false],
+  ['lesson-06', lesson06, false],
 ]) {
   await mkdir(path.join(dist, slug), { recursive: true })
   const notebookSource = path.join(folder, 'notebook.ipynb')
   const notebookTarget = path.join(dist, slug, 'notebook.ipynb')
-  if (slug === 'lesson-03' || slug === 'lesson-04') {
+  if (slug !== 'lesson-01' && slug !== 'lesson-02') {
     await writeFile(notebookTarget, cleanNotebook(await readFile(notebookSource, 'utf8')))
   } else {
     await cp(notebookSource, notebookTarget)
@@ -141,6 +145,7 @@ if (process.env.SITE_ANALYTICS_TOKEN) {
     'lesson-04/drum-submit/index.html',
     'lesson-04/submissions/index.html',
     'lesson-05/tools/index.html',
+    'lesson-06/slides/index.html',
   ]
   for (const file of pages) {
     const target = path.join(dist, file)
@@ -156,6 +161,7 @@ const slideRoutes = [
   ['lesson-02/slides', lesson02, 'slides.md'],
   ['lesson-03/slides', lesson03, 'slides.md'],
   ['lesson-04/slides', lesson04, 'slides.md'],
+  ['lesson-06/slides', lesson06, 'slides.md'],
   ['lesson-01/exercise', exerciseFolder, 'exercise.md'],
 ]
 for (const [route, folder, source] of slideRoutes) {
