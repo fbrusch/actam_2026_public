@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+  <meta name="theme-color" content="#f7f5ef">
+  <title>Lesson 06 · Reference notebook · ACTAM</title>
+  <link rel="stylesheet" href="../../assets/katex/katex.min.css">
+  <style>
+:root { color-scheme: light; color: #182f3a; background: #f7f5ef; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+* { box-sizing: border-box; }
+body { margin: 0; background: #f7f5ef; }
+main { max-width: 900px; margin: auto; padding: 40px 24px 80px; }
+.crumbs ol { display: flex; flex-wrap: wrap; gap: 0 .6em; margin: 0; padding: 0; list-style: none; font: .8rem ui-monospace, Menlo, monospace; letter-spacing: .12em; text-transform: uppercase; color: #42666a; }
+.crumbs li + li::before { content: '›'; margin-right: .6em; }
+.crumbs a { color: inherit; text-decoration: none; }
+.crumbs a:hover { text-decoration: underline; }
+h1 { font: 700 clamp(2rem, 6vw, 3.4rem)/1.08 ui-monospace, Menlo, monospace; letter-spacing: -.05em; margin: 22px 0 18px; }
+.bar { display: flex; flex-wrap: wrap; gap: 10px; }
+.button { font: .9rem ui-monospace, Menlo, monospace; padding: 9px 14px; border: 1px solid #087e83; color: #087e83; text-decoration: none; background: #fff; }
+.button.primary { background: #087e83; color: #fff; }
+.button:focus-visible { outline: 3px solid #cb4f38; outline-offset: 3px; }
+.hint { color: #42666a; font-size: .85rem; line-height: 1.5; margin: 12px 0 28px; max-width: 640px; }
+.cell { margin: 0 0 14px; }
+.markdown { line-height: 1.65; }
+.markdown h1, .markdown h2, .markdown h3 { font-family: ui-monospace, Menlo, monospace; letter-spacing: -.02em; line-height: 1.2; margin: 1.6em 0 .5em; }
+.markdown h1 { font-size: 1.8rem; } .markdown h2 { font-size: 1.4rem; } .markdown h3 { font-size: 1.1rem; }
+.markdown code { font: .88em ui-monospace, Menlo, monospace; background: #e5ece6; color: #0b5f63; padding: 1px 4px; }
+.markdown pre code { background: none; color: inherit; padding: 0; }
+.markdown table { border-collapse: collapse; margin: 12px 0; }
+.markdown th, .markdown td { border: 1px solid #ccd4cf; padding: 5px 10px; text-align: left; }
+.markdown img { max-width: 100%; }
+.markdown a { color: #087e83; }
+.markdown details { margin: 12px 0; }
+.markdown summary { cursor: pointer; color: #087e83; }
+.markdown blockquote { margin: 0; padding-left: 14px; border-left: 3px solid #087e83; color: #42666a; }
+pre { margin: 0; padding: 14px 16px; overflow-x: auto; font: .82rem/1.55 ui-monospace, Menlo, monospace; border: 1px solid #d5ddd8; }
+pre.shiki { background: #fbfcfa !important; }
+pre.plain { background: #fbfcfa; }
+.code pre { border-left: 3px solid #087e83; }
+.katex-display { overflow-x: auto; overflow-y: hidden; }
+@media (max-width: 620px) { main { padding: 28px 16px 60px; } }
+</style>
+</head>
+<body>
+<main>
+  <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../../">ACTAM</a></li><li><a href="../../#lesson-06">Lesson 06</a></li><li><span aria-current="page">Reference notebook</span></li></ol></nav>
+  <h1>Reference notebook</h1>
+  <div class="bar">
+    <a class="button" href="../notebook.ipynb" download="actam-lesson-06-notebook.ipynb">Download .ipynb</a>
+    <a class="button primary" href="../../lite/notebooks/index.html?path=lesson-06%2Fnotebook.ipynb">Open in the browser</a>
+  </div>
+  <p class="hint">“Open in the browser” runs the notebook on your computer with JupyterLite: no installation, no account. Your changes stay in that browser: download the notebook to keep them.</p>
+  <article class="notebook">
+<section class="cell markdown"><h1>Lesson 06 · What does + mean?</h1>
+<p>numpy for sound, then our own types: classes, operators, pitches and scales.</p>
+<h3>How to use this notebook</h3>
+<p>Run the cells in order. Each section starts from what the previous one built. The <strong>Your turn</strong> cells are for you: try before reading the answer below them.</p>
+<p><strong>Recall:</strong> arrays, <code>np.arange</code>, <code>np.zeros</code> and slices come from the numpy lab. Semitones and <code>2 ** (s / 12)</code> come from lessons 01–02, <code>%</code> from lesson 02, <code>render_events</code> and the pluck from lesson 05.</p>
+</section>
+<section class="cell markdown"><h2>1. Setup</h2>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">from</span><span style="color:#24292E"> IPython.display </span><span style="color:#D73A49">import</span><span style="color:#24292E"> Audio</span></span>
+<span class="line"><span style="color:#D73A49">import</span><span style="color:#24292E"> numpy </span><span style="color:#D73A49">as</span><span style="color:#24292E"> np</span></span>
+<span class="line"><span style="color:#D73A49">from</span><span style="color:#24292E"> matplotlib </span><span style="color:#D73A49">import</span><span style="color:#24292E"> pyplot </span><span style="color:#D73A49">as</span><span style="color:#24292E"> plt</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#005CC5">SR</span><span style="color:#D73A49"> =</span><span style="color:#005CC5"> 48000</span></span></code></pre></section>
+<section class="cell markdown"><h2>2. numpy for sound</h2>
+<p>numpy's philosophy: an arithmetic operation on an array applies to <strong>every element</strong>.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">a </span><span style="color:#D73A49">=</span><span style="color:#24292E"> np.arange(</span><span style="color:#005CC5">10</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(a)</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(a </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> 10</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><p>One second of sound has <code>SR</code> samples. Dividing <code>np.arange(SR)</code> by <code>SR</code> gives the <strong>time</strong> of every sample, in seconds: 0, 1/48000, 2/48000, …</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">t </span><span style="color:#D73A49">=</span><span style="color:#24292E"> np.arange(</span><span style="color:#005CC5">SR</span><span style="color:#24292E">) </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> SR</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(t[:</span><span style="color:#005CC5">10</span><span style="color:#24292E">])</span></span></code></pre></section>
+<section class="cell markdown"><p><code>np.sin</code> is numpy's sine: given an array, it computes the sine of every element. With <code>t</code> as argument we get a sine evaluated at the time of every sample. Its period is 2π seconds, longer than the second we are plotting:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">plt.plot(np.sin(t))</span></span></code></pre></section>
+<section class="cell markdown"><p>Multiplying <code>t</code> by 2π gives one period per second: 1 Hz, too low to hear. Multiplying also by 440 gives 440 periods per second, A4. The plot becomes a block: 440 periods do not fit in a picture, but we can listen to them.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">plt.plot(np.sin(</span><span style="color:#005CC5">2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> np.pi </span><span style="color:#D73A49">*</span><span style="color:#24292E"> t))</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">wave </span><span style="color:#D73A49">=</span><span style="color:#24292E"> np.sin(</span><span style="color:#005CC5">2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> np.pi </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 440</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> t)</span></span>
+<span class="line"><span style="color:#24292E">Audio(wave, </span><span style="color:#E36209">rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><p>To turn the tone into a note we need an <strong>envelope</strong>. A decaying exponential: <code>np.exp(-t / tau)</code> falls faster when <code>tau</code> (in seconds) is smaller.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">plt.plot(np.exp(</span><span style="color:#D73A49">-</span><span style="color:#24292E">t </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> 0.3</span><span style="color:#24292E">))</span></span></code></pre></section>
+<section class="cell markdown"><p>Lesson 05 needed a <code>vca</code> function to apply an envelope to a wave. With arrays it is a multiplication, sample by sample:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">env </span><span style="color:#D73A49">=</span><span style="color:#24292E"> np.exp(</span><span style="color:#D73A49">-</span><span style="color:#24292E">t </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> 0.3</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">sound </span><span style="color:#D73A49">=</span><span style="color:#24292E"> env </span><span style="color:#D73A49">*</span><span style="color:#24292E"> wave</span></span>
+<span class="line"><span style="color:#24292E">plt.plot(sound)</span></span></code></pre></section>
+<section class="cell markdown"><p>The usual <code>play</code>, now one line, and a function for the whole note. <code>pluck</code> takes a frequency in Hz; <code>dur_s</code> is a duration in seconds. In this course a name ending in <code>_s</code> is in seconds.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> play</span><span style="color:#24292E">(wave):</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> Audio(wave, </span><span style="color:#E36209">rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">, </span><span style="color:#E36209">normalize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">False</span><span style="color:#24292E">, </span><span style="color:#E36209">autoplay</span><span style="color:#D73A49">=</span><span style="color:#005CC5">False</span><span style="color:#24292E">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> pluck</span><span style="color:#24292E">(f, dur_s</span><span style="color:#D73A49">=</span><span style="color:#005CC5">1.0</span><span style="color:#24292E">, tau</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.3</span><span style="color:#24292E">, amplitude</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.25</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#24292E">    t </span><span style="color:#D73A49">=</span><span style="color:#24292E"> np.arange(</span><span style="color:#005CC5">round</span><span style="color:#24292E">(dur_s </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> SR</span><span style="color:#24292E">)) </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> SR</span></span>
+<span class="line"><span style="color:#24292E">    env </span><span style="color:#D73A49">=</span><span style="color:#24292E"> np.exp(</span><span style="color:#D73A49">-</span><span style="color:#24292E">t </span><span style="color:#D73A49">/</span><span style="color:#24292E"> tau)</span></span>
+<span class="line"><span style="color:#24292E">    wave </span><span style="color:#D73A49">=</span><span style="color:#24292E"> np.sin(</span><span style="color:#005CC5">2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> np.pi </span><span style="color:#D73A49">*</span><span style="color:#24292E"> f </span><span style="color:#D73A49">*</span><span style="color:#24292E"> t)</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> amplitude </span><span style="color:#D73A49">*</span><span style="color:#24292E"> env </span><span style="color:#D73A49">*</span><span style="color:#24292E"> wave</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">play(pluck(</span><span style="color:#005CC5">440</span><span style="color:#24292E">))</span></span></code></pre></section>
+<section class="cell markdown"><p><code>amplitude * env * wave</code>: a number times an array multiplies every sample, so <code>amplitude</code> controls the volume.</p>
+<h3>Sounds in time</h3>
+<p>A <strong>sound</strong> is a pair <code>(onset_s, wave)</code>: a waveform and the time, in seconds, at which it starts. In lesson 05 these pairs were called <em>events</em>; here they are <em>sounds</em>, because the word <em>event</em> will get a musical meaning in the next lesson.</p>
+<p><code>mix_sounds</code> puts every sound in its place:</p>
+<ol>
+<li>the total length is where the last sound ends: <code>onset_s + len(wave) / SR</code>, the largest over all sounds;</li>
+<li><code>out</code> starts as silence, <code>np.zeros</code>;</li>
+<li>each wave is added into its slice of <code>out</code>, starting at its onset converted to samples. <code>+=</code> on a slice adds sample by sample, as in the lab.</li>
+</ol>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> mix_sounds</span><span style="color:#24292E">(sounds):</span></span>
+<span class="line"><span style="color:#24292E">    dur_s </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> max</span><span style="color:#24292E">([onset_s </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(wave) </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> SR</span><span style="color:#D73A49"> for</span><span style="color:#24292E"> onset_s, wave </span><span style="color:#D73A49">in</span><span style="color:#24292E"> sounds])</span></span>
+<span class="line"><span style="color:#24292E">    out </span><span style="color:#D73A49">=</span><span style="color:#24292E"> np.zeros(</span><span style="color:#005CC5">round</span><span style="color:#24292E">(dur_s </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> SR</span><span style="color:#24292E">))</span></span>
+<span class="line"><span style="color:#D73A49">    for</span><span style="color:#24292E"> onset_s, wave </span><span style="color:#D73A49">in</span><span style="color:#24292E"> sounds:</span></span>
+<span class="line"><span style="color:#24292E">        onset </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(onset_s </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> SR</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">        out[onset:onset </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(wave)] </span><span style="color:#D73A49">+=</span><span style="color:#24292E"> wave</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> out</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">s1 </span><span style="color:#D73A49">=</span><span style="color:#24292E"> (</span><span style="color:#005CC5">0.0</span><span style="color:#24292E">, pluck(</span><span style="color:#005CC5">440</span><span style="color:#24292E">))</span></span>
+<span class="line"><span style="color:#24292E">s2 </span><span style="color:#D73A49">=</span><span style="color:#24292E"> (</span><span style="color:#005CC5">0.25</span><span style="color:#24292E">, pluck(</span><span style="color:#005CC5">330</span><span style="color:#24292E">))</span></span>
+<span class="line"><span style="color:#24292E">play(mix_sounds([s1, s2]))</span></span></code></pre></section>
+<section class="cell markdown"><p><code>onset_s</code> is in seconds, <code>onset</code> in samples: the suffix keeps them apart.</p>
+<h3>Your turn · A major scale</h3>
+<p>Play a major scale from A4 (440 Hz), one note every 0.25 s. The steps of a major scale, in semitones from the tonic: <code>[0, 2, 4, 5, 7, 9, 11, 12]</code>.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">scale </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#005CC5">0</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">4</span><span style="color:#24292E">, </span><span style="color:#005CC5">5</span><span style="color:#24292E">, </span><span style="color:#005CC5">7</span><span style="color:#24292E">, </span><span style="color:#005CC5">9</span><span style="color:#24292E">, </span><span style="color:#005CC5">11</span><span style="color:#24292E">, </span><span style="color:#005CC5">12</span><span style="color:#24292E">]</span></span>
+<span class="line"><span style="color:#24292E">sounds </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [(i </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 0.25</span><span style="color:#24292E">, pluck(</span><span style="color:#005CC5">440</span><span style="color:#D73A49"> *</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> **</span><span style="color:#24292E"> (scale[i] </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> 12</span><span style="color:#24292E">))) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> i </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> range</span><span style="color:#24292E">(</span><span style="color:#005CC5">len</span><span style="color:#24292E">(scale))]</span></span>
+<span class="line"><span style="color:#24292E">play(mix_sounds(sounds))</span></span></code></pre></section>
+<section class="cell markdown"><h2>3. Same sign, different meaning</h2>
+<p>numpy changed the meaning of <code>+</code> and <code>*</code>. Compare lists and arrays:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">a </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">3</span><span style="color:#24292E">, </span><span style="color:#005CC5">4</span><span style="color:#24292E">]</span></span>
+<span class="line"><span style="color:#24292E">b </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#005CC5">10</span><span style="color:#24292E">, </span><span style="color:#005CC5">20</span><span style="color:#24292E">, </span><span style="color:#005CC5">30</span><span style="color:#24292E">, </span><span style="color:#005CC5">40</span><span style="color:#24292E">]</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(a </span><span style="color:#D73A49">+</span><span style="color:#24292E"> b)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">x </span><span style="color:#D73A49">=</span><span style="color:#24292E"> np.array(a)</span></span>
+<span class="line"><span style="color:#24292E">y </span><span style="color:#D73A49">=</span><span style="color:#24292E"> np.array(b)</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(x </span><span style="color:#D73A49">+</span><span style="color:#24292E"> y, x </span><span style="color:#D73A49">*</span><span style="color:#24292E"> y)</span></span></code></pre></section>
+<section class="cell markdown"><p>On lists, <code>+</code> joins. <code>a * b</code> is an error: two lists cannot be multiplied. On arrays, both work element by element. <code>np.array(a)</code> makes an array from a list: a function that makes a new value of a type is called a <strong>constructor</strong>.</p>
+<p>Who decides what <code>+</code> means? The <strong>type</strong> of the value. Every value has one:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(</span><span style="color:#005CC5">type</span><span style="color:#24292E">(</span><span style="color:#005CC5">3</span><span style="color:#24292E">), </span><span style="color:#005CC5">type</span><span style="color:#24292E">(</span><span style="color:#032F62">"ciao"</span><span style="color:#24292E">), </span><span style="color:#005CC5">type</span><span style="color:#24292E">(a), </span><span style="color:#005CC5">type</span><span style="color:#24292E">(x))</span></span></code></pre></section>
+<section class="cell markdown"><p>A type comes with functions attached. <code>type(3).__add__</code> is the function that adds integers:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(</span><span style="color:#005CC5">type</span><span style="color:#24292E">(</span><span style="color:#005CC5">3</span><span style="color:#24292E">).</span><span style="color:#005CC5">__add__</span><span style="color:#24292E">(</span><span style="color:#005CC5">10</span><span style="color:#24292E">, </span><span style="color:#005CC5">20</span><span style="color:#24292E">))</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">((</span><span style="color:#005CC5">3</span><span style="color:#24292E">).</span><span style="color:#005CC5">__add__</span><span style="color:#24292E">(</span><span style="color:#005CC5">2</span><span style="color:#24292E">))</span></span></code></pre></section>
+<section class="cell markdown"><p>Behind every operator there is a method call: <code>3 + 2</code> is short for <code>(3).__add__(2)</code>. Python asks the value <strong>on the left</strong> what <code>+</code> means for it. <code>__add__</code> is <code>+</code>, <code>__mul__</code> is <code>*</code>, <code>__sub__</code> is <code>-</code>, <code>__eq__</code> is <code>==</code>. <code>dir(3)</code> lists all the methods of an integer.</p>
+<p>So if we could make a type of our own, we could decide what <code>+</code> means for it.</p>
+</section>
+<section class="cell markdown"><h2>4. A class of our own</h2>
+<p><code>class</code> creates a new type. The simplest useful class stores a value:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> MyInt</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __init__</span><span style="color:#24292E">(self, n):</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.number </span><span style="color:#D73A49">=</span><span style="color:#24292E"> n</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> print</span><span style="color:#24292E">(self):</span></span>
+<span class="line"><span style="color:#005CC5">        print</span><span style="color:#24292E">(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.number)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">x </span><span style="color:#D73A49">=</span><span style="color:#24292E"> MyInt(</span><span style="color:#005CC5">2</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(</span><span style="color:#005CC5">type</span><span style="color:#24292E">(x))</span></span>
+<span class="line"><span style="color:#24292E">x.print()</span></span></code></pre></section>
+<section class="cell markdown"><ul>
+<li><code>MyInt(2)</code> makes a new <strong>object</strong> of type <code>MyInt</code>. Python calls <code>__init__</code> to fill it in.</li>
+<li><code>self</code> is the object being made. <code>self.number = n</code> stores a value inside it: an <strong>attribute</strong>. There is no need to declare <code>number</code> anywhere else.</li>
+<li>A function written inside a class is a <strong>method</strong>. <code>x.print()</code> calls <code>print</code> with <code>x</code> as <code>self</code>.</li>
+</ul>
+<p>Now <code>+</code>. <code>__add__</code> receives the object on the left as <code>self</code>, the one on the right as <code>other</code>:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> MyInt</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __init__</span><span style="color:#24292E">(self, n):</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.number </span><span style="color:#D73A49">=</span><span style="color:#24292E"> n</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __add__</span><span style="color:#24292E">(self, other):</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> MyInt(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.number </span><span style="color:#D73A49">+</span><span style="color:#24292E"> other.number)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> print</span><span style="color:#24292E">(self):</span></span>
+<span class="line"><span style="color:#005CC5">        print</span><span style="color:#24292E">(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.number)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">y </span><span style="color:#D73A49">=</span><span style="color:#24292E"> MyInt(</span><span style="color:#005CC5">3</span><span style="color:#24292E">) </span><span style="color:#D73A49">+</span><span style="color:#24292E"> MyInt(</span><span style="color:#005CC5">4</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(</span><span style="color:#005CC5">type</span><span style="color:#24292E">(y))</span></span>
+<span class="line"><span style="color:#24292E">y.print()</span></span></code></pre></section>
+<section class="cell markdown"><p>Nothing forces <code>+</code> to add. If <code>__add__</code> returns <code>MyInt(self.number * other.number)</code>, then <code>MyInt(3) + MyInt(4)</code> prints 12. There is no reason to do that for numbers, but it shows that the author of a type chooses the meaning of its operators.</p>
+<p><strong>Note:</strong> Python has a shorter way to write classes that mostly store data, <code>@dataclass</code>. We will use it next time.</p>
+</section>
+<section class="cell markdown"><h3>A wave</h3>
+<p>The early lessons stored sounds as lists of samples. A class can give such a list the operators of numpy:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> Wave</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __init__</span><span style="color:#24292E">(self, samples):</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.samples </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> list</span><span style="color:#24292E">(samples)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#6F42C1"> peak</span><span style="color:#24292E">(self):</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#005CC5"> max</span><span style="color:#24292E">([</span><span style="color:#005CC5">abs</span><span style="color:#24292E">(s) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> s </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.samples])</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __add__</span><span style="color:#24292E">(self, other):</span></span>
+<span class="line"><span style="color:#24292E">        n </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> max</span><span style="color:#24292E">(</span><span style="color:#005CC5">len</span><span style="color:#24292E">(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.samples), </span><span style="color:#005CC5">len</span><span style="color:#24292E">(other.samples))</span></span>
+<span class="line"><span style="color:#24292E">        a </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.samples </span><span style="color:#D73A49">+</span><span style="color:#24292E"> [</span><span style="color:#005CC5">0</span><span style="color:#24292E">] </span><span style="color:#D73A49">*</span><span style="color:#24292E"> (n </span><span style="color:#D73A49">-</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.samples))</span></span>
+<span class="line"><span style="color:#24292E">        b </span><span style="color:#D73A49">=</span><span style="color:#24292E"> other.samples </span><span style="color:#D73A49">+</span><span style="color:#24292E"> [</span><span style="color:#005CC5">0</span><span style="color:#24292E">] </span><span style="color:#D73A49">*</span><span style="color:#24292E"> (n </span><span style="color:#D73A49">-</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(other.samples))</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> Wave([x </span><span style="color:#D73A49">+</span><span style="color:#24292E"> y </span><span style="color:#D73A49">for</span><span style="color:#24292E"> x, y </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> zip</span><span style="color:#24292E">(a, b)])</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __mul__</span><span style="color:#24292E">(self, other):</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#005CC5"> isinstance</span><span style="color:#24292E">(other, (</span><span style="color:#005CC5">int</span><span style="color:#24292E">, </span><span style="color:#005CC5">float</span><span style="color:#24292E">)):</span></span>
+<span class="line"><span style="color:#D73A49">            return</span><span style="color:#24292E"> Wave([other </span><span style="color:#D73A49">*</span><span style="color:#24292E"> x </span><span style="color:#D73A49">for</span><span style="color:#24292E"> x </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.samples])</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#005CC5"> NotImplemented</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __repr__</span><span style="color:#24292E">(self):</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#032F62"> "Wave"</span><span style="color:#D73A49"> +</span><span style="color:#005CC5"> str</span><span style="color:#24292E">(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.samples)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(Wave([</span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">3</span><span style="color:#24292E">]) </span><span style="color:#D73A49">+</span><span style="color:#24292E"> Wave([</span><span style="color:#005CC5">3</span><span style="color:#24292E">, </span><span style="color:#005CC5">4</span><span style="color:#24292E">, </span><span style="color:#005CC5">5</span><span style="color:#24292E">, </span><span style="color:#005CC5">6</span><span style="color:#24292E">, </span><span style="color:#005CC5">7</span><span style="color:#24292E">]))</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">((Wave([</span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">3</span><span style="color:#24292E">]) </span><span style="color:#D73A49">+</span><span style="color:#24292E"> Wave([</span><span style="color:#005CC5">3</span><span style="color:#24292E">, </span><span style="color:#005CC5">4</span><span style="color:#24292E">, </span><span style="color:#005CC5">5</span><span style="color:#24292E">, </span><span style="color:#005CC5">6</span><span style="color:#24292E">, </span><span style="color:#005CC5">7</span><span style="color:#24292E">])) </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 0.25</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><ul>
+<li><code>list(samples)</code> accepts anything that can become a list, an array or a <code>range</code> too.</li>
+<li><code>peak</code> is a method that does not take extra arguments.</li>
+<li><code>__add__</code> pads the shorter wave with zeros, then adds: mixing two sounds of different lengths. <code>zip</code> alone would stop at the shorter one and lose the end of the longer.</li>
+<li><code>__mul__</code> multiplies by a number: a gain. <code>isinstance(other, (int, float))</code> asks whether <code>other</code> is an integer or a float. For anything else it returns <code>NotImplemented</code>, Python's way of saying &quot;this case is not defined&quot;, and Python raises a <code>TypeError</code>.</li>
+<li><code>__repr__</code> is what Python shows when it prints the object. Without it we would see something like <code>&lt;__main__.Wave object at 0x10a3...&gt;</code>.</li>
+</ul>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">try</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#24292E">    Wave([</span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">3</span><span style="color:#24292E">]) </span><span style="color:#D73A49">*</span><span style="color:#24292E"> Wave([</span><span style="color:#005CC5">4</span><span style="color:#24292E">, </span><span style="color:#005CC5">5</span><span style="color:#24292E">])</span></span>
+<span class="line"><span style="color:#D73A49">except</span><span style="color:#005CC5"> TypeError</span><span style="color:#D73A49"> as</span><span style="color:#24292E"> error:</span></span>
+<span class="line"><span style="color:#005CC5">    print</span><span style="color:#24292E">(</span><span style="color:#032F62">"TypeError:"</span><span style="color:#24292E">, error)</span></span></code></pre></section>
+<section class="cell markdown"><p><code>try</code> runs a line; if it raises a <code>TypeError</code>, Python runs the <code>except</code> part instead of stopping the notebook.</p>
+<h3>Your turn · Multiplying two waves</h3>
+<p>Multiplying two waves sample by sample is what we did with <code>env * wave</code>: modulation. Extend <code>__mul__</code> so that <code>Wave * Wave</code> multiplies sample by sample, and <code>Wave * number</code> is still a gain. Use <code>zip</code>: the result is as long as the shorter wave.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> Wave</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __init__</span><span style="color:#24292E">(self, samples):</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.samples </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> list</span><span style="color:#24292E">(samples)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#6F42C1"> peak</span><span style="color:#24292E">(self):</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#005CC5"> max</span><span style="color:#24292E">([</span><span style="color:#005CC5">abs</span><span style="color:#24292E">(s) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> s </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.samples])</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __add__</span><span style="color:#24292E">(self, other):</span></span>
+<span class="line"><span style="color:#24292E">        n </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> max</span><span style="color:#24292E">(</span><span style="color:#005CC5">len</span><span style="color:#24292E">(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.samples), </span><span style="color:#005CC5">len</span><span style="color:#24292E">(other.samples))</span></span>
+<span class="line"><span style="color:#24292E">        a </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.samples </span><span style="color:#D73A49">+</span><span style="color:#24292E"> [</span><span style="color:#005CC5">0</span><span style="color:#24292E">] </span><span style="color:#D73A49">*</span><span style="color:#24292E"> (n </span><span style="color:#D73A49">-</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.samples))</span></span>
+<span class="line"><span style="color:#24292E">        b </span><span style="color:#D73A49">=</span><span style="color:#24292E"> other.samples </span><span style="color:#D73A49">+</span><span style="color:#24292E"> [</span><span style="color:#005CC5">0</span><span style="color:#24292E">] </span><span style="color:#D73A49">*</span><span style="color:#24292E"> (n </span><span style="color:#D73A49">-</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(other.samples))</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> Wave([x </span><span style="color:#D73A49">+</span><span style="color:#24292E"> y </span><span style="color:#D73A49">for</span><span style="color:#24292E"> x, y </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> zip</span><span style="color:#24292E">(a, b)])</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __mul__</span><span style="color:#24292E">(self, other):</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#005CC5"> isinstance</span><span style="color:#24292E">(other, (</span><span style="color:#005CC5">int</span><span style="color:#24292E">, </span><span style="color:#005CC5">float</span><span style="color:#24292E">)):</span></span>
+<span class="line"><span style="color:#D73A49">            return</span><span style="color:#24292E"> Wave([other </span><span style="color:#D73A49">*</span><span style="color:#24292E"> x </span><span style="color:#D73A49">for</span><span style="color:#24292E"> x </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.samples])</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#005CC5"> isinstance</span><span style="color:#24292E">(other, Wave):</span></span>
+<span class="line"><span style="color:#D73A49">            return</span><span style="color:#24292E"> Wave([x </span><span style="color:#D73A49">*</span><span style="color:#24292E"> y </span><span style="color:#D73A49">for</span><span style="color:#24292E"> x, y </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> zip</span><span style="color:#24292E">(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.samples, other.samples)])</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#005CC5"> NotImplemented</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __repr__</span><span style="color:#24292E">(self):</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#032F62"> "Wave"</span><span style="color:#D73A49"> +</span><span style="color:#005CC5"> str</span><span style="color:#24292E">(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.samples)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(Wave([</span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">3</span><span style="color:#24292E">]) </span><span style="color:#D73A49">*</span><span style="color:#24292E"> Wave([</span><span style="color:#005CC5">4</span><span style="color:#24292E">, </span><span style="color:#005CC5">5</span><span style="color:#24292E">]))</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(Wave([</span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">3</span><span style="color:#24292E">]) </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 2</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><p><strong>Note:</strong> <code>w * 2</code> works, <code>2 * w</code> does not. Python asks the number <code>2</code> first, and a number does not know our <code>Wave</code>. Python then tries <code>w.__rmul__(2)</code> (r for <em>right</em>), which we have not written.</p>
+</section>
+<section class="cell markdown"><h2>5. A pitch class</h2>
+<p>Since lesson 01 a pitch has been a bare number: a frequency in Hz, or semitones from a root. From now on we use the numbering of MIDI, the protocol of electronic instruments: one step is one semitone, middle C (C4) is 60, and <strong>A4 is 69, 440 Hz</strong>.</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">440</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.938em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.938em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mord mathnormal mtight">m</span><span class="mbin mtight">−</span><span class="mord mtight">69</span><span class="mclose mtight">)</span><span class="mord mtight">/12</span></span></span></span></span></span></span></span></span></span></span></span></span></p>
+<p>What should we be able to do with pitches? Like dates and durations in a calendar, there are two kinds of values:</p>
+<table>
+<thead>
+<tr>
+<th>operation</th>
+<th>result</th>
+<th>calendar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pitch + interval</td>
+<td>pitch</td>
+<td>date + 3 days → date</td>
+</tr>
+<tr>
+<td>pitch − pitch</td>
+<td>interval</td>
+<td>date − date → days</td>
+</tr>
+<tr>
+<td>pitch + pitch</td>
+<td>meaningless</td>
+<td>&quot;today + tomorrow&quot;</td>
+</tr>
+</tbody>
+</table>
+<p>An interval stays a plain number of semitones. A pitch becomes an object, and its class allows only the operations that make sense. We build it step by step.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> Pitch</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __init__</span><span style="color:#24292E">(self, midi):</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.midi </span><span style="color:#D73A49">=</span><span style="color:#24292E"> midi</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#6F42C1"> freq</span><span style="color:#24292E">(self):</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#005CC5"> 440</span><span style="color:#D73A49"> *</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> **</span><span style="color:#24292E"> ((</span><span style="color:#005CC5">self</span><span style="color:#24292E">.midi </span><span style="color:#D73A49">-</span><span style="color:#005CC5"> 69</span><span style="color:#24292E">) </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> 12</span><span style="color:#24292E">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">p </span><span style="color:#D73A49">=</span><span style="color:#24292E"> Pitch(</span><span style="color:#005CC5">69</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(p.freq(), Pitch(</span><span style="color:#005CC5">70</span><span style="color:#24292E">).freq())</span></span></code></pre></section>
+<section class="cell markdown"><p><code>p + 1</code> fails: Python does not know what adding a number to a <code>Pitch</code> means. We tell it with <code>__add__</code>, and refuse pitch + pitch. <code>__repr__</code> shows the name of the note:</p>
+<ul>
+<li><code>midi % 12</code> is the position in the octave, 0 for C, 9 for A;</li>
+<li><code>midi // 12</code> (whole division) counts octaves. MIDI numbers octaves from −1, so the octave is <code>midi // 12 - 1</code>: 69 is A4.</li>
+</ul>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">note_names </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#032F62">"C"</span><span style="color:#24292E">, </span><span style="color:#032F62">"C#"</span><span style="color:#24292E">, </span><span style="color:#032F62">"D"</span><span style="color:#24292E">, </span><span style="color:#032F62">"D#"</span><span style="color:#24292E">, </span><span style="color:#032F62">"E"</span><span style="color:#24292E">, </span><span style="color:#032F62">"F"</span><span style="color:#24292E">, </span><span style="color:#032F62">"F#"</span><span style="color:#24292E">, </span><span style="color:#032F62">"G"</span><span style="color:#24292E">, </span><span style="color:#032F62">"G#"</span><span style="color:#24292E">, </span><span style="color:#032F62">"A"</span><span style="color:#24292E">, </span><span style="color:#032F62">"A#"</span><span style="color:#24292E">, </span><span style="color:#032F62">"B"</span><span style="color:#24292E">]</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> Pitch</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __init__</span><span style="color:#24292E">(self, midi):</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.midi </span><span style="color:#D73A49">=</span><span style="color:#24292E"> midi</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#6F42C1"> freq</span><span style="color:#24292E">(self):</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#005CC5"> 440</span><span style="color:#D73A49"> *</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> **</span><span style="color:#24292E"> ((</span><span style="color:#005CC5">self</span><span style="color:#24292E">.midi </span><span style="color:#D73A49">-</span><span style="color:#005CC5"> 69</span><span style="color:#24292E">) </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> 12</span><span style="color:#24292E">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __add__</span><span style="color:#24292E">(self, semitones):</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#005CC5"> isinstance</span><span style="color:#24292E">(semitones, Pitch):</span></span>
+<span class="line"><span style="color:#D73A49">            raise</span><span style="color:#005CC5"> TypeError</span><span style="color:#24292E">(</span><span style="color:#032F62">"Add semitones, not a pitch."</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> Pitch(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.midi </span><span style="color:#D73A49">+</span><span style="color:#24292E"> semitones)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __repr__</span><span style="color:#24292E">(self):</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> note_names[</span><span style="color:#005CC5">self</span><span style="color:#24292E">.midi </span><span style="color:#D73A49">%</span><span style="color:#005CC5"> 12</span><span style="color:#24292E">] </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> str</span><span style="color:#24292E">(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.midi </span><span style="color:#D73A49">//</span><span style="color:#005CC5"> 12</span><span style="color:#D73A49"> -</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">A4 </span><span style="color:#D73A49">=</span><span style="color:#24292E"> Pitch(</span><span style="color:#005CC5">69</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">B4 </span><span style="color:#D73A49">=</span><span style="color:#24292E"> A4 </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> 2</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(A4, B4, </span><span style="color:#005CC5">type</span><span style="color:#24292E">(B4), B4.freq())</span></span></code></pre></section>
+<section class="cell markdown"><p><code>A4</code> is just the name of a variable. And A4 plus B4?</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">try</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#24292E">    A4 </span><span style="color:#D73A49">+</span><span style="color:#24292E"> B4</span></span>
+<span class="line"><span style="color:#D73A49">except</span><span style="color:#005CC5"> TypeError</span><span style="color:#D73A49"> as</span><span style="color:#24292E"> error:</span></span>
+<span class="line"><span style="color:#005CC5">    print</span><span style="color:#24292E">(</span><span style="color:#032F62">"TypeError:"</span><span style="color:#24292E">, error)</span></span></code></pre></section>
+<section class="cell markdown"><p>The error is ours, with our message: the class refuses an operation that has no meaning.</p>
+<h3>Pitches from names</h3>
+<p>We would like to write <code>Pitch(&quot;A4&quot;)</code>. A name is a string: the last character is the octave, the rest is the note. Slices take it apart:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">name </span><span style="color:#D73A49">=</span><span style="color:#032F62"> "A#4"</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(name[:</span><span style="color:#D73A49">-</span><span style="color:#005CC5">1</span><span style="color:#24292E">], name[</span><span style="color:#D73A49">-</span><span style="color:#005CC5">1</span><span style="color:#24292E">])</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(</span><span style="color:#005CC5">int</span><span style="color:#24292E">(name[</span><span style="color:#D73A49">-</span><span style="color:#005CC5">1</span><span style="color:#24292E">]), note_names.index(name[:</span><span style="color:#D73A49">-</span><span style="color:#005CC5">1</span><span style="color:#24292E">]))</span></span></code></pre></section>
+<section class="cell markdown"><p><code>name[:-1]</code> is all but the last character, <code>name[-1]</code> the last one. <code>note_names.index(&quot;A#&quot;)</code> is the position of <code>&quot;A#&quot;</code> in the list, 10. The MIDI number is <code>12 * (octave + 1) + position</code>.</p>
+<p>The constructor can accept either a number or a name: <code>isinstance(value, str)</code> asks whether the value is a string. We also add <code>-</code>: pitch − pitch is an interval, pitch − number a lower pitch.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> Pitch</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __init__</span><span style="color:#24292E">(self, value):</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#005CC5"> isinstance</span><span style="color:#24292E">(value, </span><span style="color:#005CC5">str</span><span style="color:#24292E">):           </span><span style="color:#6A737D"># a name like "C4": the octave last, the note before</span></span>
+<span class="line"><span style="color:#24292E">            value </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 12</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> (</span><span style="color:#005CC5">int</span><span style="color:#24292E">(value[</span><span style="color:#D73A49">-</span><span style="color:#005CC5">1</span><span style="color:#24292E">]) </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">) </span><span style="color:#D73A49">+</span><span style="color:#24292E"> note_names.index(value[:</span><span style="color:#D73A49">-</span><span style="color:#005CC5">1</span><span style="color:#24292E">])</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.midi </span><span style="color:#D73A49">=</span><span style="color:#24292E"> value</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#6F42C1"> freq</span><span style="color:#24292E">(self):</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#005CC5"> 440</span><span style="color:#D73A49"> *</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> **</span><span style="color:#24292E"> ((</span><span style="color:#005CC5">self</span><span style="color:#24292E">.midi </span><span style="color:#D73A49">-</span><span style="color:#005CC5"> 69</span><span style="color:#24292E">) </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> 12</span><span style="color:#24292E">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __add__</span><span style="color:#24292E">(self, semitones):</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#005CC5"> isinstance</span><span style="color:#24292E">(semitones, Pitch):</span></span>
+<span class="line"><span style="color:#D73A49">            raise</span><span style="color:#005CC5"> TypeError</span><span style="color:#24292E">(</span><span style="color:#032F62">"Add semitones, not a pitch."</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> Pitch(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.midi </span><span style="color:#D73A49">+</span><span style="color:#24292E"> semitones)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __sub__</span><span style="color:#24292E">(self, other):</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#005CC5"> isinstance</span><span style="color:#24292E">(other, Pitch):</span></span>
+<span class="line"><span style="color:#D73A49">            return</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.midi </span><span style="color:#D73A49">-</span><span style="color:#24292E"> other.midi    </span><span style="color:#6A737D"># an interval</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> Pitch(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.midi </span><span style="color:#D73A49">-</span><span style="color:#24292E"> other)      </span><span style="color:#6A737D"># a lower pitch</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __eq__</span><span style="color:#24292E">(self, other):</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#005CC5"> isinstance</span><span style="color:#24292E">(other, Pitch) </span><span style="color:#D73A49">and</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.midi </span><span style="color:#D73A49">==</span><span style="color:#24292E"> other.midi</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __repr__</span><span style="color:#24292E">(self):</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> note_names[</span><span style="color:#005CC5">self</span><span style="color:#24292E">.midi </span><span style="color:#D73A49">%</span><span style="color:#005CC5"> 12</span><span style="color:#24292E">] </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> str</span><span style="color:#24292E">(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.midi </span><span style="color:#D73A49">//</span><span style="color:#005CC5"> 12</span><span style="color:#D73A49"> -</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(Pitch(</span><span style="color:#032F62">"A4"</span><span style="color:#24292E">), Pitch(</span><span style="color:#032F62">"A4"</span><span style="color:#24292E">).midi, (Pitch(</span><span style="color:#032F62">"A4"</span><span style="color:#24292E">) </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">).freq())</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(Pitch(</span><span style="color:#032F62">"B5"</span><span style="color:#24292E">) </span><span style="color:#D73A49">-</span><span style="color:#005CC5"> 10</span><span style="color:#24292E">, Pitch(</span><span style="color:#032F62">"G4"</span><span style="color:#24292E">) </span><span style="color:#D73A49">-</span><span style="color:#24292E"> Pitch(</span><span style="color:#032F62">"C4"</span><span style="color:#24292E">))</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(Pitch(</span><span style="color:#032F62">"A4"</span><span style="color:#24292E">) </span><span style="color:#D73A49">==</span><span style="color:#24292E"> Pitch(</span><span style="color:#005CC5">69</span><span style="color:#24292E">))</span></span></code></pre></section>
+<section class="cell markdown"><p>Names handle octaves 0–9 and sharps only.</p>
+<h3>Your turn · Equal or the same?</h3>
+<p>Comment out the <code>__eq__</code> method, run the class cell again, and try <code>Pitch(&quot;A4&quot;) == Pitch(69)</code>. What does Python compare when a class has no <code>__eq__</code>?</p>
+<p>Without <code>__eq__</code>, <code>==</code> asks whether the two names point to <strong>the same object</strong>. Two different objects with the same <code>midi</code> are not the same object, so the answer is <code>False</code>. With <code>__eq__</code>, two pitches are equal when their notes are. Put it back before going on.</p>
+</section>
+<section class="cell markdown"><h2>6. Scales from intervals</h2>
+<p>A scale is a tonic plus a list of intervals. Adding each interval to a <code>Pitch</code> gives the notes, with their names:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">major_intervals </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#005CC5">0</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">4</span><span style="color:#24292E">, </span><span style="color:#005CC5">5</span><span style="color:#24292E">, </span><span style="color:#005CC5">7</span><span style="color:#24292E">, </span><span style="color:#005CC5">9</span><span style="color:#24292E">, </span><span style="color:#005CC5">11</span><span style="color:#24292E">, </span><span style="color:#005CC5">12</span><span style="color:#24292E">]</span></span>
+<span class="line"><span style="color:#24292E">minor_melodic_intervals </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#005CC5">0</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">3</span><span style="color:#24292E">, </span><span style="color:#005CC5">5</span><span style="color:#24292E">, </span><span style="color:#005CC5">7</span><span style="color:#24292E">, </span><span style="color:#005CC5">9</span><span style="color:#24292E">, </span><span style="color:#005CC5">11</span><span style="color:#24292E">, </span><span style="color:#005CC5">12</span><span style="color:#24292E">]</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">([Pitch(</span><span style="color:#032F62">"G4"</span><span style="color:#24292E">) </span><span style="color:#D73A49">+</span><span style="color:#24292E"> i </span><span style="color:#D73A49">for</span><span style="color:#24292E"> i </span><span style="color:#D73A49">in</span><span style="color:#24292E"> major_intervals])</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">([Pitch(</span><span style="color:#032F62">"G4"</span><span style="color:#24292E">) </span><span style="color:#D73A49">+</span><span style="color:#24292E"> i </span><span style="color:#D73A49">for</span><span style="color:#24292E"> i </span><span style="color:#D73A49">in</span><span style="color:#24292E"> minor_melodic_intervals])</span></span></code></pre></section>
+<section class="cell markdown"><p>G major has one sharp, F#: the names confirm it. From pitches to frequencies, from frequencies to sounds:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">g_major </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [(i </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 0.25</span><span style="color:#24292E">, pluck((Pitch(</span><span style="color:#032F62">"G4"</span><span style="color:#24292E">) </span><span style="color:#D73A49">+</span><span style="color:#24292E"> major_intervals[i]).freq())) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> i </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> range</span><span style="color:#24292E">(</span><span style="color:#005CC5">len</span><span style="color:#24292E">(major_intervals))]</span></span>
+<span class="line"><span style="color:#24292E">play(mix_sounds(g_major))</span></span></code></pre></section>
+<section class="cell markdown"><p>Two lists of sounds can be joined with <code>+</code>. Each sound keeps its own onset, so two scales that start at the same time are mixed together:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">g_sharp_major </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [(i </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 0.25</span><span style="color:#24292E">, pluck((Pitch(</span><span style="color:#032F62">"G#4"</span><span style="color:#24292E">) </span><span style="color:#D73A49">+</span><span style="color:#24292E"> major_intervals[i]).freq())) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> i </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> range</span><span style="color:#24292E">(</span><span style="color:#005CC5">len</span><span style="color:#24292E">(major_intervals))]</span></span>
+<span class="line"><span style="color:#24292E">play(mix_sounds(g_major </span><span style="color:#D73A49">+</span><span style="color:#24292E"> g_sharp_major))</span></span></code></pre></section>
+<section class="cell markdown"><h3>Your turn · Up and down</h3>
+<p>Play G melodic minor going up and then coming down. <code>intervals[::-1]</code> is the list reversed. Do not repeat the top note.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">up_down </span><span style="color:#D73A49">=</span><span style="color:#24292E"> minor_melodic_intervals </span><span style="color:#D73A49">+</span><span style="color:#24292E"> minor_melodic_intervals[::</span><span style="color:#D73A49">-</span><span style="color:#005CC5">1</span><span style="color:#24292E">][</span><span style="color:#005CC5">1</span><span style="color:#24292E">:]</span></span>
+<span class="line"><span style="color:#24292E">g_minor </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [(i </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 0.25</span><span style="color:#24292E">, pluck((Pitch(</span><span style="color:#032F62">"G4"</span><span style="color:#24292E">) </span><span style="color:#D73A49">+</span><span style="color:#24292E"> up_down[i]).freq())) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> i </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> range</span><span style="color:#24292E">(</span><span style="color:#005CC5">len</span><span style="color:#24292E">(up_down))]</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">([Pitch(</span><span style="color:#032F62">"G4"</span><span style="color:#24292E">) </span><span style="color:#D73A49">+</span><span style="color:#24292E"> i </span><span style="color:#D73A49">for</span><span style="color:#24292E"> i </span><span style="color:#D73A49">in</span><span style="color:#24292E"> up_down])</span></span>
+<span class="line"><span style="color:#24292E">play(mix_sounds(g_minor))</span></span></code></pre></section>
+<section class="cell markdown"><h2>7. What we would like to write</h2>
+<p>We have pitches. A <strong>note</strong> is a pitch with a duration. We would like to write melodies like this:</p>
+<pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">Note(Pitch(</span><span style="color:#032F62">"A4"</span><span style="color:#24292E">), </span><span style="color:#005CC5">2</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> Note(Pitch(</span><span style="color:#032F62">"B4"</span><span style="color:#24292E">))     </span><span style="color:#6A737D"># A4 for 2 beats, then B4</span></span>
+<span class="line"><span style="color:#24292E">Note(Pitch(</span><span style="color:#032F62">"A4"</span><span style="color:#24292E">)) </span><span style="color:#D73A49">&#x26;</span><span style="color:#24292E"> Note(Pitch(</span><span style="color:#032F62">"C#5"</span><span style="color:#24292E">))        </span><span style="color:#6A737D"># A4 and C#5 together: a chord</span></span>
+<span class="line"></span></code></pre>
+<p><code>&gt;&gt;</code> would mean <em>then</em>, <code>&amp;</code> <em>together</em>. To get there we need a type for notes, a type for sequences of notes, and the meaning of the two operators. That is the next lesson, and with it a small ambient piece of long drones.</p>
+<h2>What we built</h2>
+<ul>
+<li>numpy applies arithmetic to every element: a tone, an envelope and a note in one line each, a mixer with one slice.</li>
+<li>An operator is a method call: <code>a + b</code> is <code>a.__add__(b)</code>. The type of <code>a</code> decides what <code>+</code> means.</li>
+<li>A class makes a new type. <code>__init__</code> stores its data in <code>self</code>, methods give it behaviour, special methods give it operators and a way to print itself.</li>
+<li>A good class allows the operations that make sense and refuses the others: pitch + interval, not pitch + pitch.</li>
+</ul>
+<p>Before sharing your work, restart the notebook and run it in order.</p>
+</section>
+  </article>
+</main>
+</body>
+</html>
