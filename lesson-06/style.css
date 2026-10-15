@@ -1,0 +1,7 @@
+@import '../presentation-theme.css';
+.slidev-layout .notebook-cue { position: absolute; bottom: 22px; left: 56px; right: 56px; padding-top: 10px; border-top: 1px solid #ccd4cf; font-size: 13px; color: var(--muted); }
+.slidev-layout .notebook-cue strong { margin-right: 12px; }
+.slidev-layout .chapter { max-width: 790px; margin-top: 76px; }
+.slidev-layout .chapter h1 { font-size: 70px; line-height: 1.02; letter-spacing: -3px; margin: 18px 0 30px; }
+.slidev-layout .cover-title { font-size: 70px; line-height: 1.02; letter-spacing: -3px; margin: 40px 0 26px; }
+.slidev-layout .cover-meta { position: absolute; bottom: 28px; font: 14px Menlo, monospace; color: #bfcec9; }
