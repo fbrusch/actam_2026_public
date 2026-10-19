@@ -29,9 +29,13 @@ const lesson05 = publicLayout
 const lesson06 = publicLayout
   ? path.join(root, 'lesson-06')
   : path.join(root, 'lesson_06', 'publish', 'lesson-06')
-// Lessons 04 and 05 also publish ready-made static pages (kit, challenges, …).
+const lesson07 = publicLayout
+  ? path.join(root, 'lesson-07')
+  : path.join(root, 'lesson_07', 'publish', 'lesson-07')
+// Lessons 04, 05 and 07 also publish ready-made static pages (kit, tools, …).
 const lesson04Pages = path.join(lesson04, 'pages')
 const lesson05Pages = path.join(lesson05, 'pages')
+const lesson07Pages = path.join(lesson07, 'pages')
 const exerciseFolder = publicLayout && await exists(path.join(root, 'lab-01'))
   ? path.join(root, 'lab-01')
   : lesson01
@@ -121,6 +125,7 @@ buildSlides(
 
 await cp(lesson04Pages, path.join(dist, 'lesson-04'), { recursive: true })
 await cp(lesson05Pages, path.join(dist, 'lesson-05'), { recursive: true })
+await cp(lesson07Pages, path.join(dist, 'lesson-07'), { recursive: true })
 await cp(path.join(lesson05, 'class-notebook.ipynb'), path.join(dist, 'lesson-05', 'class-notebook.ipynb'))
 
 // Every notebook copied above gets a read-only page next to it, and the
@@ -146,6 +151,7 @@ if (process.env.SITE_ANALYTICS_TOKEN) {
     'lesson-04/submissions/index.html',
     'lesson-05/tools/index.html',
     'lesson-06/slides/index.html',
+    'lesson-07/tools/index.html',
   ]
   for (const file of pages) {
     const target = path.join(dist, file)
