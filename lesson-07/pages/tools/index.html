@@ -18,6 +18,12 @@
     button:focus-visible { outline: 3px solid #cb4f38; outline-offset: 4px; }
     .status { color: #42666a; font-size: .85rem; }
     pre { max-width: 100%; margin: 12px 0 0; padding: 18px; overflow-x: auto; background: #182f3a; color: #eef2ef; font-size: .82rem; line-height: 1.55; }
+    .k { color: #f39b86; }
+    .f { color: #7bd2c1; }
+    .b, .d { color: #a9c8ec; }
+    .s { color: #bfdc94; }
+    .n { color: #f2c27c; }
+    .c { color: #93aca9; font-style: italic; }
     @media (max-width: 620px) { main { padding: 32px 16px; } }
   </style>
 </head>
@@ -25,62 +31,62 @@
 <main>
   <style>.crumbs ol { display: flex; flex-wrap: wrap; gap: 0 .6em; margin: 0; padding: 0; list-style: none; }.crumbs li + li::before { content: '›'; margin-right: .6em; }.crumbs { text-transform: uppercase; margin: 1em 0; }nav.crumbs a { color: inherit; text-decoration: none; padding: 0; border: 0; background: none; }nav.crumbs a:hover { text-decoration: underline; text-underline-offset: 3px; }</style><nav class="eyebrow crumbs" aria-label="Breadcrumb"><ol><li><a href="../../">ACTAM</a></li><li><a href="../../#lesson-07">Lesson 07</a></li><li><span aria-current="page">The tools</span></li></ol></nav>
   <h1>The tools.</h1>
-  <p>Last time's tools, ready for today. Paste this into the first cell of a new notebook and run it.</p>
+  <p>Last time&#x27;s tools, ready for today. Paste this into the first cell of a new notebook and run it.</p>
   <div class="bar">
     <span class="status" id="status" role="status"></span>
     <button type="button" id="copy">Copy code</button>
   </div>
-  <pre><code id="code">from IPython.display import Audio
-from dataclasses import dataclass
-import numpy as np
-from matplotlib import pyplot as plt
+  <pre><code id="code"><span class="k">from</span> IPython.display <span class="k">import</span> Audio
+<span class="k">from</span> dataclasses <span class="k">import</span> dataclass
+<span class="k">import</span> numpy <span class="k">as</span> np
+<span class="k">from</span> matplotlib <span class="k">import</span> pyplot <span class="k">as</span> plt
 
-SR = 48000
+SR = <span class="n">48000</span>
 
-def play(wave):
-    return Audio(wave, rate=SR, normalize=False, autoplay=False)
+<span class="k">def</span> <span class="f">play</span>(wave):
+    <span class="k">return</span> Audio(wave, rate=SR, normalize=<span class="k">False</span>, autoplay=<span class="k">False</span>)
 
-def pluck(f, dur_s=1.0, tau=0.3, amplitude=0.25):
-    t = np.arange(round(dur_s * SR)) / SR
+<span class="k">def</span> <span class="f">pluck</span>(f, dur_s=<span class="n">1.0</span>, tau=<span class="n">0.3</span>, amplitude=<span class="n">0.25</span>):
+    t = np.arange(<span class="b">round</span>(dur_s * SR)) / SR
     env = np.exp(-t / tau)
-    wave = np.sin(2 * np.pi * f * t)
-    return amplitude * env * wave
+    wave = np.sin(<span class="n">2</span> * np.pi * f * t)
+    <span class="k">return</span> amplitude * env * wave
 
-def mix_sounds(sounds):                      # a sound is (onset_s, wave)
-    dur_s = max([onset_s + len(wave) / SR for onset_s, wave in sounds])
-    out = np.zeros(round(dur_s * SR))
-    for onset_s, wave in sounds:
-        onset = round(onset_s * SR)
-        out[onset:onset + len(wave)] += wave
-    return out
+<span class="k">def</span> <span class="f">mix_sounds</span>(sounds):                      <span class="c"># a sound is (onset_s, wave)</span>
+    dur_s = <span class="b">max</span>([onset_s + <span class="b">len</span>(wave) / SR <span class="k">for</span> onset_s, wave <span class="k">in</span> sounds])
+    out = np.zeros(<span class="b">round</span>(dur_s * SR))
+    <span class="k">for</span> onset_s, wave <span class="k">in</span> sounds:
+        onset = <span class="b">round</span>(onset_s * SR)
+        out[onset:onset + <span class="b">len</span>(wave)] += wave
+    <span class="k">return</span> out
 
-note_names = [&quot;C&quot;, &quot;C#&quot;, &quot;D&quot;, &quot;D#&quot;, &quot;E&quot;, &quot;F&quot;, &quot;F#&quot;, &quot;G&quot;, &quot;G#&quot;, &quot;A&quot;, &quot;A#&quot;, &quot;B&quot;]
+note_names = [<span class="s">&quot;C&quot;</span>, <span class="s">&quot;C#&quot;</span>, <span class="s">&quot;D&quot;</span>, <span class="s">&quot;D#&quot;</span>, <span class="s">&quot;E&quot;</span>, <span class="s">&quot;F&quot;</span>, <span class="s">&quot;F#&quot;</span>, <span class="s">&quot;G&quot;</span>, <span class="s">&quot;G#&quot;</span>, <span class="s">&quot;A&quot;</span>, <span class="s">&quot;A#&quot;</span>, <span class="s">&quot;B&quot;</span>]
 
-class Pitch:
-    def __init__(self, value):
-        if isinstance(value, str):           # a name like &quot;C4&quot;: the octave last, the note before
-            value = 12 * (int(value[-1]) + 1) + note_names.index(value[:-1])
-        self.midi = value
+<span class="k">class</span> <span class="f">Pitch</span>:
+    <span class="k">def</span> <span class="f">__init__</span>(<span class="b">self</span>, value):
+        <span class="k">if</span> <span class="b">isinstance</span>(value, <span class="b">str</span>):           <span class="c"># a name like &quot;C4&quot;: the octave last, the note before</span>
+            value = <span class="n">12</span> * (<span class="b">int</span>(value[-<span class="n">1</span>]) + <span class="n">1</span>) + note_names.index(value[:-<span class="n">1</span>])
+        <span class="b">self</span>.midi = value
 
-    @property
-    def f(self):                             # the frequency in Hz
-        return 440 * 2 ** ((self.midi - 69) / 12)
+    <span class="d">@</span><span class="d">property</span>
+    <span class="k">def</span> <span class="f">f</span>(<span class="b">self</span>):                             <span class="c"># the frequency in Hz</span>
+        <span class="k">return</span> <span class="n">440</span> * <span class="n">2</span> ** ((<span class="b">self</span>.midi - <span class="n">69</span>) / <span class="n">12</span>)
 
-    def __add__(self, semitones):
-        if isinstance(semitones, Pitch):
-            raise TypeError(&quot;Add semitones, not a pitch.&quot;)
-        return Pitch(self.midi + semitones)
+    <span class="k">def</span> <span class="f">__add__</span>(<span class="b">self</span>, semitones):
+        <span class="k">if</span> <span class="b">isinstance</span>(semitones, Pitch):
+            <span class="k">raise</span> <span class="b">TypeError</span>(<span class="s">&quot;Add semitones, not a pitch.&quot;</span>)
+        <span class="k">return</span> Pitch(<span class="b">self</span>.midi + semitones)
 
-    def __sub__(self, other):
-        if isinstance(other, Pitch):
-            return self.midi - other.midi    # an interval
-        return Pitch(self.midi - other)      # a lower pitch
+    <span class="k">def</span> <span class="f">__sub__</span>(<span class="b">self</span>, other):
+        <span class="k">if</span> <span class="b">isinstance</span>(other, Pitch):
+            <span class="k">return</span> <span class="b">self</span>.midi - other.midi    <span class="c"># an interval</span>
+        <span class="k">return</span> Pitch(<span class="b">self</span>.midi - other)      <span class="c"># a lower pitch</span>
 
-    def __eq__(self, other):
-        return isinstance(other, Pitch) and self.midi == other.midi
+    <span class="k">def</span> <span class="f">__eq__</span>(<span class="b">self</span>, other):
+        <span class="k">return</span> <span class="b">isinstance</span>(other, Pitch) <span class="k">and</span> <span class="b">self</span>.midi == other.midi
 
-    def __repr__(self):
-        return note_names[self.midi % 12] + str(self.midi // 12 - 1)
+    <span class="k">def</span> <span class="f">__repr__</span>(<span class="b">self</span>):
+        <span class="k">return</span> note_names[<span class="b">self</span>.midi % <span class="n">12</span>] + <span class="b">str</span>(<span class="b">self</span>.midi // <span class="n">12</span> - <span class="n">1</span>)
 </code></pre>
 </main>
 <script>
