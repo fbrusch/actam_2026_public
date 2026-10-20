@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+  <meta name="theme-color" content="#f7f5ef">
+  <title>Lesson 07 · Reference notebook · ACTAM</title>
+  <link rel="stylesheet" href="../../assets/katex/katex.min.css">
+  <style>
+:root { color-scheme: light; color: #182f3a; background: #f7f5ef; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+* { box-sizing: border-box; }
+body { margin: 0; background: #f7f5ef; }
+main { max-width: 900px; margin: auto; padding: 40px 24px 80px; }
+.crumbs ol { display: flex; flex-wrap: wrap; gap: 0 .6em; margin: 0; padding: 0; list-style: none; font: .8rem ui-monospace, Menlo, monospace; letter-spacing: .12em; text-transform: uppercase; color: #42666a; }
+.crumbs li + li::before { content: '›'; margin-right: .6em; }
+.crumbs a { color: inherit; text-decoration: none; }
+.crumbs a:hover { text-decoration: underline; }
+h1 { font: 700 clamp(2rem, 6vw, 3.4rem)/1.08 ui-monospace, Menlo, monospace; letter-spacing: -.05em; margin: 22px 0 18px; }
+.bar { display: flex; flex-wrap: wrap; gap: 10px; }
+.button { font: .9rem ui-monospace, Menlo, monospace; padding: 9px 14px; border: 1px solid #087e83; color: #087e83; text-decoration: none; background: #fff; }
+.button.primary { background: #087e83; color: #fff; }
+.button:focus-visible { outline: 3px solid #cb4f38; outline-offset: 3px; }
+.hint { color: #42666a; font-size: .85rem; line-height: 1.5; margin: 12px 0 28px; max-width: 640px; }
+.cell { margin: 0 0 14px; }
+.markdown { line-height: 1.65; }
+.markdown h1, .markdown h2, .markdown h3 { font-family: ui-monospace, Menlo, monospace; letter-spacing: -.02em; line-height: 1.2; margin: 1.6em 0 .5em; }
+.markdown h1 { font-size: 1.8rem; } .markdown h2 { font-size: 1.4rem; } .markdown h3 { font-size: 1.1rem; }
+.markdown code { font: .88em ui-monospace, Menlo, monospace; background: #e5ece6; color: #0b5f63; padding: 1px 4px; }
+.markdown pre code { background: none; color: inherit; padding: 0; }
+.markdown table { border-collapse: collapse; margin: 12px 0; }
+.markdown th, .markdown td { border: 1px solid #ccd4cf; padding: 5px 10px; text-align: left; }
+.markdown img { max-width: 100%; }
+.markdown a { color: #087e83; }
+.markdown details { margin: 12px 0; }
+.markdown summary { cursor: pointer; color: #087e83; }
+.markdown blockquote { margin: 0; padding-left: 14px; border-left: 3px solid #087e83; color: #42666a; }
+pre { margin: 0; padding: 14px 16px; overflow-x: auto; font: .82rem/1.55 ui-monospace, Menlo, monospace; border: 1px solid #d5ddd8; }
+pre.shiki { background: #fbfcfa !important; }
+pre.plain { background: #fbfcfa; }
+.code pre { border-left: 3px solid #087e83; }
+.katex-display { overflow-x: auto; overflow-y: hidden; }
+@media (max-width: 620px) { main { padding: 28px 16px 60px; } }
+</style>
+</head>
+<body>
+<main>
+  <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../../">ACTAM</a></li><li><a href="../../#lesson-07">Lesson 07</a></li><li><span aria-current="page">Reference notebook</span></li></ol></nav>
+  <h1>Reference notebook</h1>
+  <div class="bar">
+    <a class="button" href="../notebook.ipynb" download="actam-lesson-07-notebook.ipynb">Download .ipynb</a>
+    <a class="button primary" href="../../lite/notebooks/index.html?path=lesson-07%2Fnotebook.ipynb">Open in the browser</a>
+  </div>
+  <p class="hint">“Open in the browser” runs the notebook on your computer with JupyterLite: no installation, no account. Your changes stay in that browser: download the notebook to keep them.</p>
+  <article class="notebook">
+<section class="cell markdown"><h1>Lesson 07 · Music as data</h1>
+<p><em>Fra Martino</em> written once as data, then played in other scales and as a canon: clips, operators and scales, a small language of our own.</p>
+<h3>How to use this notebook</h3>
+<p>Run the cells in order. Each section starts from what the previous one built. The <strong>Your turn</strong> cells are for you: try before reading the answer below them.</p>
+<p><strong>Recall:</strong> classes, <code>__add__</code>, <code>__eq__</code>, <code>Pitch</code> and <code>mix_sounds</code> come from lesson 06. A name ending in <code>_s</code> is in seconds; without a suffix, time is in beats.</p>
+</section>
+<section class="cell markdown"><h2>1. Setup</h2>
+<p>Last time's tools, with <code>from dataclasses import dataclass</code>, which we use today.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">from</span><span style="color:#24292E"> IPython.display </span><span style="color:#D73A49">import</span><span style="color:#24292E"> Audio</span></span>
+<span class="line"><span style="color:#D73A49">from</span><span style="color:#24292E"> dataclasses </span><span style="color:#D73A49">import</span><span style="color:#24292E"> dataclass</span></span>
+<span class="line"><span style="color:#D73A49">import</span><span style="color:#24292E"> numpy </span><span style="color:#D73A49">as</span><span style="color:#24292E"> np</span></span>
+<span class="line"><span style="color:#D73A49">from</span><span style="color:#24292E"> matplotlib </span><span style="color:#D73A49">import</span><span style="color:#24292E"> pyplot </span><span style="color:#D73A49">as</span><span style="color:#24292E"> plt</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#005CC5">SR</span><span style="color:#D73A49"> =</span><span style="color:#005CC5"> 48000</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> play</span><span style="color:#24292E">(wave):</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> Audio(wave, </span><span style="color:#E36209">rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">, </span><span style="color:#E36209">normalize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">False</span><span style="color:#24292E">, </span><span style="color:#E36209">autoplay</span><span style="color:#D73A49">=</span><span style="color:#005CC5">False</span><span style="color:#24292E">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> pluck</span><span style="color:#24292E">(f, dur_s</span><span style="color:#D73A49">=</span><span style="color:#005CC5">1.0</span><span style="color:#24292E">, tau</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.3</span><span style="color:#24292E">, amplitude</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.25</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#24292E">    t </span><span style="color:#D73A49">=</span><span style="color:#24292E"> np.arange(</span><span style="color:#005CC5">round</span><span style="color:#24292E">(dur_s </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> SR</span><span style="color:#24292E">)) </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> SR</span></span>
+<span class="line"><span style="color:#24292E">    env </span><span style="color:#D73A49">=</span><span style="color:#24292E"> np.exp(</span><span style="color:#D73A49">-</span><span style="color:#24292E">t </span><span style="color:#D73A49">/</span><span style="color:#24292E"> tau)</span></span>
+<span class="line"><span style="color:#24292E">    wave </span><span style="color:#D73A49">=</span><span style="color:#24292E"> np.sin(</span><span style="color:#005CC5">2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> np.pi </span><span style="color:#D73A49">*</span><span style="color:#24292E"> f </span><span style="color:#D73A49">*</span><span style="color:#24292E"> t)</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> amplitude </span><span style="color:#D73A49">*</span><span style="color:#24292E"> env </span><span style="color:#D73A49">*</span><span style="color:#24292E"> wave</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> mix_sounds</span><span style="color:#24292E">(sounds):                      </span><span style="color:#6A737D"># a sound is (onset_s, wave)</span></span>
+<span class="line"><span style="color:#24292E">    dur_s </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> max</span><span style="color:#24292E">([onset_s </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(wave) </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> SR</span><span style="color:#D73A49"> for</span><span style="color:#24292E"> onset_s, wave </span><span style="color:#D73A49">in</span><span style="color:#24292E"> sounds])</span></span>
+<span class="line"><span style="color:#24292E">    out </span><span style="color:#D73A49">=</span><span style="color:#24292E"> np.zeros(</span><span style="color:#005CC5">round</span><span style="color:#24292E">(dur_s </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> SR</span><span style="color:#24292E">))</span></span>
+<span class="line"><span style="color:#D73A49">    for</span><span style="color:#24292E"> onset_s, wave </span><span style="color:#D73A49">in</span><span style="color:#24292E"> sounds:</span></span>
+<span class="line"><span style="color:#24292E">        onset </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(onset_s </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> SR</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">        out[onset:onset </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(wave)] </span><span style="color:#D73A49">+=</span><span style="color:#24292E"> wave</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> out</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">note_names </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#032F62">"C"</span><span style="color:#24292E">, </span><span style="color:#032F62">"C#"</span><span style="color:#24292E">, </span><span style="color:#032F62">"D"</span><span style="color:#24292E">, </span><span style="color:#032F62">"D#"</span><span style="color:#24292E">, </span><span style="color:#032F62">"E"</span><span style="color:#24292E">, </span><span style="color:#032F62">"F"</span><span style="color:#24292E">, </span><span style="color:#032F62">"F#"</span><span style="color:#24292E">, </span><span style="color:#032F62">"G"</span><span style="color:#24292E">, </span><span style="color:#032F62">"G#"</span><span style="color:#24292E">, </span><span style="color:#032F62">"A"</span><span style="color:#24292E">, </span><span style="color:#032F62">"A#"</span><span style="color:#24292E">, </span><span style="color:#032F62">"B"</span><span style="color:#24292E">]</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> Pitch</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __init__</span><span style="color:#24292E">(self, value):</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#005CC5"> isinstance</span><span style="color:#24292E">(value, </span><span style="color:#005CC5">str</span><span style="color:#24292E">):           </span><span style="color:#6A737D"># a name like "C4": the octave last, the note before</span></span>
+<span class="line"><span style="color:#24292E">            value </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 12</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> (</span><span style="color:#005CC5">int</span><span style="color:#24292E">(value[</span><span style="color:#D73A49">-</span><span style="color:#005CC5">1</span><span style="color:#24292E">]) </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">) </span><span style="color:#D73A49">+</span><span style="color:#24292E"> note_names.index(value[:</span><span style="color:#D73A49">-</span><span style="color:#005CC5">1</span><span style="color:#24292E">])</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.midi </span><span style="color:#D73A49">=</span><span style="color:#24292E"> value</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6F42C1">    @</span><span style="color:#005CC5">property</span></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#6F42C1"> f</span><span style="color:#24292E">(self):                             </span><span style="color:#6A737D"># the frequency in Hz</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#005CC5"> 440</span><span style="color:#D73A49"> *</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> **</span><span style="color:#24292E"> ((</span><span style="color:#005CC5">self</span><span style="color:#24292E">.midi </span><span style="color:#D73A49">-</span><span style="color:#005CC5"> 69</span><span style="color:#24292E">) </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> 12</span><span style="color:#24292E">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __add__</span><span style="color:#24292E">(self, semitones):</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#005CC5"> isinstance</span><span style="color:#24292E">(semitones, Pitch):</span></span>
+<span class="line"><span style="color:#D73A49">            raise</span><span style="color:#005CC5"> TypeError</span><span style="color:#24292E">(</span><span style="color:#032F62">"Add semitones, not a pitch."</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> Pitch(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.midi </span><span style="color:#D73A49">+</span><span style="color:#24292E"> semitones)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __sub__</span><span style="color:#24292E">(self, other):</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#005CC5"> isinstance</span><span style="color:#24292E">(other, Pitch):</span></span>
+<span class="line"><span style="color:#D73A49">            return</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.midi </span><span style="color:#D73A49">-</span><span style="color:#24292E"> other.midi    </span><span style="color:#6A737D"># an interval</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> Pitch(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.midi </span><span style="color:#D73A49">-</span><span style="color:#24292E"> other)      </span><span style="color:#6A737D"># a lower pitch</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __eq__</span><span style="color:#24292E">(self, other):</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#005CC5"> isinstance</span><span style="color:#24292E">(other, Pitch) </span><span style="color:#D73A49">and</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.midi </span><span style="color:#D73A49">==</span><span style="color:#24292E"> other.midi</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __repr__</span><span style="color:#24292E">(self):</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> note_names[</span><span style="color:#005CC5">self</span><span style="color:#24292E">.midi </span><span style="color:#D73A49">%</span><span style="color:#005CC5"> 12</span><span style="color:#24292E">] </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> str</span><span style="color:#24292E">(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.midi </span><span style="color:#D73A49">//</span><span style="color:#005CC5"> 12</span><span style="color:#D73A49"> -</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><p>One change from lesson 06: <code>freq()</code> is now <code>f</code>, with <code>@property</code> on the line above. A line starting with <code>@</code> is a <strong>decorator</strong>: it changes the function written right after it. <code>@property</code> lets us read the method like an attribute, <code>p.f</code>, without parentheses: Python calls the method for us.</p>
+<p>It suits methods that only read the object and compute something from its state. A pitch has exactly one frequency, so <code>p.f</code> reads well. It is only a matter of notation: the frequency is still computed every time we ask for it. To compute it once, <code>__init__</code> could store it.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">p </span><span style="color:#D73A49">=</span><span style="color:#24292E"> Pitch(</span><span style="color:#032F62">"A4"</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(p.f)</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">((p </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">).f)       </span><span style="color:#6A737D"># A#4, one semitone higher</span></span></code></pre></section>
+<section class="cell markdown"><h2>2. From notes to sounds</h2>
+<p>The first bar of <em>Fra Martino</em> (<em>Frère Jacques</em>), from a root of A4. Each note is a pair: how many beats it lasts, and how many semitones it is above the root.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">root </span><span style="color:#D73A49">=</span><span style="color:#24292E"> Pitch(</span><span style="color:#032F62">"A4"</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">call_notes </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [(</span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#005CC5">0</span><span style="color:#24292E">), (</span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">), (</span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#005CC5">4</span><span style="color:#24292E">), (</span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#005CC5">0</span><span style="color:#24292E">)]     </span><span style="color:#6A737D"># (beats, semitones)</span></span></code></pre></section>
+<section class="cell markdown"><p>From this natural description to something we can hear, one step at a time. First the semitones become pitches:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">call_pitches </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [(beats, root </span><span style="color:#D73A49">+</span><span style="color:#24292E"> semitones) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> beats, semitones </span><span style="color:#D73A49">in</span><span style="color:#24292E"> call_notes]</span></span>
+<span class="line"><span style="color:#24292E">call_pitches</span></span></code></pre></section>
+<section class="cell markdown"><p>Then the pitches become waves, with <code>pluck</code>:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">call_sounds </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [(beats, pluck(pitch.f)) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> beats, pitch </span><span style="color:#D73A49">in</span><span style="color:#24292E"> call_pitches]</span></span>
+<span class="line"><span style="color:#24292E">play(call_sounds[</span><span style="color:#005CC5">1</span><span style="color:#24292E">][</span><span style="color:#005CC5">1</span><span style="color:#24292E">])        </span><span style="color:#6A737D"># the second note</span></span></code></pre></section>
+<section class="cell markdown"><p>One step is missing. <code>mix_sounds</code> wants sounds <code>(onset_s, wave)</code>: <em>when</em> each note starts, not how long it lasts. We would have to turn the durations into onsets, adding them up one by one: 0, 1, 2, 3. It can be done, but it is annoying, and it gets worse with every new thing we want to do: repeat a phrase, play two voices together, start a voice later.</p>
+<h2>3. What we would like to write</h2>
+<p>Instead of the steps, let us first write what we would <em>like</em> to write, and then work backwards to make it possible:</p>
+<pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">clip </span><span style="color:#D73A49">=</span><span style="color:#24292E"> note(</span><span style="color:#005CC5">0</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">2</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">4</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">0</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">play_clip(clip)</span></span>
+<span class="line"></span></code></pre>
+<p><code>note(0)</code> is one note, the root, one beat long. <code>&gt;&gt;</code> reads as <em>then</em>: first this, then that. The result is a <strong>clip</strong>, as in a sequencer or a DAW: a group of notes we can play, join, repeat.</p>
+</section>
+<section class="cell markdown"><h2>4. Events and clips</h2>
+<p>A sound is <code>(onset_s, wave)</code>: when, in seconds, and a wave. An <strong>event</strong> is the same idea, one step more abstract: <code>(onset, data)</code>. The onset is in beats, and the data is <em>what</em> happens. For now the data is a pitch:</p>
+<pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">(</span><span style="color:#005CC5">4.5</span><span style="color:#24292E">, Pitch(</span><span style="color:#032F62">"A#4"</span><span style="color:#24292E">))      </span><span style="color:#6A737D"># an A#4, on beat 4.5</span></span>
+<span class="line"></span></code></pre>
+<p>A <strong>clip</strong> is a set of events and a length, in beats.</p>
+<h3>Dataclasses</h3>
+<p>Some classes only hold data. For them Python has <code>@dataclass</code>, another decorator: we list the fields with their types, and it writes <code>__init__</code>, <code>__repr__</code> and <code>__eq__</code> for us. A complex number, as an example:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#6F42C1">@dataclass</span></span>
+<span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> ComplexNumber</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#24292E">    real: </span><span style="color:#005CC5">float</span></span>
+<span class="line"><span style="color:#24292E">    imag: </span><span style="color:#005CC5">float</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">z </span><span style="color:#D73A49">=</span><span style="color:#24292E"> ComplexNumber(</span><span style="color:#005CC5">0</span><span style="color:#24292E">, </span><span style="color:#005CC5">1</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(z, z.imag)</span></span></code></pre></section>
+<section class="cell markdown"><p>The type after each colon documents the field; Python does not check it. Our clip:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#6F42C1">@dataclass</span></span>
+<span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> Clip</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#24292E">    events: </span><span style="color:#005CC5">list</span><span style="color:#6A737D">      # (onset, data): onset in beats</span></span>
+<span class="line"><span style="color:#24292E">    length: </span><span style="color:#005CC5">float</span><span style="color:#6A737D">     # in beats: where the next clip starts</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">clip </span><span style="color:#D73A49">=</span><span style="color:#24292E"> Clip([(</span><span style="color:#005CC5">0</span><span style="color:#24292E">, Pitch(</span><span style="color:#032F62">"A4"</span><span style="color:#24292E">)), (</span><span style="color:#005CC5">1</span><span style="color:#24292E">, Pitch(</span><span style="color:#032F62">"B4"</span><span style="color:#24292E">))], </span><span style="color:#005CC5">2</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">clip</span></span></code></pre></section>
+<section class="cell markdown"><p>Two events, A4 on beat 0 and B4 on beat 1. Why a length of 2? The events do not say how long the clip is: the last note could ring for one beat or for ten. The length is a choice, and it will say where the next clip starts.</p>
+<h3>Playing a clip</h3>
+<p>Each event becomes a sound: the onset stays, the pitch becomes a wave. Then <code>mix_sounds</code> puts the sounds together. <code>beat_s</code> is the length of a beat in seconds, the tempo: onsets in beats times seconds per beat give onsets in seconds.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> play_clip</span><span style="color:#24292E">(clip, beat_s</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.5</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#24292E">    sounds </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [(onset </span><span style="color:#D73A49">*</span><span style="color:#24292E"> beat_s, pluck(pitch.f)) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> onset, pitch </span><span style="color:#D73A49">in</span><span style="color:#24292E"> clip.events]</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> play(mix_sounds(sounds))</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">play_clip(clip)</span></span></code></pre></section>
+<section class="cell markdown"><h3>A note is a clip</h3>
+<p>Now <code>note</code> from our wish is easy: a clip with a single event, at time 0. Its length is the length of the note, one beat unless we say otherwise.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> note</span><span style="color:#24292E">(semitones, length</span><span style="color:#D73A49">=</span><span style="color:#005CC5">1</span><span style="color:#24292E">, root</span><span style="color:#D73A49">=</span><span style="color:#24292E">Pitch(</span><span style="color:#032F62">"A4"</span><span style="color:#24292E">)):</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> Clip([(</span><span style="color:#005CC5">0</span><span style="color:#24292E">, root </span><span style="color:#D73A49">+</span><span style="color:#24292E"> semitones)], length)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">note(</span><span style="color:#005CC5">0</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">play_clip(note(</span><span style="color:#005CC5">0</span><span style="color:#24292E">))</span></span></code></pre></section>
+<section class="cell markdown"><h2>5. Then: <code>&gt;&gt;</code></h2>
+<p>Python turns <code>a &gt;&gt; b</code> into <code>a.__rshift__(b)</code>. For numbers, <code>&gt;&gt;</code> shifts the binary digits to the right; we do not care: what matters is that we can give it a meaning for clips. <code>a &gt;&gt; b</code> must be a new clip with the events of <code>a</code> and the events of <code>b</code>.</p>
+<p>A first try: put the two lists of events together.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">a </span><span style="color:#D73A49">=</span><span style="color:#24292E"> Clip([(</span><span style="color:#005CC5">0</span><span style="color:#24292E">, Pitch(</span><span style="color:#032F62">"A4"</span><span style="color:#24292E">)), (</span><span style="color:#005CC5">1</span><span style="color:#24292E">, Pitch(</span><span style="color:#032F62">"B4"</span><span style="color:#24292E">))], </span><span style="color:#005CC5">2</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">b </span><span style="color:#D73A49">=</span><span style="color:#24292E"> Clip([(</span><span style="color:#005CC5">0</span><span style="color:#24292E">, Pitch(</span><span style="color:#032F62">"C#5"</span><span style="color:#24292E">)), (</span><span style="color:#005CC5">1</span><span style="color:#24292E">, Pitch(</span><span style="color:#032F62">"D5"</span><span style="color:#24292E">))], </span><span style="color:#005CC5">2</span><span style="color:#24292E">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">together </span><span style="color:#D73A49">=</span><span style="color:#24292E"> Clip(a.events </span><span style="color:#D73A49">+</span><span style="color:#24292E"> b.events, a.length </span><span style="color:#D73A49">+</span><span style="color:#24292E"> b.length)</span></span>
+<span class="line"><span style="color:#24292E">together.events</span></span></code></pre></section>
+<section class="cell markdown"><p>Both clips have events on beats 0 and 1, so their notes sound at the same time:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">play_clip(together)</span></span></code></pre></section>
+<section class="cell markdown"><p><code>b</code> must start where <code>a</code> ends: every onset of <code>b</code> moves later by the length of <code>a</code>.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>events</th>
+<th>length</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>a</code></td>
+<td><code>(0, A4)</code>, <code>(1, B4)</code></td>
+<td>2</td>
+</tr>
+<tr>
+<td><code>b</code></td>
+<td><code>(0, C#5)</code>, <code>(1, D5)</code></td>
+<td>2</td>
+</tr>
+<tr>
+<td><code>a &gt;&gt; b</code></td>
+<td><code>(0, A4)</code>, <code>(1, B4)</code>, <code>(2, C#5)</code>, <code>(3, D5)</code></td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<p>The events of <code>a</code> stay where they are. The events of <code>b</code> keep their data, and their onsets grow by <code>self.length</code>, the length of <code>a</code>. The length of the result is the sum of the two lengths.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#6F42C1">@dataclass</span></span>
+<span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> Clip</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#24292E">    events: </span><span style="color:#005CC5">list</span><span style="color:#6A737D">      # (onset, data): onset in beats</span></span>
+<span class="line"><span style="color:#24292E">    length: </span><span style="color:#005CC5">float</span><span style="color:#6A737D">     # in beats: where the next clip starts</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __rshift__</span><span style="color:#24292E">(self, other):          </span><span style="color:#6A737D"># then</span></span>
+<span class="line"><span style="color:#24292E">        moved </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [(onset </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.length, data) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> onset, data </span><span style="color:#D73A49">in</span><span style="color:#24292E"> other.events]</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> Clip(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.events </span><span style="color:#D73A49">+</span><span style="color:#24292E"> moved, </span><span style="color:#005CC5">self</span><span style="color:#24292E">.length </span><span style="color:#D73A49">+</span><span style="color:#24292E"> other.length)</span></span></code></pre></section>
+<section class="cell markdown"><p><code>a</code> and <code>b</code> were made with the old class, which has no <code>&gt;&gt;</code>: we make them again.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">a </span><span style="color:#D73A49">=</span><span style="color:#24292E"> Clip([(</span><span style="color:#005CC5">0</span><span style="color:#24292E">, Pitch(</span><span style="color:#032F62">"A4"</span><span style="color:#24292E">)), (</span><span style="color:#005CC5">1</span><span style="color:#24292E">, Pitch(</span><span style="color:#032F62">"B4"</span><span style="color:#24292E">))], </span><span style="color:#005CC5">2</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">b </span><span style="color:#D73A49">=</span><span style="color:#24292E"> Clip([(</span><span style="color:#005CC5">0</span><span style="color:#24292E">, Pitch(</span><span style="color:#032F62">"C#5"</span><span style="color:#24292E">)), (</span><span style="color:#005CC5">1</span><span style="color:#24292E">, Pitch(</span><span style="color:#032F62">"D5"</span><span style="color:#24292E">))], </span><span style="color:#005CC5">2</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">(a </span><span style="color:#D73A49">>></span><span style="color:#24292E"> b).events</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">play_clip(note(</span><span style="color:#005CC5">0</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">1</span><span style="color:#24292E">))</span></span></code></pre></section>
+<section class="cell markdown"><p>One short method, and the wish of section 3 works:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">call </span><span style="color:#D73A49">=</span><span style="color:#24292E"> note(</span><span style="color:#005CC5">0</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">2</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">4</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">0</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">play_clip(call)</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">play_clip(call, </span><span style="color:#E36209">beat_s</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.25</span><span style="color:#24292E">)        </span><span style="color:#6A737D"># twice as fast</span></span></code></pre></section>
+<section class="cell markdown"><h2>6. Again: <code>*</code></h2>
+<p><em>Fra Martino</em> sings every phrase twice. With lists, <code>[1, 2] * 2</code> is <code>[1, 2, 1, 2]</code>. With clips?</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">try</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#24292E">    call </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 2</span></span>
+<span class="line"><span style="color:#D73A49">except</span><span style="color:#005CC5"> TypeError</span><span style="color:#D73A49"> as</span><span style="color:#24292E"> error:</span></span>
+<span class="line"><span style="color:#005CC5">    print</span><span style="color:#24292E">(</span><span style="color:#032F62">"TypeError:"</span><span style="color:#24292E">, error)</span></span></code></pre></section>
+<section class="cell markdown"><p><code>*</code> calls <code>__mul__</code>. We start from an empty clip, no events and no length, and add <code>self</code> after it as many times as asked:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#6F42C1">@dataclass</span></span>
+<span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> Clip</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#24292E">    events: </span><span style="color:#005CC5">list</span><span style="color:#6A737D">      # (onset, data): onset in beats</span></span>
+<span class="line"><span style="color:#24292E">    length: </span><span style="color:#005CC5">float</span><span style="color:#6A737D">     # in beats: where the next clip starts</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __rshift__</span><span style="color:#24292E">(self, other):          </span><span style="color:#6A737D"># then</span></span>
+<span class="line"><span style="color:#24292E">        moved </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [(onset </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.length, data) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> onset, data </span><span style="color:#D73A49">in</span><span style="color:#24292E"> other.events]</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> Clip(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.events </span><span style="color:#D73A49">+</span><span style="color:#24292E"> moved, </span><span style="color:#005CC5">self</span><span style="color:#24292E">.length </span><span style="color:#D73A49">+</span><span style="color:#24292E"> other.length)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __mul__</span><span style="color:#24292E">(self, times):             </span><span style="color:#6A737D"># again</span></span>
+<span class="line"><span style="color:#24292E">        out </span><span style="color:#D73A49">=</span><span style="color:#24292E"> Clip([], </span><span style="color:#005CC5">0</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#D73A49">        for</span><span style="color:#24292E"> _ </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> range</span><span style="color:#24292E">(times):</span></span>
+<span class="line"><span style="color:#24292E">            out </span><span style="color:#D73A49">=</span><span style="color:#24292E"> out </span><span style="color:#D73A49">>></span><span style="color:#005CC5"> self</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> out</span></span></code></pre></section>
+<section class="cell markdown"><p>The old <code>call</code> was made with the old class, so we make it again:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">call </span><span style="color:#D73A49">=</span><span style="color:#24292E"> note(</span><span style="color:#005CC5">0</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">2</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">4</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">0</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">play_clip(call </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 2</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><p>Small methods, each a few lines, and a way of writing music emerges: a small language of our own, closer to the music than lists and loops.</p>
+<h2>7. Degrees of a scale</h2>
+<p><em>Fra Martino</em> in minor? With semitones we would have to rewrite the notes: the third, 4 semitones above the root, would become 3. In his First Symphony, Mahler turned this tune into a funeral march: in minor, much slower.</p>
+<p>A melody can be written one level higher, in <strong>degrees</strong> of a scale: the first, second, third note of the scale, counting from 0. <code>note(0) &gt;&gt; note(1) &gt;&gt; note(2) &gt;&gt; note(0)</code> is <em>Fra Martino</em> in a major scale and in a minor one: only the scale changes.</p>
+<p>First, what we would like a scale to do. A scale is a root and its <strong>steps</strong>, the distances in semitones between neighbouring notes. The major scale goes up by 2, 2, 1, 2, 2, 2, 1:</p>
+<pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">scale </span><span style="color:#D73A49">=</span><span style="color:#24292E"> Scale([</span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">1</span><span style="color:#24292E">], Pitch(</span><span style="color:#032F62">"A4"</span><span style="color:#24292E">))</span></span>
+<span class="line"><span style="color:#24292E">scale[</span><span style="color:#005CC5">0</span><span style="color:#24292E">]      </span><span style="color:#6A737D"># A4</span></span>
+<span class="line"><span style="color:#24292E">scale[</span><span style="color:#005CC5">1</span><span style="color:#24292E">]      </span><span style="color:#6A737D"># B4</span></span>
+<span class="line"><span style="color:#24292E">scale[</span><span style="color:#005CC5">2</span><span style="color:#24292E">]      </span><span style="color:#6A737D"># C#5</span></span>
+<span class="line"></span></code></pre>
+<p>To get there, the scale needs the distance of every degree from the root. Each distance is the previous one plus a step: we <strong>accumulate</strong> the steps.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> Scale</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __init__</span><span style="color:#24292E">(self, steps, root):</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.root </span><span style="color:#D73A49">=</span><span style="color:#24292E"> root</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.distances </span><span style="color:#D73A49">=</span><span style="color:#24292E"> []</span></span>
+<span class="line"><span style="color:#24292E">        distance </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 0</span></span>
+<span class="line"><span style="color:#D73A49">        for</span><span style="color:#24292E"> step </span><span style="color:#D73A49">in</span><span style="color:#24292E"> steps:</span></span>
+<span class="line"><span style="color:#005CC5">            self</span><span style="color:#24292E">.distances.append(distance)</span></span>
+<span class="line"><span style="color:#24292E">            distance </span><span style="color:#D73A49">+=</span><span style="color:#24292E"> step</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">s </span><span style="color:#D73A49">=</span><span style="color:#24292E"> Scale([</span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">1</span><span style="color:#24292E">], Pitch(</span><span style="color:#032F62">"A4"</span><span style="color:#24292E">))</span></span>
+<span class="line"><span style="color:#24292E">s.distances</span></span></code></pre></section>
+<section class="cell markdown"><p><code>[0, 2, 4, 5, 7, 9, 11]</code>: the distances of A, B, C#, D, E, F#, G# from A. Now <code>s[2]</code>:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">try</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#24292E">    s[</span><span style="color:#005CC5">2</span><span style="color:#24292E">]</span></span>
+<span class="line"><span style="color:#D73A49">except</span><span style="color:#005CC5"> TypeError</span><span style="color:#D73A49"> as</span><span style="color:#24292E"> error:</span></span>
+<span class="line"><span style="color:#005CC5">    print</span><span style="color:#24292E">(</span><span style="color:#032F62">"TypeError:"</span><span style="color:#24292E">, error)</span></span></code></pre></section>
+<section class="cell markdown"><p><em>Not subscriptable</em>: the object does not know what square brackets mean. Python turns <code>s[2]</code> into <code>s.__getitem__(2)</code>, and we can write that method too. The pitch of a degree is the root plus the distance of that degree, with the <code>+</code> of <code>Pitch</code>:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> Scale</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __init__</span><span style="color:#24292E">(self, steps, root):</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.root </span><span style="color:#D73A49">=</span><span style="color:#24292E"> root</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.distances </span><span style="color:#D73A49">=</span><span style="color:#24292E"> []</span></span>
+<span class="line"><span style="color:#24292E">        distance </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 0</span></span>
+<span class="line"><span style="color:#D73A49">        for</span><span style="color:#24292E"> step </span><span style="color:#D73A49">in</span><span style="color:#24292E"> steps:</span></span>
+<span class="line"><span style="color:#005CC5">            self</span><span style="color:#24292E">.distances.append(distance)</span></span>
+<span class="line"><span style="color:#24292E">            distance </span><span style="color:#D73A49">+=</span><span style="color:#24292E"> step</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __getitem__</span><span style="color:#24292E">(self, degree):</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.root </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.distances[degree]</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">a_major </span><span style="color:#D73A49">=</span><span style="color:#24292E"> Scale([</span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">1</span><span style="color:#24292E">], Pitch(</span><span style="color:#032F62">"A4"</span><span style="color:#24292E">))</span></span>
+<span class="line"><span style="color:#D73A49">assert</span><span style="color:#24292E"> a_major[</span><span style="color:#005CC5">0</span><span style="color:#24292E">] </span><span style="color:#D73A49">==</span><span style="color:#24292E"> Pitch(</span><span style="color:#032F62">"A4"</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#D73A49">assert</span><span style="color:#24292E"> a_major[</span><span style="color:#005CC5">1</span><span style="color:#24292E">] </span><span style="color:#D73A49">==</span><span style="color:#24292E"> Pitch(</span><span style="color:#032F62">"B4"</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#D73A49">assert</span><span style="color:#24292E"> a_major[</span><span style="color:#005CC5">2</span><span style="color:#24292E">] </span><span style="color:#D73A49">==</span><span style="color:#24292E"> Pitch(</span><span style="color:#032F62">"C#5"</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(a_major[</span><span style="color:#005CC5">1</span><span style="color:#24292E">], a_major[</span><span style="color:#005CC5">2</span><span style="color:#24292E">])</span></span></code></pre></section>
+<section class="cell markdown"><h2>8. Data, not pitches</h2>
+<p>Our <code>note</code> turns semitones into a pitch straight away: the clip holds pitches. Now we want it to hold degrees, and decide only when playing what they mean.</p>
+<p><code>Clip</code> already allows it: an event is <code>(onset, data)</code>, and the clip never looks inside the data. Only <code>note</code> chose pitches. We take that choice away: the data is just stored. Deciding what it means becomes the job of whoever plays the clip.</p>
+<p>It is what a sequencer does in a modular synthesizer: it sends out events in time with some values, and the module it is connected to decides what those values mean: a pitch, a volume, anything else.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> note</span><span style="color:#24292E">(data, length</span><span style="color:#D73A49">=</span><span style="color:#005CC5">1</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> Clip([(</span><span style="color:#005CC5">0</span><span style="color:#24292E">, data)], length)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">call </span><span style="color:#D73A49">=</span><span style="color:#24292E"> note(</span><span style="color:#005CC5">0</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">1</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">2</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">0</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">call.events</span></span></code></pre></section>
+<section class="cell markdown"><p>The events now hold plain numbers. <code>play_clip</code> reads them as degrees of a scale: degree, then pitch, then frequency, then wave.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> play_clip</span><span style="color:#24292E">(clip, scale, beat_s</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.5</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#24292E">    sounds </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [(onset </span><span style="color:#D73A49">*</span><span style="color:#24292E"> beat_s, pluck(scale[data].f)) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> onset, data </span><span style="color:#D73A49">in</span><span style="color:#24292E"> clip.events]</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> play(mix_sounds(sounds))</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">play_clip(call </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 2</span><span style="color:#24292E">, a_major)</span></span></code></pre></section>
+<section class="cell markdown"><p>The minor scale goes up by 2, 1, 2, 2, 1, 2, 2. The clip does not change:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">a_minor </span><span style="color:#D73A49">=</span><span style="color:#24292E"> Scale([</span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">], Pitch(</span><span style="color:#032F62">"A4"</span><span style="color:#24292E">))</span></span>
+<span class="line"><span style="color:#24292E">play_clip(call </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 2</span><span style="color:#24292E">, a_minor)</span></span></code></pre></section>
+<section class="cell markdown"><p>The melody and the way it is played are now independent: the same clip, two scales.</p>
+<h3>Your turn · Another scale</h3>
+<p>Play <code>call</code> in A Mixolydian, a major scale with a lower seventh: steps 2, 2, 1, 2, 2, 1, 2. Then in a scale of your own: the steps must add up to 12, to come back to the root one octave higher.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">a_mixolydian </span><span style="color:#D73A49">=</span><span style="color:#24292E"> Scale([</span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">], Pitch(</span><span style="color:#032F62">"A4"</span><span style="color:#24292E">))</span></span>
+<span class="line"><span style="color:#24292E">play_clip(call </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 2</span><span style="color:#24292E">, a_mixolydian)</span></span></code></pre></section>
+<section class="cell markdown"><p><em>Fra Martino</em> sounds the same in major and Mixolydian: it never reaches the seventh. The scale matters only for the degrees the melody uses.</p>
+<h2>9. The whole song</h2>
+<p>The other phrases, each written once: <em>dormez-vous?</em> climbs to the fifth, <em>sonnez les matines</em> rings like bells.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">call </span><span style="color:#D73A49">=</span><span style="color:#24292E"> note(</span><span style="color:#005CC5">0</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">1</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">2</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">0</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">climb </span><span style="color:#D73A49">=</span><span style="color:#24292E"> note(</span><span style="color:#005CC5">2</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">3</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">4</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">bells </span><span style="color:#D73A49">=</span><span style="color:#24292E"> note(</span><span style="color:#005CC5">4</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.5</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">5</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.5</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">4</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.5</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">3</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.5</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">2</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">0</span><span style="color:#24292E">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">fm </span><span style="color:#D73A49">=</span><span style="color:#24292E"> call </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> >></span><span style="color:#24292E"> climb </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> >></span><span style="color:#24292E"> bells </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 2</span></span>
+<span class="line"><span style="color:#24292E">play_clip(fm, a_major)</span></span></code></pre></section>
+<section class="cell markdown"><p>The last phrase, <em>ding, dang, dong</em>, goes down to the fifth below the root: degree 4, one octave lower. Counting down from 0, that is degree −3.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">cadence </span><span style="color:#D73A49">=</span><span style="color:#24292E"> note(</span><span style="color:#005CC5">0</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#D73A49">-</span><span style="color:#005CC5">3</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">0</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#005CC5">print</span><span style="color:#24292E">(a_major[</span><span style="color:#D73A49">-</span><span style="color:#005CC5">3</span><span style="color:#24292E">])</span></span>
+<span class="line"><span style="color:#24292E">play_clip(cadence, a_major)</span></span></code></pre></section>
+<section class="cell markdown"><p>E5, not E4: the note goes up instead of down. For a list, a negative index counts from the end: <code>distances[-3]</code> is the third from the end, the distance of degree 4. Our scale does not know about octaves yet; we will teach it next time. For now the song ends with the bells.</p>
+<h2>10. Together: <code>|</code></h2>
+<p>A canon: the same melody, sung again by a second voice that enters later. First we need two clips playing at the same time. We would like <code>a | b</code>, with two parallel lines.</p>
+<p>Remember the first try at <code>&gt;&gt;</code>: putting the two lists of events together made the notes sound at the same time. That is exactly <em>together</em>. The length is the longer of the two.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#6F42C1">@dataclass</span></span>
+<span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> Clip</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#24292E">    events: </span><span style="color:#005CC5">list</span><span style="color:#6A737D">      # (onset, data): onset in beats</span></span>
+<span class="line"><span style="color:#24292E">    length: </span><span style="color:#005CC5">float</span><span style="color:#6A737D">     # in beats: where the next clip starts</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __rshift__</span><span style="color:#24292E">(self, other):          </span><span style="color:#6A737D"># then</span></span>
+<span class="line"><span style="color:#24292E">        moved </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [(onset </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.length, data) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> onset, data </span><span style="color:#D73A49">in</span><span style="color:#24292E"> other.events]</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> Clip(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.events </span><span style="color:#D73A49">+</span><span style="color:#24292E"> moved, </span><span style="color:#005CC5">self</span><span style="color:#24292E">.length </span><span style="color:#D73A49">+</span><span style="color:#24292E"> other.length)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __mul__</span><span style="color:#24292E">(self, times):             </span><span style="color:#6A737D"># again</span></span>
+<span class="line"><span style="color:#24292E">        out </span><span style="color:#D73A49">=</span><span style="color:#24292E"> Clip([], </span><span style="color:#005CC5">0</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#D73A49">        for</span><span style="color:#24292E"> _ </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> range</span><span style="color:#24292E">(times):</span></span>
+<span class="line"><span style="color:#24292E">            out </span><span style="color:#D73A49">=</span><span style="color:#24292E"> out </span><span style="color:#D73A49">>></span><span style="color:#005CC5"> self</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> out</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __or__</span><span style="color:#24292E">(self, other):              </span><span style="color:#6A737D"># together</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> Clip(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.events </span><span style="color:#D73A49">+</span><span style="color:#24292E"> other.events, </span><span style="color:#005CC5">max</span><span style="color:#24292E">(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.length, other.length))</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">call </span><span style="color:#D73A49">=</span><span style="color:#24292E"> note(</span><span style="color:#005CC5">0</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">1</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">2</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">0</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">climb </span><span style="color:#D73A49">=</span><span style="color:#24292E"> note(</span><span style="color:#005CC5">2</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">3</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">4</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">bells </span><span style="color:#D73A49">=</span><span style="color:#24292E"> note(</span><span style="color:#005CC5">4</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.5</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">5</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.5</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">4</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.5</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">3</span><span style="color:#24292E">, </span><span style="color:#005CC5">0.5</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">2</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">0</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">fm </span><span style="color:#D73A49">=</span><span style="color:#24292E"> call </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> >></span><span style="color:#24292E"> climb </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> >></span><span style="color:#24292E"> bells </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 2</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">play_clip(climb </span><span style="color:#D73A49">|</span><span style="color:#24292E"> bells, a_major)</span></span></code></pre></section>
+<section class="cell markdown"><h3>A rest</h3>
+<p>For the canon the second voice must wait. A rest is a clip with no events, only a length:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">Clip([], </span><span style="color:#005CC5">8</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">play_clip(fm </span><span style="color:#D73A49">|</span><span style="color:#24292E"> (Clip([], </span><span style="color:#005CC5">8</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> fm), a_major)</span></span></code></pre></section>
+<section class="cell markdown"><p>The second voice enters 8 beats, two bars, after the first. <code>Clip([], 8)</code> works, but <code>rest(8)</code> says what we mean. Like <code>note</code>, a function that makes a clip:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> rest</span><span style="color:#24292E">(length):</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> Clip([], length)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">canon </span><span style="color:#D73A49">=</span><span style="color:#24292E"> fm </span><span style="color:#D73A49">|</span><span style="color:#24292E"> (rest(</span><span style="color:#005CC5">8</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> fm)</span></span>
+<span class="line"><span style="color:#24292E">play_clip(canon, a_major)</span></span></code></pre></section>
+<section class="cell markdown"><p>The parentheses are for safety. Python applies <code>&gt;&gt;</code> before <code>|</code>, so <code>fm | rest(8) &gt;&gt; fm</code> means the same.</p>
+<h3>Your turn · Three voices, and Mahler</h3>
+<p>Add a third voice that enters after 16 beats. Then make it a funeral march: in minor, much slower.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">canon3 </span><span style="color:#D73A49">=</span><span style="color:#24292E"> fm </span><span style="color:#D73A49">|</span><span style="color:#24292E"> rest(</span><span style="color:#005CC5">8</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> fm </span><span style="color:#D73A49">|</span><span style="color:#24292E"> rest(</span><span style="color:#005CC5">16</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> fm</span></span>
+<span class="line"><span style="color:#24292E">play_clip(canon3, a_major)</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">play_clip(canon3, a_minor, </span><span style="color:#E36209">beat_s</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.8</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell markdown"><h2>11. What we built</h2>
+<table>
+<thead>
+<tr>
+<th>expression</th>
+<th>meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>note(d, length)</code></td>
+<td>a clip with one event</td>
+</tr>
+<tr>
+<td><code>rest(length)</code></td>
+<td>a clip with no events</td>
+</tr>
+<tr>
+<td><code>a &gt;&gt; b</code></td>
+<td><code>a</code>, then <code>b</code></td>
+</tr>
+<tr>
+<td><code>a | b</code></td>
+<td><code>a</code> and <code>b</code> together</td>
+</tr>
+<tr>
+<td><code>a * 2</code></td>
+<td><code>a</code>, twice</td>
+</tr>
+<tr>
+<td><code>scale[d]</code></td>
+<td>the pitch of degree <code>d</code></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><code>@property</code> reads a method like an attribute. <code>@dataclass</code> writes <code>__init__</code>, <code>__repr__</code> and <code>__eq__</code> for a class that holds data.</li>
+<li>An event is <code>(onset, data)</code>: when, in beats, and what. A clip is a set of events and a length; the length says where the next clip starts.</li>
+<li>The clip does not look inside the data: what the data mean is decided when the clip is played.</li>
+<li>A melody in degrees, the scale's steps accumulated into distances, and <code>__getitem__</code> for square brackets: the same clip in major, minor, Mixolydian.</li>
+<li>With a few small operators, a small language for music.</li>
+</ul>
+<h2>For next time · Higher</h2>
+<p>We would like to write <code>fm + 7</code>: every degree 7 higher, one octave up, for the second voice of the canon.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">try</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#24292E">    fm </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> 7</span></span>
+<span class="line"><span style="color:#D73A49">except</span><span style="color:#005CC5"> TypeError</span><span style="color:#D73A49"> as</span><span style="color:#24292E"> error:</span></span>
+<span class="line"><span style="color:#005CC5">    print</span><span style="color:#24292E">(</span><span style="color:#032F62">"TypeError:"</span><span style="color:#24292E">, error)</span></span></code></pre></section>
+<section class="cell markdown"><p>Write <code>__add__</code> for <code>Clip</code>: a new clip with the same onsets and the same length, and every data plus the number. Then try <code>play_clip(fm + 7, a_major)</code>. What happens, and why? The cadence and its −3 are part of the same problem. Next time we fix both, and <em>Fra Martino</em> becomes an ambient piece.</p>
+</section>
+  </article>
+</main>
+</body>
+</html>
