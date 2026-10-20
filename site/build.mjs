@@ -91,6 +91,7 @@ for (const [slug, folder, includeExercise] of [
   ['lesson-03', lesson03, false],
   ['lesson-04', lesson04, false],
   ['lesson-06', lesson06, false],
+  ['lesson-07', lesson07, false],
 ]) {
   await mkdir(path.join(dist, slug), { recursive: true })
   const notebookSource = path.join(folder, 'notebook.ipynb')
@@ -151,6 +152,7 @@ if (process.env.SITE_ANALYTICS_TOKEN) {
     'lesson-04/submissions/index.html',
     'lesson-05/tools/index.html',
     'lesson-06/slides/index.html',
+    'lesson-07/slides/index.html',
     'lesson-07/tools/index.html',
   ]
   for (const file of pages) {
@@ -168,6 +170,7 @@ const slideRoutes = [
   ['lesson-03/slides', lesson03, 'slides.md'],
   ['lesson-04/slides', lesson04, 'slides.md'],
   ['lesson-06/slides', lesson06, 'slides.md'],
+  ['lesson-07/slides', lesson07, 'slides.md'],
   ['lesson-01/exercise', exerciseFolder, 'exercise.md'],
 ]
 for (const [route, folder, source] of slideRoutes) {
