@@ -133,6 +133,7 @@ await cp(lesson05Pages, path.join(dist, 'lesson-05'), { recursive: true })
 await cp(lesson07Pages, path.join(dist, 'lesson-07'), { recursive: true })
 await cp(lesson08Pages, path.join(dist, 'lesson-08'), { recursive: true })
 await cp(path.join(lesson05, 'class-notebook.ipynb'), path.join(dist, 'lesson-05', 'class-notebook.ipynb'))
+await cp(path.join(lesson08, 'class-notebook.ipynb'), path.join(dist, 'lesson-08', 'class-notebook.ipynb'))
 
 // Every notebook copied above gets a read-only page next to it, and the
 // trusted ones can run in the browser with JupyterLite. See site/notebooks/.
