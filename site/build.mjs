@@ -161,6 +161,7 @@ if (process.env.SITE_ANALYTICS_TOKEN) {
     'lesson-07/slides/index.html',
     'lesson-07/tools/index.html',
     'lesson-08/tools/index.html',
+    'lesson-08/your-version/index.html',
   ]
   for (const file of pages) {
     const target = path.join(dist, file)
