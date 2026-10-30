@@ -23,6 +23,7 @@ export const TRUSTED = [
   { path: 'lesson-05/class-notebook.ipynb', title: 'Notebook from class' },
   { path: 'lesson-06/notebook.ipynb', title: 'Reference notebook' },
   { path: 'lesson-07/notebook.ipynb', title: 'Reference notebook' },
+  { path: 'lesson-08/class-notebook.ipynb', title: 'Notebook from class' },
   // Example of a reviewed outside notebook, pinned to its content:
   // { path: 'lesson-04/submissions/notebooks/group-03.ipynb', title: 'Group 03', sha256: '…' },
 ]
