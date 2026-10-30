@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f5ef">
+  <title>The tools · ACTAM 08</title>
+  <style>
+    :root { color-scheme: light; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #182f3a; background: #f7f5ef; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f7f5ef; }
+    main { max-width: 960px; margin: auto; padding: 56px 24px 80px; }
+    .eyebrow { color: #42666a; font-size: .85rem; letter-spacing: .12em; }
+    h1 { font-size: clamp(2.5rem, 7vw, 4.5rem); letter-spacing: -.065em; margin: 24px 0 16px; line-height: 1.06; }
+    p { line-height: 1.7; }
+    .bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 32px 0 0; }
+    button { font: inherit; padding: 10px 16px; border: 1px solid #087e83; background: #087e83; color: #fff; cursor: pointer; }
+    button:focus-visible { outline: 3px solid #cb4f38; outline-offset: 4px; }
+    .status { color: #42666a; font-size: .85rem; }
+    pre { max-width: 100%; margin: 12px 0 0; padding: 18px; overflow-x: auto; background: #182f3a; color: #eef2ef; font-size: .82rem; line-height: 1.55; }
+    .k { color: #f39b86; }
+    .f { color: #7bd2c1; }
+    .b, .d { color: #a9c8ec; }
+    .s { color: #bfdc94; }
+    .n { color: #f2c27c; }
+    .c { color: #93aca9; font-style: italic; }
+    @media (max-width: 620px) { main { padding: 32px 16px; } }
+  </style>
+</head>
+<body>
+<main>
+  <style>.crumbs ol { display: flex; flex-wrap: wrap; gap: 0 .6em; margin: 0; padding: 0; list-style: none; }.crumbs li + li::before { content: '›'; margin-right: .6em; }.crumbs { text-transform: uppercase; margin: 1em 0; }nav.crumbs a { color: inherit; text-decoration: none; padding: 0; border: 0; background: none; }nav.crumbs a:hover { text-decoration: underline; text-underline-offset: 3px; }</style><nav class="eyebrow crumbs" aria-label="Breadcrumb"><ol><li><a href="../../">ACTAM</a></li><li><a href="../../#lesson-08">Lesson 08</a></li><li><span aria-current="page">The tools</span></li></ol></nav>
+  <h1>The tools.</h1>
+  <p>Last time&#x27;s tools and Fra Martino, ready for today. Paste this into the first cell of a new notebook and run it.</p>
+  <div class="bar">
+    <span class="status" id="status" role="status"></span>
+    <button type="button" id="copy">Copy code</button>
+  </div>
+  <pre><code id="code"><span class="k">from</span> IPython.display <span class="k">import</span> Audio
+<span class="k">from</span> dataclasses <span class="k">import</span> dataclass
+<span class="k">import</span> numpy <span class="k">as</span> np
+<span class="k">from</span> matplotlib <span class="k">import</span> pyplot <span class="k">as</span> plt
+
+SR = <span class="n">48000</span>
+
+<span class="k">def</span> <span class="f">play</span>(wave):
+    <span class="k">return</span> Audio(wave, rate=SR, normalize=<span class="k">False</span>, autoplay=<span class="k">False</span>)
+
+<span class="k">def</span> <span class="f">pluck</span>(f, dur_s=<span class="n">1.0</span>, tau=<span class="n">0.3</span>, amplitude=<span class="n">0.25</span>):
+    t = np.arange(<span class="b">round</span>(dur_s * SR)) / SR
+    env = np.exp(-t / tau)
+    wave = np.sin(<span class="n">2</span> * np.pi * f * t)
+    <span class="k">return</span> amplitude * env * wave
+
+<span class="k">def</span> <span class="f">mix_sounds</span>(sounds):                      <span class="c"># a sound is (onset_s, wave)</span>
+    dur_s = <span class="b">max</span>([onset_s + <span class="b">len</span>(wave) / SR <span class="k">for</span> onset_s, wave <span class="k">in</span> sounds])
+    out = np.zeros(<span class="b">round</span>(dur_s * SR))
+    <span class="k">for</span> onset_s, wave <span class="k">in</span> sounds:
+        onset = <span class="b">round</span>(onset_s * SR)
+        out[onset:onset + <span class="b">len</span>(wave)] += wave
+    <span class="k">return</span> out
+
+note_names = [<span class="s">&quot;C&quot;</span>, <span class="s">&quot;C#&quot;</span>, <span class="s">&quot;D&quot;</span>, <span class="s">&quot;D#&quot;</span>, <span class="s">&quot;E&quot;</span>, <span class="s">&quot;F&quot;</span>, <span class="s">&quot;F#&quot;</span>, <span class="s">&quot;G&quot;</span>, <span class="s">&quot;G#&quot;</span>, <span class="s">&quot;A&quot;</span>, <span class="s">&quot;A#&quot;</span>, <span class="s">&quot;B&quot;</span>]
+
+<span class="k">class</span> <span class="f">Pitch</span>:
+    <span class="k">def</span> <span class="f">__init__</span>(<span class="b">self</span>, value):
+        <span class="k">if</span> <span class="b">isinstance</span>(value, <span class="b">str</span>):           <span class="c"># a name like &quot;C4&quot;: the octave last, the note before</span>
+            value = <span class="n">12</span> * (<span class="b">int</span>(value[-<span class="n">1</span>]) + <span class="n">1</span>) + note_names.index(value[:-<span class="n">1</span>])
+        <span class="b">self</span>.midi = value
+
+    <span class="d">@</span><span class="d">property</span>
+    <span class="k">def</span> <span class="f">f</span>(<span class="b">self</span>):                             <span class="c"># the frequency in Hz</span>
+        <span class="k">return</span> <span class="n">440</span> * <span class="n">2</span> ** ((<span class="b">self</span>.midi - <span class="n">69</span>) / <span class="n">12</span>)
+
+    <span class="k">def</span> <span class="f">__add__</span>(<span class="b">self</span>, semitones):
+        <span class="k">if</span> <span class="b">isinstance</span>(semitones, Pitch):
+            <span class="k">raise</span> <span class="b">TypeError</span>(<span class="s">&quot;Add semitones, not a pitch.&quot;</span>)
+        <span class="k">return</span> Pitch(<span class="b">self</span>.midi + semitones)
+
+    <span class="k">def</span> <span class="f">__sub__</span>(<span class="b">self</span>, other):
+        <span class="k">if</span> <span class="b">isinstance</span>(other, Pitch):
+            <span class="k">return</span> <span class="b">self</span>.midi - other.midi    <span class="c"># an interval</span>
+        <span class="k">return</span> Pitch(<span class="b">self</span>.midi - other)      <span class="c"># a lower pitch</span>
+
+    <span class="k">def</span> <span class="f">__eq__</span>(<span class="b">self</span>, other):
+        <span class="k">return</span> <span class="b">isinstance</span>(other, Pitch) <span class="k">and</span> <span class="b">self</span>.midi == other.midi
+
+    <span class="k">def</span> <span class="f">__repr__</span>(<span class="b">self</span>):
+        <span class="k">return</span> note_names[<span class="b">self</span>.midi % <span class="n">12</span>] + <span class="b">str</span>(<span class="b">self</span>.midi // <span class="n">12</span> - <span class="n">1</span>)
+
+<span class="d">@</span><span class="d">dataclass</span>
+<span class="k">class</span> <span class="f">Clip</span>:
+    events: <span class="b">list</span>      <span class="c"># (onset, data): onset in beats</span>
+    length: <span class="b">float</span>     <span class="c"># in beats: where the next clip starts</span>
+
+    <span class="k">def</span> <span class="f">__rshift__</span>(<span class="b">self</span>, other):          <span class="c"># then</span>
+        moved = [(onset + <span class="b">self</span>.length, data) <span class="k">for</span> onset, data <span class="k">in</span> other.events]
+        <span class="k">return</span> Clip(<span class="b">self</span>.events + moved, <span class="b">self</span>.length + other.length)
+
+    <span class="k">def</span> <span class="f">__mul__</span>(<span class="b">self</span>, times):             <span class="c"># again</span>
+        out = Clip([], <span class="n">0</span>)
+        <span class="k">for</span> _ <span class="k">in</span> <span class="b">range</span>(times):
+            out = out &gt;&gt; <span class="b">self</span>
+        <span class="k">return</span> out
+
+    <span class="k">def</span> <span class="f">__or__</span>(<span class="b">self</span>, other):              <span class="c"># together</span>
+        <span class="k">return</span> Clip(<span class="b">self</span>.events + other.events, <span class="b">max</span>(<span class="b">self</span>.length, other.length))
+
+<span class="k">def</span> <span class="f">note</span>(data, length=<span class="n">1</span>):
+    <span class="k">return</span> Clip([(<span class="n">0</span>, data)], length)
+
+<span class="k">def</span> <span class="f">rest</span>(length):
+    <span class="k">return</span> Clip([], length)
+
+<span class="k">class</span> <span class="f">Scale</span>:
+    <span class="k">def</span> <span class="f">__init__</span>(<span class="b">self</span>, steps, root):
+        <span class="b">self</span>.root = root
+        <span class="b">self</span>.distances = []
+        distance = <span class="n">0</span>
+        <span class="k">for</span> step <span class="k">in</span> steps:
+            <span class="b">self</span>.distances.append(distance)
+            distance += step
+
+    <span class="k">def</span> <span class="f">__getitem__</span>(<span class="b">self</span>, degree):
+        <span class="k">return</span> <span class="b">self</span>.root + <span class="b">self</span>.distances[degree]
+
+<span class="k">def</span> <span class="f">play_clip</span>(clip, scale, beat_s=<span class="n">0.5</span>):
+    sounds = [(onset * beat_s, pluck(scale[data].f)) <span class="k">for</span> onset, data <span class="k">in</span> clip.events]
+    <span class="k">return</span> play(mix_sounds(sounds))
+
+a_major = Scale([<span class="n">2</span>, <span class="n">2</span>, <span class="n">1</span>, <span class="n">2</span>, <span class="n">2</span>, <span class="n">2</span>, <span class="n">1</span>], Pitch(<span class="s">&quot;A4&quot;</span>))
+a_minor = Scale([<span class="n">2</span>, <span class="n">1</span>, <span class="n">2</span>, <span class="n">2</span>, <span class="n">1</span>, <span class="n">2</span>, <span class="n">2</span>], Pitch(<span class="s">&quot;A4&quot;</span>))
+
+call = note(<span class="n">0</span>) &gt;&gt; note(<span class="n">1</span>) &gt;&gt; note(<span class="n">2</span>) &gt;&gt; note(<span class="n">0</span>)                                      <span class="c"># &quot;Frère Jacques&quot;</span>
+climb = note(<span class="n">2</span>) &gt;&gt; note(<span class="n">3</span>) &gt;&gt; note(<span class="n">4</span>, <span class="n">2</span>)                                            <span class="c"># &quot;dormez-vous?&quot;</span>
+bells = note(<span class="n">4</span>, <span class="n">0.5</span>) &gt;&gt; note(<span class="n">5</span>, <span class="n">0.5</span>) &gt;&gt; note(<span class="n">4</span>, <span class="n">0.5</span>) &gt;&gt; note(<span class="n">3</span>, <span class="n">0.5</span>) &gt;&gt; note(<span class="n">2</span>) &gt;&gt; note(<span class="n">0</span>)   <span class="c"># &quot;sonnez les matines&quot;</span>
+
+fm = call * <span class="n">2</span> &gt;&gt; climb * <span class="n">2</span> &gt;&gt; bells * <span class="n">2</span>
+play_clip(fm | rest(<span class="n">8</span>) &gt;&gt; fm, a_major)
+</code></pre>
+</main>
+<script>
+  const button = document.getElementById('copy');
+  const status = document.getElementById('status');
+  const code = document.getElementById('code');
+  button.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(code.textContent);
+      status.textContent = 'Copied.';
+    } catch {
+      const range = document.createRange();
+      range.selectNodeContents(code);
+      const selection = getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      status.textContent = 'Selected: press Ctrl+C or ⌘C.';
+    }
+  });
+</script>
+  <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"f0427f56e626492fad6cdcf05fbce5bb","spa":false}'></script>
+</body>
+</html>
