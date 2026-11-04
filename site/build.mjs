@@ -137,7 +137,8 @@ await cp(lesson07Pages, path.join(dist, 'lesson-07'), { recursive: true })
 await cp(lesson08Pages, path.join(dist, 'lesson-08'), { recursive: true })
 await cp(path.join(lesson05, 'class-notebook.ipynb'), path.join(dist, 'lesson-05', 'class-notebook.ipynb'))
 await cp(path.join(lesson08, 'class-notebook.ipynb'), path.join(dist, 'lesson-08', 'class-notebook.ipynb'))
-// Lesson 09: a live notebook, and the stand-in for sounddevice it imports in the browser.
+// Lesson 09: the notebook from class, a live notebook, and the stand-in for sounddevice it imports in the browser.
+await cp(path.join(lesson09, 'class-notebook.ipynb'), path.join(dist, 'lesson-09', 'class-notebook.ipynb'))
 await cp(path.join(lesson09, 'live-notebook.ipynb'), path.join(dist, 'lesson-09', 'live-notebook.ipynb'))
 await cp(path.join(lesson09, 'sounddevice.py'), path.join(dist, 'lesson-09', 'sounddevice.py'))
 
