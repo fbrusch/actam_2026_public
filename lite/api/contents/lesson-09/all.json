@@ -1,0 +1,43 @@
+{
+  "content": [
+    {
+      "content": null,
+      "created": "2026-11-04T13:36:20.868918Z",
+      "format": null,
+      "hash": null,
+      "hash_algorithm": null,
+      "last_modified": "2026-11-04T13:36:20.868918Z",
+      "mimetype": "text/x-python",
+      "name": "sounddevice.py",
+      "path": "lesson-09/sounddevice.py",
+      "size": 11512,
+      "type": "file",
+      "writable": true
+    },
+    {
+      "content": null,
+      "created": "2026-11-04T13:36:20.868495Z",
+      "format": null,
+      "hash": null,
+      "hash_algorithm": null,
+      "last_modified": "2026-11-04T13:36:20.868495Z",
+      "mimetype": null,
+      "name": "live-notebook.ipynb",
+      "path": "lesson-09/live-notebook.ipynb",
+      "size": 988,
+      "type": "notebook",
+      "writable": true
+    }
+  ],
+  "created": "2026-11-04T13:36:22.040266Z",
+  "format": "json",
+  "hash": null,
+  "hash_algorithm": null,
+  "last_modified": "2026-11-04T13:36:22.040550Z",
+  "mimetype": null,
+  "name": "lesson-09",
+  "path": "lesson-09",
+  "size": null,
+  "type": "directory",
+  "writable": true
+}
