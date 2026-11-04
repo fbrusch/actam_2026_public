@@ -10,6 +10,8 @@
 //
 // `path` is where the notebook is published, relative to the site root.
 // `title` is shown on its page, after the lesson in the breadcrumb.
+// `files` are published files the notebook imports, such as a module next to
+// it: they are copied into JupyterLite at the same paths.
 // To make an outside notebook runnable after reviewing it, add an entry with
 // the `sha256` of the reviewed file: if the file changes, it falls back to
 // read-only until it is reviewed again.
@@ -24,6 +26,7 @@ export const TRUSTED = [
   { path: 'lesson-06/notebook.ipynb', title: 'Reference notebook' },
   { path: 'lesson-07/notebook.ipynb', title: 'Reference notebook' },
   { path: 'lesson-08/class-notebook.ipynb', title: 'Notebook from class' },
+  { path: 'lesson-09/live-notebook.ipynb', title: 'Live notebook', files: ['lesson-09/sounddevice.py'] },
   // Example of a reviewed outside notebook, pinned to its content:
   // { path: 'lesson-04/submissions/notebooks/group-03.ipynb', title: 'Group 03', sha256: '…' },
 ]

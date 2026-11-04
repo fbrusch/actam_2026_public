@@ -12,7 +12,7 @@
 // browser".
 
 import { execFileSync } from 'node:child_process'
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 
@@ -30,7 +30,7 @@ export const liteEnabled = () => process.env.SKIP_LITE !== '1'
 export const liteHref = (root, notebookPath) =>
   `${root}lite/notebooks/index.html?path=${encodeURIComponent(notebookPath)}`
 
-export async function buildLite({ dist, notebooks }) {
+export async function buildLite({ dist, notebooks, files = [] }) {
   const work = await mkdtemp(path.join(os.tmpdir(), 'actam-lite-'))
   try {
     for (const relative of notebooks) {
@@ -39,6 +39,11 @@ export async function buildLite({ dist, notebooks }) {
       const target = path.join(work, 'contents', relative)
       await mkdir(path.dirname(target), { recursive: true })
       await writeFile(target, `${JSON.stringify(notebook, null, 1)}\n`)
+    }
+    for (const relative of files) {
+      const target = path.join(work, 'contents', relative)
+      await mkdir(path.dirname(target), { recursive: true })
+      await cp(path.join(dist, relative), target)
     }
     const [core, kernel, server] = Object.entries(VERSIONS).map(([name, version]) => `${name}==${version}`)
     execFileSync('uvx', [
