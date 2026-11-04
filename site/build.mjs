@@ -35,6 +35,9 @@ const lesson07 = publicLayout
 const lesson08 = publicLayout
   ? path.join(root, 'lesson-08')
   : path.join(root, 'lesson_08', 'publish', 'lesson-08')
+const lesson09 = publicLayout
+  ? path.join(root, 'lesson-09')
+  : path.join(root, 'lesson_09', 'publish', 'lesson-09')
 // Lessons 04, 05, 07 and 08 also publish ready-made static pages (kit, tools, …).
 const lesson04Pages = path.join(lesson04, 'pages')
 const lesson05Pages = path.join(lesson05, 'pages')
@@ -134,6 +137,9 @@ await cp(lesson07Pages, path.join(dist, 'lesson-07'), { recursive: true })
 await cp(lesson08Pages, path.join(dist, 'lesson-08'), { recursive: true })
 await cp(path.join(lesson05, 'class-notebook.ipynb'), path.join(dist, 'lesson-05', 'class-notebook.ipynb'))
 await cp(path.join(lesson08, 'class-notebook.ipynb'), path.join(dist, 'lesson-08', 'class-notebook.ipynb'))
+// Lesson 09: a live notebook, and the stand-in for sounddevice it imports in the browser.
+await cp(path.join(lesson09, 'live-notebook.ipynb'), path.join(dist, 'lesson-09', 'live-notebook.ipynb'))
+await cp(path.join(lesson09, 'sounddevice.py'), path.join(dist, 'lesson-09', 'sounddevice.py'))
 
 // Every notebook copied above gets a read-only page next to it, and the
 // trusted ones can run in the browser with JupyterLite. See site/notebooks/.

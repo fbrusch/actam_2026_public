@@ -22,7 +22,8 @@ export async function publishNotebooks({ root, dist }) {
   const trusted = await trustedNotebooks(dist, found)
   const runnable = liteEnabled() && trusted.size > 0
 
-  if (runnable) await buildLite({ dist, notebooks: [...trusted.keys()] })
+  const files = [...trusted.values()].flatMap((entry) => entry.files ?? [])
+  if (runnable) await buildLite({ dist, notebooks: [...trusted.keys()], files })
   await copyKatexStyles(root, dist)
   await prepareViewer()
 
