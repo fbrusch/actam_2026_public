@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+  <meta name="theme-color" content="#f7f5ef">
+  <title>Lesson 09 · Notebook from class · ACTAM</title>
+  <link rel="stylesheet" href="../../assets/katex/katex.min.css">
+  <style>
+:root { color-scheme: light; color: #182f3a; background: #f7f5ef; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+* { box-sizing: border-box; }
+body { margin: 0; background: #f7f5ef; }
+main { max-width: 900px; margin: auto; padding: 40px 24px 80px; }
+.crumbs ol { display: flex; flex-wrap: wrap; gap: 0 .6em; margin: 0; padding: 0; list-style: none; font: .8rem ui-monospace, Menlo, monospace; letter-spacing: .12em; text-transform: uppercase; color: #42666a; }
+.crumbs li + li::before { content: '›'; margin-right: .6em; }
+.crumbs a { color: inherit; text-decoration: none; }
+.crumbs a:hover { text-decoration: underline; }
+h1 { font: 700 clamp(2rem, 6vw, 3.4rem)/1.08 ui-monospace, Menlo, monospace; letter-spacing: -.05em; margin: 22px 0 18px; }
+.bar { display: flex; flex-wrap: wrap; gap: 10px; }
+.button { font: .9rem ui-monospace, Menlo, monospace; padding: 9px 14px; border: 1px solid #087e83; color: #087e83; text-decoration: none; background: #fff; }
+.button.primary { background: #087e83; color: #fff; }
+.button:focus-visible { outline: 3px solid #cb4f38; outline-offset: 3px; }
+.hint { color: #42666a; font-size: .85rem; line-height: 1.5; margin: 12px 0 28px; max-width: 640px; }
+.cell { margin: 0 0 14px; }
+.markdown { line-height: 1.65; }
+.markdown h1, .markdown h2, .markdown h3 { font-family: ui-monospace, Menlo, monospace; letter-spacing: -.02em; line-height: 1.2; margin: 1.6em 0 .5em; }
+.markdown h1 { font-size: 1.8rem; } .markdown h2 { font-size: 1.4rem; } .markdown h3 { font-size: 1.1rem; }
+.markdown code { font: .88em ui-monospace, Menlo, monospace; background: #e5ece6; color: #0b5f63; padding: 1px 4px; }
+.markdown pre code { background: none; color: inherit; padding: 0; }
+.markdown table { border-collapse: collapse; margin: 12px 0; }
+.markdown th, .markdown td { border: 1px solid #ccd4cf; padding: 5px 10px; text-align: left; }
+.markdown img { max-width: 100%; }
+.markdown a { color: #087e83; }
+.markdown details { margin: 12px 0; }
+.markdown summary { cursor: pointer; color: #087e83; }
+.markdown blockquote { margin: 0; padding-left: 14px; border-left: 3px solid #087e83; color: #42666a; }
+pre { margin: 0; padding: 14px 16px; overflow-x: auto; font: .82rem/1.55 ui-monospace, Menlo, monospace; border: 1px solid #d5ddd8; }
+pre.shiki { background: #fbfcfa !important; }
+pre.plain { background: #fbfcfa; }
+.code pre { border-left: 3px solid #087e83; }
+.katex-display { overflow-x: auto; overflow-y: hidden; }
+@media (max-width: 620px) { main { padding: 28px 16px 60px; } }
+</style>
+</head>
+<body>
+<main>
+  <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../../">ACTAM</a></li><li><a href="../../#lesson-09">Lesson 09</a></li><li><span aria-current="page">Notebook from class</span></li></ol></nav>
+  <h1>Notebook from class</h1>
+  <div class="bar">
+    <a class="button" href="../class-notebook.ipynb" download="actam-lesson-09-class-notebook.ipynb">Download .ipynb</a>
+    <a class="button primary" href="../../lite/notebooks/index.html?path=lesson-09%2Fclass-notebook.ipynb">Open in the browser</a>
+  </div>
+  <p class="hint">“Open in the browser” runs the notebook on your computer with JupyterLite: no installation, no account. Your changes stay in that browser: download the notebook to keep them.</p>
+  <article class="notebook">
+<section class="cell markdown"><h1>Sound in real time · notebook from class</h1>
+<blockquote>
+<p><strong>Provisional.</strong> This is what we did on Wednesday, cleaned up. It will grow after the next lesson.</p>
+</blockquote>
+<p>Until now we computed a whole wave, then played it: write, run, listen. Now the sound card asks for the next few samples, again and again, and we answer while it plays. We can change things from a cell and hear them a moment later, as in a REPL.</p>
+<p>In a local Jupyter this needs <code>%pip install sounddevice</code>. In the browser a stand-in with the same interface is next to this notebook: run the first cell and press <strong>▶ audio</strong>.</p>
+</section>
+<section class="cell markdown"><h2>Setup</h2>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">import</span><span style="color:#24292E"> sounddevice </span><span style="color:#D73A49">as</span><span style="color:#24292E"> sd</span></span>
+<span class="line"><span style="color:#D73A49">import</span><span style="color:#24292E"> numpy </span><span style="color:#D73A49">as</span><span style="color:#24292E"> np</span></span>
+<span class="line"><span style="color:#D73A49">import</span><span style="color:#24292E"> asyncio</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#005CC5">SR</span><span style="color:#D73A49"> =</span><span style="color:#005CC5"> 48000</span></span></code></pre></section>
+<section class="cell markdown"><h2>1 · The sound card asks</h2>
+<p>An <code>OutputStream</code> calls a function of ours, the <strong>callback</strong>, whenever it needs samples. It passes <code>outdata</code>, an empty array to fill, and <code>frames</code>, how many samples it wants.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> callback</span><span style="color:#24292E">(outdata, frames, time, status):</span></span>
+<span class="line"><span style="color:#24292E">    outdata[:, </span><span style="color:#005CC5">0</span><span style="color:#24292E">] </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 0.1</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> np.random.uniform(</span><span style="color:#D73A49">-</span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#005CC5">1</span><span style="color:#24292E">, frames)      </span><span style="color:#6A737D"># noise</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">out </span><span style="color:#D73A49">=</span><span style="color:#24292E"> sd.OutputStream(</span><span style="color:#E36209">samplerate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">, </span><span style="color:#E36209">channels</span><span style="color:#D73A49">=</span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#E36209">callback</span><span style="color:#D73A49">=</span><span style="color:#24292E">callback)</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">out.start()</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">out.stop()</span></span></code></pre></section>
+<section class="cell markdown"><p><code>outdata</code> has one row per sample and one column per channel. <code>outdata[:, 0]</code> is the whole first column: all the rows, column 0. A small array shows how this indexing works:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">r </span><span style="color:#D73A49">=</span><span style="color:#24292E"> np.random.random((</span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">3</span><span style="color:#24292E">))</span></span>
+<span class="line"><span style="color:#24292E">r</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">r.shape</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">r[:, </span><span style="color:#005CC5">0</span><span style="color:#24292E">]               </span><span style="color:#6A737D"># the first column</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">r[</span><span style="color:#005CC5">0</span><span style="color:#24292E">]                  </span><span style="color:#6A737D"># the first row</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">r[:, </span><span style="color:#005CC5">0</span><span style="color:#24292E">] </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#005CC5">10</span><span style="color:#24292E">, </span><span style="color:#005CC5">20</span><span style="color:#24292E">]    </span><span style="color:#6A737D"># a column takes as many values as there are rows</span></span>
+<span class="line"><span style="color:#24292E">r</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">try</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#24292E">    r[:, </span><span style="color:#005CC5">0</span><span style="color:#24292E">] </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">3</span><span style="color:#24292E">]</span></span>
+<span class="line"><span style="color:#D73A49">except</span><span style="color:#005CC5"> ValueError</span><span style="color:#D73A49"> as</span><span style="color:#24292E"> e:</span></span>
+<span class="line"><span style="color:#005CC5">    print</span><span style="color:#24292E">(e)</span></span></code></pre></section>
+<section class="cell markdown"><p>Two more things:</p>
+<ul>
+<li><strong>write into <code>outdata</code>, do not rebind it.</strong> <code>outdata = ...</code> only moves a local name: the sound card never sees it. The return value of the callback is ignored;</li>
+<li><strong>pass <code>channels</code> and <code>samplerate</code>.</strong> Without them the stream uses the device's: often two channels, and the second column, never written, plays whatever was in memory.</li>
+</ul>
+</section>
+<section class="cell markdown"><h2>2 · A sine, block by block</h2>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> sine_callback</span><span style="color:#24292E">(outdata, frames, time, status):</span></span>
+<span class="line"><span style="color:#24292E">    t </span><span style="color:#D73A49">=</span><span style="color:#24292E"> np.arange(frames) </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> SR</span></span>
+<span class="line"><span style="color:#24292E">    outdata[:, </span><span style="color:#005CC5">0</span><span style="color:#24292E">] </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 0.2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> np.sin(</span><span style="color:#005CC5">2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> np.pi </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 440</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> t)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">out </span><span style="color:#D73A49">=</span><span style="color:#24292E"> sd.OutputStream(</span><span style="color:#E36209">samplerate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">, </span><span style="color:#E36209">channels</span><span style="color:#D73A49">=</span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#E36209">blocksize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">512</span><span style="color:#24292E">, </span><span style="color:#E36209">callback</span><span style="color:#D73A49">=</span><span style="color:#24292E">sine_callback)</span></span>
+<span class="line"><span style="color:#24292E">out.start()</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">out.stop()</span></span></code></pre></section>
+<section class="cell markdown"><p>It buzzes. Every block starts again from <code>t = 0</code>, so the sine jumps back to the start of its cycle every 512 samples: 48000 / 512 ≈ 94 times a second. A click that repeats 94 times a second is no longer a click: it is a low note.</p>
+</section>
+<section class="cell markdown"><p>With blocks of 48000 samples the jump comes once a second, and we hear it as a click:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">out </span><span style="color:#D73A49">=</span><span style="color:#24292E"> sd.OutputStream(</span><span style="color:#E36209">samplerate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">, </span><span style="color:#E36209">channels</span><span style="color:#D73A49">=</span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#E36209">blocksize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">48000</span><span style="color:#24292E">, </span><span style="color:#E36209">callback</span><span style="color:#D73A49">=</span><span style="color:#24292E">sine_callback)</span></span>
+<span class="line"><span style="color:#24292E">out.start()</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">out.stop()</span></span></code></pre></section>
+<section class="cell markdown"><p>Bigger blocks are not the fix: a change made now would be heard up to a second later (the <strong>latency</strong>). The callback needs a memory.</p>
+</section>
+<section class="cell markdown"><h2>3 · A sine that remembers</h2>
+<p>Memory between calls means state, and state calls for an object. A method can be the callback: <code>s.callback</code> remembers its <code>s</code>.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> Sine</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __init__</span><span style="color:#24292E">(self, f):</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.f </span><span style="color:#D73A49">=</span><span style="color:#24292E"> f</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.t </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 0.0</span><span style="color:#6A737D">                         # where we are, in seconds</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#6F42C1"> callback</span><span style="color:#24292E">(self, outdata, frames, time, status):</span></span>
+<span class="line"><span style="color:#24292E">        t </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.t </span><span style="color:#D73A49">+</span><span style="color:#24292E"> np.arange(frames) </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> SR</span></span>
+<span class="line"><span style="color:#24292E">        outdata[:, </span><span style="color:#005CC5">0</span><span style="color:#24292E">] </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 0.2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> np.sin(</span><span style="color:#005CC5">2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> np.pi </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.f </span><span style="color:#D73A49">*</span><span style="color:#24292E"> t)</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.t </span><span style="color:#D73A49">+=</span><span style="color:#24292E"> frames </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> SR</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">s </span><span style="color:#D73A49">=</span><span style="color:#24292E"> Sine(</span><span style="color:#005CC5">440</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">out </span><span style="color:#D73A49">=</span><span style="color:#24292E"> sd.OutputStream(</span><span style="color:#E36209">samplerate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">, </span><span style="color:#E36209">channels</span><span style="color:#D73A49">=</span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#E36209">blocksize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">512</span><span style="color:#24292E">, </span><span style="color:#E36209">callback</span><span style="color:#D73A49">=</span><span style="color:#24292E">s.callback)</span></span>
+<span class="line"><span style="color:#24292E">out.start()</span></span></code></pre></section>
+<section class="cell markdown"><p>No more buzz. Now change the frequency while it plays:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">for</span><span style="color:#24292E"> i </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> range</span><span style="color:#24292E">(</span><span style="color:#005CC5">20</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#24292E">    s.f </span><span style="color:#D73A49">+=</span><span style="color:#005CC5"> 5</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> i</span></span>
+<span class="line"><span style="color:#D73A49">    await</span><span style="color:#24292E"> asyncio.sleep(</span><span style="color:#005CC5">0.5</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">out.stop()</span></span></code></pre></section>
+<section class="cell markdown"><p>It clicks at every change. The phase is <code>2π · f · t</code>, with <code>t</code> growing all the time: change <code>f</code>, and the phase of the whole past changes with it, so the wave jumps.</p>
+<p>What the oscillator must remember is not the time but <strong>where it is in its cycle</strong>: the phase. At each block the phase grows by <code>2π · f · frames / SR</code>, with the frequency of that block.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> Sine</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __init__</span><span style="color:#24292E">(self, f):</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.f </span><span style="color:#D73A49">=</span><span style="color:#24292E"> f</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.phase </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 0.0</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#6F42C1"> callback</span><span style="color:#24292E">(self, outdata, frames, time, status):</span></span>
+<span class="line"><span style="color:#24292E">        phases </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.phase </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> np.pi </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.f </span><span style="color:#D73A49">*</span><span style="color:#24292E"> np.arange(frames) </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> SR</span></span>
+<span class="line"><span style="color:#24292E">        outdata[:, </span><span style="color:#005CC5">0</span><span style="color:#24292E">] </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 0.2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> np.sin(phases)</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.phase </span><span style="color:#D73A49">+=</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> np.pi </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.f </span><span style="color:#D73A49">*</span><span style="color:#24292E"> frames </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> SR</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">s </span><span style="color:#D73A49">=</span><span style="color:#24292E"> Sine(</span><span style="color:#005CC5">440</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">out </span><span style="color:#D73A49">=</span><span style="color:#24292E"> sd.OutputStream(</span><span style="color:#E36209">samplerate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">, </span><span style="color:#E36209">channels</span><span style="color:#D73A49">=</span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#E36209">blocksize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">512</span><span style="color:#24292E">, </span><span style="color:#E36209">callback</span><span style="color:#D73A49">=</span><span style="color:#24292E">s.callback)</span></span>
+<span class="line"><span style="color:#24292E">out.start()</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">for</span><span style="color:#24292E"> i </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> range</span><span style="color:#24292E">(</span><span style="color:#005CC5">20</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#24292E">    s.f </span><span style="color:#D73A49">+=</span><span style="color:#005CC5"> 5</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> i</span></span>
+<span class="line"><span style="color:#D73A49">    await</span><span style="color:#24292E"> asyncio.sleep(</span><span style="color:#005CC5">0.5</span><span style="color:#24292E">)</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">out.stop()</span></span></code></pre></section>
+<section class="cell markdown"><p><code>await asyncio.sleep(...)</code> waits without blocking the sound. It works in a local Jupyter and in the browser, where <code>time.sleep</code> would stop the audio too.</p>
+</section>
+<section class="cell markdown"><h2>4 · Sources</h2>
+<p>The sine fills <code>outdata</code> itself, so it can only play alone. We split the two jobs:</p>
+<ul>
+<li>the sine gives its next samples: <code>block(frames)</code>;</li>
+<li><code>stream_of</code> builds a stream whose callback writes them into <code>outdata</code>.</li>
+</ul>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> Sine</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __init__</span><span style="color:#24292E">(self, f):</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.f </span><span style="color:#D73A49">=</span><span style="color:#24292E"> f</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.phase </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 0.0</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#6F42C1"> block</span><span style="color:#24292E">(self, frames):</span></span>
+<span class="line"><span style="color:#24292E">        phases </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.phase </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> np.pi </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.f </span><span style="color:#D73A49">*</span><span style="color:#24292E"> np.arange(frames) </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> SR</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.phase </span><span style="color:#D73A49">+=</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> np.pi </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.f </span><span style="color:#D73A49">*</span><span style="color:#24292E"> frames </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> SR</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#005CC5"> 0.2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> np.sin(phases)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> stream_of</span><span style="color:#24292E">(source):</span></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#6F42C1"> callback</span><span style="color:#24292E">(outdata, frames, time, status):</span></span>
+<span class="line"><span style="color:#24292E">        outdata[:, </span><span style="color:#005CC5">0</span><span style="color:#24292E">] </span><span style="color:#D73A49">=</span><span style="color:#24292E"> source.block(frames)</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> sd.OutputStream(</span><span style="color:#E36209">samplerate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">, </span><span style="color:#E36209">channels</span><span style="color:#D73A49">=</span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#E36209">blocksize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">512</span><span style="color:#24292E">, </span><span style="color:#E36209">callback</span><span style="color:#D73A49">=</span><span style="color:#24292E">callback)</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">s </span><span style="color:#D73A49">=</span><span style="color:#24292E"> Sine(</span><span style="color:#005CC5">440</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">out </span><span style="color:#D73A49">=</span><span style="color:#24292E"> stream_of(s)</span></span>
+<span class="line"><span style="color:#24292E">out.start()</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">s.f </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 600</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">out.stop()</span></span></code></pre></section>
+<section class="cell markdown"><p>Inside <code>callback</code>, the name must be <code>source</code>, the parameter. With a global name such as <code>s</code> it would play <code>s</code> whatever we pass, without any error.</p>
+<p><code>stream_of</code> uses only one thing of the object: its <code>block</code> method. From now on, anything with <code>block(frames)</code> is a <strong>source</strong>. It is not a class but a family of classes: a duck type. Python can give it a name with a <code>Protocol</code>. A square wave is another source:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> Square</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __init__</span><span style="color:#24292E">(self, f):</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.f </span><span style="color:#D73A49">=</span><span style="color:#24292E"> f</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.phase </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 0.0</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#6F42C1"> block</span><span style="color:#24292E">(self, frames):</span></span>
+<span class="line"><span style="color:#24292E">        phases </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.phase </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> np.pi </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.f </span><span style="color:#D73A49">*</span><span style="color:#24292E"> np.arange(frames) </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> SR</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.phase </span><span style="color:#D73A49">+=</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> np.pi </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.f </span><span style="color:#D73A49">*</span><span style="color:#24292E"> frames </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> SR</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#005CC5"> 0.1</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> np.sign(np.sin(phases))        </span><span style="color:#6A737D"># +1 where the sine is positive, -1 where it is negative</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">sq </span><span style="color:#D73A49">=</span><span style="color:#24292E"> Square(</span><span style="color:#005CC5">440</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">out </span><span style="color:#D73A49">=</span><span style="color:#24292E"> stream_of(sq)</span></span>
+<span class="line"><span style="color:#24292E">out.start()</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">sq.f </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 100</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">out.stop()</span></span></code></pre></section>
+<section class="cell markdown"><h2>5 · A mixer</h2>
+<p>A mixer holds a list of sources and sums their blocks. It has a <code>block</code> method too, so a mixer is a source: it can go into <code>stream_of</code>, or into another mixer.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> Mixer</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __init__</span><span style="color:#24292E">(self, sources):</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.sources </span><span style="color:#D73A49">=</span><span style="color:#24292E"> sources</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#6F42C1"> block</span><span style="color:#24292E">(self, frames):</span></span>
+<span class="line"><span style="color:#24292E">        out </span><span style="color:#D73A49">=</span><span style="color:#24292E"> np.zeros(frames)</span></span>
+<span class="line"><span style="color:#D73A49">        for</span><span style="color:#24292E"> source </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.sources:</span></span>
+<span class="line"><span style="color:#24292E">            out </span><span style="color:#D73A49">+=</span><span style="color:#24292E"> source.block(frames)</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> out</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">s1 </span><span style="color:#D73A49">=</span><span style="color:#24292E"> Sine(</span><span style="color:#005CC5">400</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">s2 </span><span style="color:#D73A49">=</span><span style="color:#24292E"> Sine(</span><span style="color:#005CC5">500</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">m </span><span style="color:#D73A49">=</span><span style="color:#24292E"> Mixer([s1, s2])</span></span>
+<span class="line"><span style="color:#24292E">out </span><span style="color:#D73A49">=</span><span style="color:#24292E"> stream_of(m)</span></span>
+<span class="line"><span style="color:#24292E">out.start()</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">s1.f </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 300</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">s2.f </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 301</span><span style="color:#6A737D">        # 1 Hz apart: they beat</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">out.stop()</span></span></code></pre></section>
+<section class="cell markdown"><h2>6 · From clips to sources</h2>
+<p>We built clips, scales and instruments in the last lessons. Here are the tools again:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">from</span><span style="color:#24292E"> IPython.display </span><span style="color:#D73A49">import</span><span style="color:#24292E"> Audio</span></span>
+<span class="line"><span style="color:#D73A49">from</span><span style="color:#24292E"> dataclasses </span><span style="color:#D73A49">import</span><span style="color:#24292E"> dataclass</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> play</span><span style="color:#24292E">(wave):</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> Audio(wave, </span><span style="color:#E36209">rate</span><span style="color:#D73A49">=</span><span style="color:#005CC5">SR</span><span style="color:#24292E">, </span><span style="color:#E36209">normalize</span><span style="color:#D73A49">=</span><span style="color:#005CC5">False</span><span style="color:#24292E">, </span><span style="color:#E36209">autoplay</span><span style="color:#D73A49">=</span><span style="color:#005CC5">False</span><span style="color:#24292E">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> pluck</span><span style="color:#24292E">(f, dur_s</span><span style="color:#D73A49">=</span><span style="color:#005CC5">1.0</span><span style="color:#24292E">, tau</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.3</span><span style="color:#24292E">, amplitude</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.25</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#24292E">    t </span><span style="color:#D73A49">=</span><span style="color:#24292E"> np.arange(</span><span style="color:#005CC5">round</span><span style="color:#24292E">(dur_s </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> SR</span><span style="color:#24292E">)) </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> SR</span></span>
+<span class="line"><span style="color:#24292E">    env </span><span style="color:#D73A49">=</span><span style="color:#24292E"> np.exp(</span><span style="color:#D73A49">-</span><span style="color:#24292E">t </span><span style="color:#D73A49">/</span><span style="color:#24292E"> tau)</span></span>
+<span class="line"><span style="color:#24292E">    wave </span><span style="color:#D73A49">=</span><span style="color:#24292E"> np.sin(</span><span style="color:#005CC5">2</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> np.pi </span><span style="color:#D73A49">*</span><span style="color:#24292E"> f </span><span style="color:#D73A49">*</span><span style="color:#24292E"> t)</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> amplitude </span><span style="color:#D73A49">*</span><span style="color:#24292E"> env </span><span style="color:#D73A49">*</span><span style="color:#24292E"> wave</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> mix_sounds</span><span style="color:#24292E">(sounds):                      </span><span style="color:#6A737D"># a sound is (onset_s, wave)</span></span>
+<span class="line"><span style="color:#24292E">    dur_s </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> max</span><span style="color:#24292E">([onset_s </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(wave) </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> SR</span><span style="color:#D73A49"> for</span><span style="color:#24292E"> onset_s, wave </span><span style="color:#D73A49">in</span><span style="color:#24292E"> sounds])</span></span>
+<span class="line"><span style="color:#24292E">    out </span><span style="color:#D73A49">=</span><span style="color:#24292E"> np.zeros(</span><span style="color:#005CC5">round</span><span style="color:#24292E">(dur_s </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> SR</span><span style="color:#24292E">))</span></span>
+<span class="line"><span style="color:#D73A49">    for</span><span style="color:#24292E"> onset_s, wave </span><span style="color:#D73A49">in</span><span style="color:#24292E"> sounds:</span></span>
+<span class="line"><span style="color:#24292E">        onset </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> round</span><span style="color:#24292E">(onset_s </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> SR</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">        out[onset:onset </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(wave)] </span><span style="color:#D73A49">+=</span><span style="color:#24292E"> wave</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> out</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">note_names </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [</span><span style="color:#032F62">"C"</span><span style="color:#24292E">, </span><span style="color:#032F62">"C#"</span><span style="color:#24292E">, </span><span style="color:#032F62">"D"</span><span style="color:#24292E">, </span><span style="color:#032F62">"D#"</span><span style="color:#24292E">, </span><span style="color:#032F62">"E"</span><span style="color:#24292E">, </span><span style="color:#032F62">"F"</span><span style="color:#24292E">, </span><span style="color:#032F62">"F#"</span><span style="color:#24292E">, </span><span style="color:#032F62">"G"</span><span style="color:#24292E">, </span><span style="color:#032F62">"G#"</span><span style="color:#24292E">, </span><span style="color:#032F62">"A"</span><span style="color:#24292E">, </span><span style="color:#032F62">"A#"</span><span style="color:#24292E">, </span><span style="color:#032F62">"B"</span><span style="color:#24292E">]</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> Pitch</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __init__</span><span style="color:#24292E">(self, value):</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#005CC5"> isinstance</span><span style="color:#24292E">(value, </span><span style="color:#005CC5">str</span><span style="color:#24292E">):           </span><span style="color:#6A737D"># a name like "C4": the octave last, the note before</span></span>
+<span class="line"><span style="color:#24292E">            value </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 12</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> (</span><span style="color:#005CC5">int</span><span style="color:#24292E">(value[</span><span style="color:#D73A49">-</span><span style="color:#005CC5">1</span><span style="color:#24292E">]) </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">) </span><span style="color:#D73A49">+</span><span style="color:#24292E"> note_names.index(value[:</span><span style="color:#D73A49">-</span><span style="color:#005CC5">1</span><span style="color:#24292E">])</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.midi </span><span style="color:#D73A49">=</span><span style="color:#24292E"> value</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6F42C1">    @</span><span style="color:#005CC5">property</span></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#6F42C1"> f</span><span style="color:#24292E">(self):                             </span><span style="color:#6A737D"># the frequency in Hz</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#005CC5"> 440</span><span style="color:#D73A49"> *</span><span style="color:#005CC5"> 2</span><span style="color:#D73A49"> **</span><span style="color:#24292E"> ((</span><span style="color:#005CC5">self</span><span style="color:#24292E">.midi </span><span style="color:#D73A49">-</span><span style="color:#005CC5"> 69</span><span style="color:#24292E">) </span><span style="color:#D73A49">/</span><span style="color:#005CC5"> 12</span><span style="color:#24292E">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __add__</span><span style="color:#24292E">(self, semitones):</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#005CC5"> isinstance</span><span style="color:#24292E">(semitones, Pitch):</span></span>
+<span class="line"><span style="color:#D73A49">            raise</span><span style="color:#005CC5"> TypeError</span><span style="color:#24292E">(</span><span style="color:#032F62">"Add semitones, not a pitch."</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> Pitch(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.midi </span><span style="color:#D73A49">+</span><span style="color:#24292E"> semitones)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __sub__</span><span style="color:#24292E">(self, other):</span></span>
+<span class="line"><span style="color:#D73A49">        if</span><span style="color:#005CC5"> isinstance</span><span style="color:#24292E">(other, Pitch):</span></span>
+<span class="line"><span style="color:#D73A49">            return</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.midi </span><span style="color:#D73A49">-</span><span style="color:#24292E"> other.midi    </span><span style="color:#6A737D"># an interval</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> Pitch(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.midi </span><span style="color:#D73A49">-</span><span style="color:#24292E"> other)      </span><span style="color:#6A737D"># a lower pitch</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __eq__</span><span style="color:#24292E">(self, other):</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#005CC5"> isinstance</span><span style="color:#24292E">(other, Pitch) </span><span style="color:#D73A49">and</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.midi </span><span style="color:#D73A49">==</span><span style="color:#24292E"> other.midi</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __repr__</span><span style="color:#24292E">(self):</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> note_names[</span><span style="color:#005CC5">self</span><span style="color:#24292E">.midi </span><span style="color:#D73A49">%</span><span style="color:#005CC5"> 12</span><span style="color:#24292E">] </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> str</span><span style="color:#24292E">(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.midi </span><span style="color:#D73A49">//</span><span style="color:#005CC5"> 12</span><span style="color:#D73A49"> -</span><span style="color:#005CC5"> 1</span><span style="color:#24292E">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6F42C1">@dataclass</span></span>
+<span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> Clip</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#24292E">    events: </span><span style="color:#005CC5">list</span><span style="color:#6A737D">      # (onset, data): onset in beats</span></span>
+<span class="line"><span style="color:#24292E">    length: </span><span style="color:#005CC5">float</span><span style="color:#6A737D">     # in beats: where the next clip starts</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __rshift__</span><span style="color:#24292E">(self, other):          </span><span style="color:#6A737D"># then</span></span>
+<span class="line"><span style="color:#24292E">        moved </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [(onset </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.length, data) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> onset, data </span><span style="color:#D73A49">in</span><span style="color:#24292E"> other.events]</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> Clip(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.events </span><span style="color:#D73A49">+</span><span style="color:#24292E"> moved, </span><span style="color:#005CC5">self</span><span style="color:#24292E">.length </span><span style="color:#D73A49">+</span><span style="color:#24292E"> other.length)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __mul__</span><span style="color:#24292E">(self, times):             </span><span style="color:#6A737D"># again</span></span>
+<span class="line"><span style="color:#24292E">        out </span><span style="color:#D73A49">=</span><span style="color:#24292E"> Clip([], </span><span style="color:#005CC5">0</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#D73A49">        for</span><span style="color:#24292E"> _ </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> range</span><span style="color:#24292E">(times):</span></span>
+<span class="line"><span style="color:#24292E">            out </span><span style="color:#D73A49">=</span><span style="color:#24292E"> out </span><span style="color:#D73A49">>></span><span style="color:#005CC5"> self</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> out</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __add__</span><span style="color:#24292E">(self, n):</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> Clip([(onset, data </span><span style="color:#D73A49">+</span><span style="color:#24292E"> n) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> onset, data </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.events], </span><span style="color:#005CC5">self</span><span style="color:#24292E">.length)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __or__</span><span style="color:#24292E">(self, other):              </span><span style="color:#6A737D"># together</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> Clip(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.events </span><span style="color:#D73A49">+</span><span style="color:#24292E"> other.events, </span><span style="color:#005CC5">max</span><span style="color:#24292E">(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.length, other.length))</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> note</span><span style="color:#24292E">(data, length</span><span style="color:#D73A49">=</span><span style="color:#005CC5">1</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> Clip([(</span><span style="color:#005CC5">0</span><span style="color:#24292E">, data)], length)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> rest</span><span style="color:#24292E">(length):</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> Clip([], length)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> Scale</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __init__</span><span style="color:#24292E">(self, steps, root):</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.root </span><span style="color:#D73A49">=</span><span style="color:#24292E"> root</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.distances </span><span style="color:#D73A49">=</span><span style="color:#24292E"> []</span></span>
+<span class="line"><span style="color:#24292E">        distance </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 0</span></span>
+<span class="line"><span style="color:#D73A49">        for</span><span style="color:#24292E"> step </span><span style="color:#D73A49">in</span><span style="color:#24292E"> steps:</span></span>
+<span class="line"><span style="color:#005CC5">            self</span><span style="color:#24292E">.distances.append(distance)</span></span>
+<span class="line"><span style="color:#24292E">            distance </span><span style="color:#D73A49">+=</span><span style="color:#24292E"> step</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __getitem__</span><span style="color:#24292E">(self, degree):</span></span>
+<span class="line"><span style="color:#24292E">        octave </span><span style="color:#D73A49">=</span><span style="color:#24292E"> degree </span><span style="color:#D73A49">//</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.distances)</span></span>
+<span class="line"><span style="color:#24292E">        step </span><span style="color:#D73A49">=</span><span style="color:#24292E"> degree </span><span style="color:#D73A49">%</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.distances)</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.root </span><span style="color:#D73A49">+</span><span style="color:#24292E"> (</span><span style="color:#005CC5">12</span><span style="color:#D73A49"> *</span><span style="color:#24292E"> octave) </span><span style="color:#D73A49">+</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.distances[step]</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> play_clip</span><span style="color:#24292E">(clip, scale, beat_s</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.5</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#24292E">    sounds </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [(onset </span><span style="color:#D73A49">*</span><span style="color:#24292E"> beat_s, pluck(scale[data].f)) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> onset, data </span><span style="color:#D73A49">in</span><span style="color:#24292E"> clip.events]</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> play(mix_sounds(sounds))</span></span></code></pre></section>
+<section class="cell markdown"><p><code>play_clip</code> goes from a clip to a sound, a whole wave. We keep that step on its own:</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> render_clip</span><span style="color:#24292E">(clip, scale, beat_s</span><span style="color:#D73A49">=</span><span style="color:#005CC5">0.5</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#24292E">    sounds </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [(onset </span><span style="color:#D73A49">*</span><span style="color:#24292E"> beat_s, pluck(scale[data].f)) </span><span style="color:#D73A49">for</span><span style="color:#24292E"> onset, data </span><span style="color:#D73A49">in</span><span style="color:#24292E"> clip.events]</span></span>
+<span class="line"><span style="color:#D73A49">    return</span><span style="color:#24292E"> mix_sounds(sounds)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">a_major </span><span style="color:#D73A49">=</span><span style="color:#24292E"> Scale([</span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">1</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">1</span><span style="color:#24292E">], Pitch(</span><span style="color:#032F62">"A4"</span><span style="color:#24292E">))</span></span>
+<span class="line"><span style="color:#24292E">call </span><span style="color:#D73A49">=</span><span style="color:#24292E"> note(</span><span style="color:#005CC5">0</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">1</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">2</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">0</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">sound </span><span style="color:#D73A49">=</span><span style="color:#24292E"> render_clip(call, a_major)</span></span></code></pre></section>
+<section class="cell markdown"><p>A wave is an array: it has no <code>block</code>, so it is not a source. We need an adapter that takes a wave and gives it out one block at a time. We call it a <strong>voice</strong>, as in a sampler: it remembers how far it has got.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> Voice</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __init__</span><span style="color:#24292E">(self, wave):</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.wave </span><span style="color:#D73A49">=</span><span style="color:#24292E"> wave</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.i </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 0</span><span style="color:#6A737D">                           # how far we have got</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#6F42C1"> block</span><span style="color:#24292E">(self, frames):</span></span>
+<span class="line"><span style="color:#24292E">        out </span><span style="color:#D73A49">=</span><span style="color:#24292E"> np.zeros(frames)</span></span>
+<span class="line"><span style="color:#24292E">        chunk </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.wave[</span><span style="color:#005CC5">self</span><span style="color:#24292E">.i : </span><span style="color:#005CC5">self</span><span style="color:#24292E">.i </span><span style="color:#D73A49">+</span><span style="color:#24292E"> frames]     </span><span style="color:#6A737D"># shorter at the end, then empty</span></span>
+<span class="line"><span style="color:#24292E">        out[:</span><span style="color:#005CC5">len</span><span style="color:#24292E">(chunk)] </span><span style="color:#D73A49">=</span><span style="color:#24292E"> chunk</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.i </span><span style="color:#D73A49">+=</span><span style="color:#24292E"> frames</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> out</span></span></code></pre></section>
+<section class="cell markdown"><p>A slice past the end of an array is not an error: it is shorter, or empty. So the last block is the end of the wave and then zeros, and after that only zeros.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">np.arange(</span><span style="color:#005CC5">10</span><span style="color:#24292E">)[</span><span style="color:#005CC5">8</span><span style="color:#24292E">:</span><span style="color:#005CC5">13</span><span style="color:#24292E">], np.arange(</span><span style="color:#005CC5">10</span><span style="color:#24292E">)[</span><span style="color:#005CC5">20</span><span style="color:#24292E">:</span><span style="color:#005CC5">25</span><span style="color:#24292E">]</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">v </span><span style="color:#D73A49">=</span><span style="color:#24292E"> Voice(render_clip(call, a_major))</span></span>
+<span class="line"><span style="color:#24292E">out </span><span style="color:#D73A49">=</span><span style="color:#24292E"> stream_of(v)</span></span>
+<span class="line"><span style="color:#24292E">out.start()</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">v.i </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 0</span><span style="color:#6A737D">           # back to the start</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">v.wave </span><span style="color:#D73A49">=</span><span style="color:#24292E"> render_clip(note(</span><span style="color:#005CC5">1</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">2</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">1</span><span style="color:#24292E">) </span><span style="color:#D73A49">>></span><span style="color:#24292E"> note(</span><span style="color:#005CC5">0</span><span style="color:#24292E">), a_major)</span></span>
+<span class="line"><span style="color:#24292E">v.i </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 0</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">out.stop()</span></span></code></pre></section>
+<section class="cell markdown"><h2>7 · Playing into a mixer</h2>
+<p>Start a stream on an empty mixer: silence. Then add sources while it plays.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">m </span><span style="color:#D73A49">=</span><span style="color:#24292E"> Mixer([])</span></span>
+<span class="line"><span style="color:#24292E">out </span><span style="color:#D73A49">=</span><span style="color:#24292E"> stream_of(m)</span></span>
+<span class="line"><span style="color:#24292E">out.start()</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">m.sources.append(Voice(pluck(Pitch(</span><span style="color:#032F62">"A4"</span><span style="color:#24292E">).f)))       </span><span style="color:#6A737D"># run it again and again</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">for</span><span style="color:#24292E"> degree </span><span style="color:#D73A49">in</span><span style="color:#24292E"> [</span><span style="color:#005CC5">0</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">4</span><span style="color:#24292E">, </span><span style="color:#005CC5">7</span><span style="color:#24292E">]:</span></span>
+<span class="line"><span style="color:#24292E">    m.sources.append(Voice(pluck(a_major[degree].f, </span><span style="color:#E36209">dur_s</span><span style="color:#D73A49">=</span><span style="color:#005CC5">2</span><span style="color:#24292E">)))     </span><span style="color:#6A737D"># a chord</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#005CC5">len</span><span style="color:#24292E">(m.sources)</span></span></code></pre></section>
+<section class="cell markdown"><p>The notes are over, but the voices are still in the list: the mixer asks each of them for a block of zeros, every block. Add enough and the callback can no longer finish in time: the sound card gets no samples, and we hear cracks (an <strong>underflow</strong>).</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">out.stop()</span></span></code></pre></section>
+<section class="cell markdown"><p>A voice can say when it is over: <code>done</code>, a property. The mixer takes finished sources out of its list. It loops over a copy, <code>list(self.sources)</code>: removing from the list it loops over would skip elements. Sources without <code>done</code>, such as <code>Sine</code>, play forever.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> Voice</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __init__</span><span style="color:#24292E">(self, wave):</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.wave </span><span style="color:#D73A49">=</span><span style="color:#24292E"> wave</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.i </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 0</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#6F42C1"> block</span><span style="color:#24292E">(self, frames):</span></span>
+<span class="line"><span style="color:#24292E">        out </span><span style="color:#D73A49">=</span><span style="color:#24292E"> np.zeros(frames)</span></span>
+<span class="line"><span style="color:#24292E">        chunk </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.wave[</span><span style="color:#005CC5">self</span><span style="color:#24292E">.i : </span><span style="color:#005CC5">self</span><span style="color:#24292E">.i </span><span style="color:#D73A49">+</span><span style="color:#24292E"> frames]</span></span>
+<span class="line"><span style="color:#24292E">        out[:</span><span style="color:#005CC5">len</span><span style="color:#24292E">(chunk)] </span><span style="color:#D73A49">=</span><span style="color:#24292E"> chunk</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.i </span><span style="color:#D73A49">+=</span><span style="color:#24292E"> frames</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> out</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6F42C1">    @</span><span style="color:#005CC5">property</span></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#6F42C1"> done</span><span style="color:#24292E">(self):</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#005CC5"> self</span><span style="color:#24292E">.i </span><span style="color:#D73A49">>=</span><span style="color:#005CC5"> len</span><span style="color:#24292E">(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.wave)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> Mixer</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __init__</span><span style="color:#24292E">(self, sources):</span></span>
+<span class="line"><span style="color:#005CC5">        self</span><span style="color:#24292E">.sources </span><span style="color:#D73A49">=</span><span style="color:#24292E"> sources</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49">    def</span><span style="color:#6F42C1"> block</span><span style="color:#24292E">(self, frames):</span></span>
+<span class="line"><span style="color:#24292E">        out </span><span style="color:#D73A49">=</span><span style="color:#24292E"> np.zeros(frames)</span></span>
+<span class="line"><span style="color:#D73A49">        for</span><span style="color:#24292E"> source </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> list</span><span style="color:#24292E">(</span><span style="color:#005CC5">self</span><span style="color:#24292E">.sources):</span></span>
+<span class="line"><span style="color:#24292E">            out </span><span style="color:#D73A49">+=</span><span style="color:#24292E"> source.block(frames)</span></span>
+<span class="line"><span style="color:#D73A49">            if</span><span style="color:#005CC5"> getattr</span><span style="color:#24292E">(source, </span><span style="color:#032F62">"done"</span><span style="color:#24292E">, </span><span style="color:#005CC5">False</span><span style="color:#24292E">):       </span><span style="color:#6A737D"># False for sources without done</span></span>
+<span class="line"><span style="color:#005CC5">                self</span><span style="color:#24292E">.sources.remove(source)</span></span>
+<span class="line"><span style="color:#D73A49">        return</span><span style="color:#24292E"> out</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">m </span><span style="color:#D73A49">=</span><span style="color:#24292E"> Mixer([])</span></span>
+<span class="line"><span style="color:#24292E">out </span><span style="color:#D73A49">=</span><span style="color:#24292E"> stream_of(m)</span></span>
+<span class="line"><span style="color:#24292E">out.start()</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">for</span><span style="color:#24292E"> degree </span><span style="color:#D73A49">in</span><span style="color:#24292E"> [</span><span style="color:#005CC5">0</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">4</span><span style="color:#24292E">, </span><span style="color:#005CC5">7</span><span style="color:#24292E">]:</span></span>
+<span class="line"><span style="color:#24292E">    m.sources.append(Voice(pluck(a_major[degree].f, </span><span style="color:#E36209">dur_s</span><span style="color:#D73A49">=</span><span style="color:#005CC5">2</span><span style="color:#24292E">)))</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#005CC5">len</span><span style="color:#24292E">(m.sources)    </span><span style="color:#6A737D"># run it again after two seconds</span></span></code></pre></section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">out.stop()</span></span></code></pre></section>
+<section class="cell markdown"><h2>8 · A chiptune arpeggio</h2>
+<p>One square wave, jumping between the notes of a chord sixteen times a second: the ear hears the chord. Old video game chips had three or four voices, and played chords this way.</p>
+<p><code>[0, 2, 4, 7]</code> are degrees of the scale: the triad (first, third, fifth) and the root an octave up. The four chords are I, vi, IV and V.</p>
+</section>
+<section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">sq </span><span style="color:#D73A49">=</span><span style="color:#24292E"> Square(</span><span style="color:#005CC5">440</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">out </span><span style="color:#D73A49">=</span><span style="color:#24292E"> stream_of(sq)</span></span>
+<span class="line"><span style="color:#24292E">out.start()</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E">chords </span><span style="color:#D73A49">=</span><span style="color:#24292E"> [[</span><span style="color:#005CC5">0</span><span style="color:#24292E">, </span><span style="color:#005CC5">2</span><span style="color:#24292E">, </span><span style="color:#005CC5">4</span><span style="color:#24292E">, </span><span style="color:#005CC5">7</span><span style="color:#24292E">], [</span><span style="color:#005CC5">5</span><span style="color:#24292E">, </span><span style="color:#005CC5">7</span><span style="color:#24292E">, </span><span style="color:#005CC5">9</span><span style="color:#24292E">, </span><span style="color:#005CC5">12</span><span style="color:#24292E">], [</span><span style="color:#005CC5">3</span><span style="color:#24292E">, </span><span style="color:#005CC5">5</span><span style="color:#24292E">, </span><span style="color:#005CC5">7</span><span style="color:#24292E">, </span><span style="color:#005CC5">10</span><span style="color:#24292E">], [</span><span style="color:#005CC5">4</span><span style="color:#24292E">, </span><span style="color:#005CC5">6</span><span style="color:#24292E">, </span><span style="color:#005CC5">8</span><span style="color:#24292E">, </span><span style="color:#005CC5">11</span><span style="color:#24292E">]]</span></span>
+<span class="line"><span style="color:#D73A49">for</span><span style="color:#24292E"> chord </span><span style="color:#D73A49">in</span><span style="color:#24292E"> chords </span><span style="color:#D73A49">*</span><span style="color:#005CC5"> 2</span><span style="color:#24292E">:</span></span>
+<span class="line"><span style="color:#D73A49">    for</span><span style="color:#24292E"> _ </span><span style="color:#D73A49">in</span><span style="color:#005CC5"> range</span><span style="color:#24292E">(</span><span style="color:#005CC5">4</span><span style="color:#24292E">):</span></span>
+<span class="line"><span style="color:#D73A49">        for</span><span style="color:#24292E"> degree </span><span style="color:#D73A49">in</span><span style="color:#24292E"> chord:</span></span>
+<span class="line"><span style="color:#24292E">            sq.f </span><span style="color:#D73A49">=</span><span style="color:#24292E"> a_major[degree].f</span></span>
+<span class="line"><span style="color:#D73A49">            await</span><span style="color:#24292E"> asyncio.sleep(</span><span style="color:#005CC5">0.06</span><span style="color:#24292E">)</span></span>
+<span class="line"><span style="color:#24292E">out.stop()</span></span></code></pre></section>
+<section class="cell markdown"><p>Try <code>[0, 2, 4, 6]</code>: the fourth note becomes the seventh of the scale, and the colour changes.</p>
+</section>
+  </article>
+</main>
+</body>
+</html>
