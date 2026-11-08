@@ -141,6 +141,12 @@ await cp(path.join(lesson08, 'class-notebook.ipynb'), path.join(dist, 'lesson-08
 await cp(path.join(lesson09, 'class-notebook.ipynb'), path.join(dist, 'lesson-09', 'class-notebook.ipynb'))
 await cp(path.join(lesson09, 'live-notebook.ipynb'), path.join(dist, 'lesson-09', 'live-notebook.ipynb'))
 await cp(path.join(lesson09, 'sounddevice.py'), path.join(dist, 'lesson-09', 'sounddevice.py'))
+buildSlides(
+  'slides.md',
+  lesson09,
+  `${basePath}lesson-09/slides/`,
+  path.join(dist, 'lesson-09', 'slides'),
+)
 
 // Every notebook copied above gets a read-only page next to it, and the
 // trusted ones can run in the browser with JupyterLite. See site/notebooks/.
@@ -169,6 +175,7 @@ if (process.env.SITE_ANALYTICS_TOKEN) {
     'lesson-07/tools/index.html',
     'lesson-08/tools/index.html',
     'lesson-08/your-version/index.html',
+    'lesson-09/slides/index.html',
   ]
   for (const file of pages) {
     const target = path.join(dist, file)
@@ -186,6 +193,7 @@ const slideRoutes = [
   ['lesson-04/slides', lesson04, 'slides.md'],
   ['lesson-06/slides', lesson06, 'slides.md'],
   ['lesson-07/slides', lesson07, 'slides.md'],
+  ['lesson-09/slides', lesson09, 'slides.md'],
   ['lesson-01/exercise', exerciseFolder, 'exercise.md'],
 ]
 for (const [route, folder, source] of slideRoutes) {
