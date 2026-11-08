@@ -54,10 +54,7 @@ pre.plain { background: #fbfcfa; }
   <p class="hint">“Open in the browser” runs the notebook on your computer with JupyterLite: no installation, no account. Your changes stay in that browser: download the notebook to keep them.</p>
   <article class="notebook">
 <section class="cell markdown"><h1>Sound in real time · notebook from class</h1>
-<blockquote>
-<p><strong>Provisional.</strong> This is what we did on Wednesday, cleaned up. It will grow after the next lesson.</p>
-</blockquote>
-<p>Until now we computed a whole wave, then played it: write, run, listen. Now the sound card asks for the next few samples, again and again, and we answer while it plays. We can change things from a cell and hear them a moment later, as in a REPL.</p>
+<p>One way to make sound is to compute a whole wave, then play it: write, run, listen. Here the sound card asks for the next few samples, again and again, and we answer while it plays. We can change things from a cell and hear them a moment later, as in a REPL.</p>
 <p>In a local Jupyter this needs <code>%pip install sounddevice</code>. In the browser a stand-in with the same interface is next to this notebook: run the first cell and press <strong>▶ audio</strong>.</p>
 </section>
 <section class="cell markdown"><h2>Setup</h2>
@@ -184,7 +181,7 @@ pre.plain { background: #fbfcfa; }
 <section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">s.f </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 600</span></span></code></pre></section>
 <section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">out.stop()</span></span></code></pre></section>
 <section class="cell markdown"><p>Inside <code>callback</code>, the name must be <code>source</code>, the parameter. With a global name such as <code>s</code> it would play <code>s</code> whatever we pass, without any error.</p>
-<p><code>stream_of</code> uses only one thing of the object: its <code>block</code> method. From now on, anything with <code>block(frames)</code> is a <strong>source</strong>. It is not a class but a family of classes: a duck type. Python can give it a name with a <code>Protocol</code>. A square wave is another source:</p>
+<p><code>stream_of</code> uses only one thing of the object: its <code>block</code> method. Anything with <code>block(frames)</code> is a <strong>source</strong>. It is not a class but a family of classes: a duck type. Python can give it a name with a <code>Protocol</code>. A square wave is another source:</p>
 </section>
 <section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">class</span><span style="color:#6F42C1"> Square</span><span style="color:#24292E">:</span></span>
 <span class="line"><span style="color:#D73A49">    def</span><span style="color:#005CC5"> __init__</span><span style="color:#24292E">(self, f):</span></span>
@@ -221,7 +218,7 @@ pre.plain { background: #fbfcfa; }
 <section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">s2.f </span><span style="color:#D73A49">=</span><span style="color:#005CC5"> 301</span><span style="color:#6A737D">        # 1 Hz apart: they beat</span></span></code></pre></section>
 <section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#24292E">out.stop()</span></span></code></pre></section>
 <section class="cell markdown"><h2>6 · From clips to sources</h2>
-<p>We built clips, scales and instruments in the last lessons. Here are the tools again:</p>
+<p>The tools for clips, scales and instruments:</p>
 </section>
 <section class="cell code"><pre class="shiki github-light" style="background-color:#fff;color:#24292e" tabindex="0"><code><span class="line"><span style="color:#D73A49">from</span><span style="color:#24292E"> IPython.display </span><span style="color:#D73A49">import</span><span style="color:#24292E"> Audio</span></span>
 <span class="line"><span style="color:#D73A49">from</span><span style="color:#24292E"> dataclasses </span><span style="color:#D73A49">import</span><span style="color:#24292E"> dataclass</span></span>
