@@ -43,6 +43,10 @@ const lesson04Pages = path.join(lesson04, 'pages')
 const lesson05Pages = path.join(lesson05, 'pages')
 const lesson07Pages = path.join(lesson07, 'pages')
 const lesson08Pages = path.join(lesson08, 'pages')
+const lesson10 = publicLayout
+  ? path.join(root, 'lesson-10')
+  : path.join(root, 'lesson_10', 'publish', 'lesson-10')
+const lesson10Pages = path.join(lesson10, 'pages')
 const exerciseFolder = publicLayout && await exists(path.join(root, 'lab-01'))
   ? path.join(root, 'lab-01')
   : lesson01
@@ -135,6 +139,7 @@ await cp(lesson04Pages, path.join(dist, 'lesson-04'), { recursive: true })
 await cp(lesson05Pages, path.join(dist, 'lesson-05'), { recursive: true })
 await cp(lesson07Pages, path.join(dist, 'lesson-07'), { recursive: true })
 await cp(lesson08Pages, path.join(dist, 'lesson-08'), { recursive: true })
+await cp(lesson10Pages, path.join(dist, 'lesson-10'), { recursive: true })
 await cp(path.join(lesson05, 'class-notebook.ipynb'), path.join(dist, 'lesson-05', 'class-notebook.ipynb'))
 await cp(path.join(lesson08, 'class-notebook.ipynb'), path.join(dist, 'lesson-08', 'class-notebook.ipynb'))
 // Lesson 09: the notebook from class, a live notebook, and the stand-in for sounddevice it imports in the browser.
@@ -176,6 +181,7 @@ if (process.env.SITE_ANALYTICS_TOKEN) {
     'lesson-08/tools/index.html',
     'lesson-08/your-version/index.html',
     'lesson-09/slides/index.html',
+    'lesson-10/tools/index.html',
   ]
   for (const file of pages) {
     const target = path.join(dist, file)
