@@ -154,6 +154,36 @@ note_names = [<span class="s">&quot;C&quot;</span>, <span class="s">&quot;C#&quo
 a_major = Scale([<span class="n">2</span>, <span class="n">2</span>, <span class="n">1</span>, <span class="n">2</span>, <span class="n">2</span>, <span class="n">2</span>, <span class="n">1</span>], Pitch(<span class="s">&quot;A4&quot;</span>))
 a_minor = Scale([<span class="n">2</span>, <span class="n">1</span>, <span class="n">2</span>, <span class="n">2</span>, <span class="n">1</span>, <span class="n">2</span>, <span class="n">2</span>], Pitch(<span class="s">&quot;A4&quot;</span>))
 </code></pre>
+  <h2>Drum sounds</h2>
+  <div class="bar">
+    <span class="status" role="status"></span>
+    <button type="button" class="copy">Copy code</button>
+  </div>
+  <pre><code>rng = np.random.default_rng(<span class="n">808</span>)
+
+<span class="k">def</span> <span class="f">decay</span>(dur_s, tau):
+    t = np.arange(<span class="b">round</span>(dur_s * SR)) / SR
+    <span class="k">return</span> np.exp(-t / tau)
+
+<span class="k">def</span> <span class="f">kick</span>(dur_s=<span class="n">0.3</span>):
+    t = np.arange(<span class="b">round</span>(dur_s * SR)) / SR
+    f = <span class="n">45</span> + <span class="n">135</span> * np.exp(-t / <span class="n">0.03</span>)                 <span class="c"># the pitch falls fast</span>
+    <span class="k">return</span> <span class="n">0.5</span> * np.sin(<span class="n">2</span> * np.pi * np.cumsum(f) / SR) * decay(dur_s, <span class="n">0.07</span>)
+
+<span class="k">def</span> <span class="f">snare</span>(dur_s=<span class="n">0.2</span>):
+    t = np.arange(<span class="b">round</span>(dur_s * SR)) / SR
+    tone = <span class="n">0.5</span> * np.sin(<span class="n">2</span> * np.pi * <span class="n">190</span> * t) * decay(dur_s, <span class="n">0.03</span>)
+    noise = <span class="n">0.7</span> * rng.uniform(-<span class="n">1</span>, <span class="n">1</span>, <span class="b">len</span>(t)) * decay(dur_s, <span class="n">0.05</span>)
+    <span class="k">return</span> <span class="n">0.25</span> * (tone + noise)
+
+<span class="k">def</span> <span class="f">hat</span>(dur_s=<span class="n">0.05</span>):
+    <span class="k">return</span> <span class="n">0.12</span> * np.diff(rng.uniform(-<span class="n">1</span>, <span class="n">1</span>, <span class="b">round</span>(dur_s * SR)), prepend=<span class="n">0</span>) * decay(dur_s, <span class="n">0.008</span>)
+
+kit = {<span class="s">&quot;k&quot;</span>: kick(), <span class="s">&quot;s&quot;</span>: snare(), <span class="s">&quot;h&quot;</span>: hat()}
+
+<span class="k">def</span> <span class="f">drum</span>(name):
+    <span class="k">return</span> kit[name]
+</code></pre>
   <h2>Sources, from lesson 09</h2>
   <div class="bar">
     <span class="status" role="status"></span>
