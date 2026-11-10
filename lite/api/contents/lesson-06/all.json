@@ -2,11 +2,11 @@
   "content": [
     {
       "content": null,
-      "created": "2026-11-09T12:25:44.599034Z",
+      "created": "2026-11-10T08:21:52.715239Z",
       "format": null,
       "hash": null,
       "hash_algorithm": null,
-      "last_modified": "2026-11-09T12:25:44.599034Z",
+      "last_modified": "2026-11-10T08:21:52.715239Z",
       "mimetype": null,
       "name": "notebook.ipynb",
       "path": "lesson-06/notebook.ipynb",
@@ -15,11 +15,11 @@
       "writable": true
     }
   ],
-  "created": "2026-11-09T12:25:45.755992Z",
+  "created": "2026-11-10T08:21:53.461958Z",
   "format": "json",
   "hash": null,
   "hash_algorithm": null,
-  "last_modified": "2026-11-09T12:25:45.756055Z",
+  "last_modified": "2026-11-10T08:21:53.462023Z",
   "mimetype": null,
   "name": "lesson-06",
   "path": "lesson-06",
