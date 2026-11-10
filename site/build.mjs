@@ -145,12 +145,22 @@ await cp(path.join(lesson08, 'class-notebook.ipynb'), path.join(dist, 'lesson-08
 // Lesson 09: the notebook from class, a live notebook, and the stand-in for sounddevice it imports in the browser.
 await cp(path.join(lesson09, 'class-notebook.ipynb'), path.join(dist, 'lesson-09', 'class-notebook.ipynb'))
 await cp(path.join(lesson09, 'live-notebook.ipynb'), path.join(dist, 'lesson-09', 'live-notebook.ipynb'))
-await cp(path.join(lesson09, 'sounddevice.py'), path.join(dist, 'lesson-09', 'sounddevice.py'))
+// In the private repo the stand-in sits outside the lesson folder: next to a notebook it would hide the real sounddevice in a local Jupyter.
+const browserSounddevice = publicLayout
+  ? path.join(lesson09, 'sounddevice.py')
+  : path.join(root, 'lesson_09', 'browser', 'sounddevice.py')
+await cp(browserSounddevice, path.join(dist, 'lesson-09', 'sounddevice.py'))
 buildSlides(
   'slides.md',
   lesson09,
   `${basePath}lesson-09/slides/`,
   path.join(dist, 'lesson-09', 'slides'),
+)
+buildSlides(
+  'slides.md',
+  lesson10,
+  `${basePath}lesson-10/slides/`,
+  path.join(dist, 'lesson-10', 'slides'),
 )
 
 // Every notebook copied above gets a read-only page next to it, and the
@@ -182,6 +192,7 @@ if (process.env.SITE_ANALYTICS_TOKEN) {
     'lesson-08/your-version/index.html',
     'lesson-09/slides/index.html',
     'lesson-10/tools/index.html',
+    'lesson-10/slides/index.html',
   ]
   for (const file of pages) {
     const target = path.join(dist, file)
@@ -200,6 +211,7 @@ const slideRoutes = [
   ['lesson-06/slides', lesson06, 'slides.md'],
   ['lesson-07/slides', lesson07, 'slides.md'],
   ['lesson-09/slides', lesson09, 'slides.md'],
+  ['lesson-10/slides', lesson10, 'slides.md'],
   ['lesson-01/exercise', exerciseFolder, 'exercise.md'],
 ]
 for (const [route, folder, source] of slideRoutes) {
