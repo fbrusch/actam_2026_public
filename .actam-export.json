@@ -29,14 +29,14 @@
     "lesson-07/notebook.ipynb": "e39df6cead776a4901f4fe896e354c6e3c87eb41a17934d4705bcd283c9fd739",
     "lesson-07/global-top.vue": "3373b7f64c157236881054b8e1fb5c74170377274c05e6f20ef26cd2fd465841",
     "lesson-07/style.css": "ebe46e732a6899eb5c0d011614c96cc9a9846133ee6d2ae87b7f1fa4d55b7410",
-    "site/build.mjs": "560a9d2fd8793e072facedd4e2c158f3cdd4a0f8e379e2267e7608d6d2dd80f7",
+    "site/build.mjs": "77f663e7215acc935b006edbaf00b2043a86eb5738111375e899907e06bb5080",
     "site/notebooks/README.md": "f947bfd3f9ff7c2bedfe997541fb4750b769498ee4659def354dd4d80f97ebbf",
     "site/notebooks/catalog.mjs": "be0c4051fab9bccc352e88921414c1ef4256bc5ec72d3fd4fc96bc2cb4fbdd6e",
     "site/notebooks/lite.mjs": "8691ac5d502294f6207b4bcdd4611016825f1d6858b8ee0e2880384a1afd021c",
     "site/notebooks/publish.mjs": "7e2d452e6631b0bb15a3f81168ca492b3befe81d342f10c8087fd97142f6f5aa",
     "site/notebooks/view.mjs": "366c0b433eda46f42bfed814f4b67fda5d7a16f8e5a8cb1924064a04254b1695",
     "presentation-theme.css": "e6df5b9e217864dafc56ebcf1b327e8780671d8a80f9ec0109bac80138d8efac",
-    "site/index.html": "f1124c7ce14340ca2257891fdf598f1887a6f5681fb681e4056584ac8076734d",
+    "site/index.html": "e86fb006f3d927dd1650e18e27e82a5f9b3d5e9ddf1de4e6d977beea11479535",
     "lesson-01/components/NotebookCue.vue": "a0e38f1a574284171f1c7fc9cae4959ff71855e68a802dfbb8d050650dd883b8",
     "lesson-01/components/SampleLab.vue": "af18207141b732909e3a37d0885276d3cd1652e32cd279f88a195a2fda6170ca",
     "lesson-01/components/WavePlot.vue": "a9bcf846da2daffb5beddfab7ef6fd27f2351fdb438138a4c0a0fd1bd9e415cc",
@@ -52,6 +52,7 @@
     "lesson-06/components/NotebookCue.vue": "a0e38f1a574284171f1c7fc9cae4959ff71855e68a802dfbb8d050650dd883b8",
     "lesson-07/components/NotebookCue.vue": "a0e38f1a574284171f1c7fc9cae4959ff71855e68a802dfbb8d050650dd883b8",
     "lesson-09/components/NotebookCue.vue": "a0e38f1a574284171f1c7fc9cae4959ff71855e68a802dfbb8d050650dd883b8",
+    "lesson-10/components/NotebookCue.vue": "a0e38f1a574284171f1c7fc9cae4959ff71855e68a802dfbb8d050650dd883b8",
     "lesson-04/pages/challenges/index.html": "bc37784fc66887aec70b31685090e851a63efc56f335ccc9f6e2e35ac1cb068a",
     "lesson-04/pages/drum-links/index.html": "e2d7e3289dfe2ac96532e6610fb9a14ff2742c88ff5b892d9c6482157226806f",
     "lesson-04/pages/drum-submit/index.html": "82152a0db4eefd007c53b24ca54ed6b12b4c4e9438f548130b14349fdeb21e1b",
@@ -80,6 +81,9 @@
     "lesson-09/class-notebook.ipynb": "565c1f8abc87d0d70bbbfd5b06c856cdfe2b653e14cac77fc4934c3e859c3204",
     "lesson-09/live-notebook.ipynb": "c3d41eb8c4f0e691110eb2791386a81b52236c9cab91266d483a619be48b15fb",
     "lesson-09/sounddevice.py": "908787fda3875d127ea136ee67c74c8ffbaba1e102be3537b973bef7fa39dad2",
-    "lesson-10/pages/tools/index.html": "3d9ec34d2c2007990fa105e104b5269689cb8c57274c7a65ed4b079f4f953928"
+    "lesson-10/slides.md": "883f6ff60f05d01795923a95275e9904734d454a675b61546a7b3da00af4c07a",
+    "lesson-10/global-top.vue": "a2eb6079404c22933a8e48320eff663911ee44602ca599d2ce423ab8d706fed4",
+    "lesson-10/style.css": "c827e95984a075f8c97f9303b8c7eae4d4e05030d0558a3e2a12e426de0d5974",
+    "lesson-10/pages/tools/index.html": "4593f5304545d91de7095543308a10bee308d03f261cce93be28da9c8a653d22"
   }
 }
