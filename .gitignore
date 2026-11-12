@@ -10,3 +10,4 @@ __pycache__/
 *.log
 *.tmp
 .DS_Store
+*firebase-adminsdk*.json
