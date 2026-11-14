@@ -1,7 +1,6 @@
 ## Running itWS
 
-Requires `websockets` in the venv (`pip install websockets`, already done
-here: `.venv/bin/pip install websockets`).
+Requires `websockets` in the venv (`pip install websockets`).
 
 ```
 cd option2_control && ../../../.venv/bin/python server.py   # ws://localhost:8765
