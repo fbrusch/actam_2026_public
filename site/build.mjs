@@ -190,6 +190,7 @@ if (process.env.SITE_ANALYTICS_TOKEN) {
     'lesson-07/tools/index.html',
     'lesson-08/tools/index.html',
     'lesson-08/your-version/index.html',
+    'lesson-08/submissions/index.html',
     'lesson-09/slides/index.html',
     'lesson-10/tools/index.html',
     'lesson-10/slides/index.html',
