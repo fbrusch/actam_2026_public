@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Option 3 - audio streaming</title>
+</head>
+<body>
+<h1>Option 3: Python makes sound, browser just plays it back</h1>
+<p id="status">connecting...</p>
+<button id="start" disabled>start</button>
+<button id="stop" disabled>stop</button>
+<p>Frequency (sent to Python): <input id="freq" type="range" min="80" max="1000" value="220"></p>
+<p>Cutoff (filtered in Python, real one-pole lowpass): <input id="cutoff" type="range" min="0" max="1" step="0.01" value="1"></p>
+
+<script>
+const BLOCK = 1024;
+let ctx;                 // created lazily, only once, on first "start"
+let processor;
+let queue = [];          // Float32Array chunks waiting to be played
+let queueOffset = 0;     // how far we are into queue[0]
+
+const ws = new WebSocket("ws://localhost:8766");
+ws.binaryType = "arraybuffer";
+const startBtn = document.getElementById("start");
+const stopBtn = document.getElementById("stop");
+
+ws.onopen = () => {
+  document.getElementById("status").textContent = "connected";
+  startBtn.disabled = false;
+};
+ws.onclose = () => {
+  document.getElementById("status").textContent = "disconnected";
+  startBtn.disabled = true;
+  stopBtn.disabled = true;
+};
+
+ws.onmessage = (event) => {
+  queue.push(new Float32Array(event.data));   // a block of raw PCM samples
+};
+
+function makeProcessor() {
+  // ScriptProcessorNode: deprecated, but the simplest way to live-code this.
+  // A production synth should use an AudioWorkletProcessor instead.
+  const node = ctx.createScriptProcessor(BLOCK, 0, 1);
+  node.onaudioprocess = (e) => {
+    const out = e.outputBuffer.getChannelData(0);
+    let written = 0;
+    while (written < out.length && queue.length > 0) {
+      const chunk = queue[0];
+      const available = chunk.length - queueOffset;
+      const toCopy = Math.min(available, out.length - written);
+      out.set(chunk.subarray(queueOffset, queueOffset + toCopy), written);
+      written += toCopy;
+      queueOffset += toCopy;
+      if (queueOffset >= chunk.length) {
+        queue.shift();
+        queueOffset = 0;
+      }
+    }
+    if (written < out.length) {
+      console.warn("underrun: not enough audio arrived in time");
+      // the rest of `out` stays zero: silence, not a crash
+    }
+  };
+  return node;
+}
+
+startBtn.onclick = () => {
+  if (!ctx) ctx = new AudioContext();
+  ctx.resume();                                  // required after a user gesture
+  queue = [];
+  queueOffset = 0;
+  if (!processor) {
+    processor = makeProcessor();
+    processor.connect(ctx.destination);
+  }
+  ws.send(JSON.stringify({ cmd: "start" }));       // tells Python to start sending blocks
+  startBtn.disabled = true;
+  stopBtn.disabled = false;
+};
+
+stopBtn.onclick = () => {
+  ws.send(JSON.stringify({ cmd: "stop" }));        // tells Python to stop sending blocks
+  queue = [];                                       // drop anything already in flight
+  queueOffset = 0;
+  startBtn.disabled = false;
+  stopBtn.disabled = true;
+};
+
+document.getElementById("freq").addEventListener("input", (e) => {
+  if (ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ f: parseFloat(e.target.value) }));
+  }
+});
+
+document.getElementById("cutoff").addEventListener("input", (e) => {
+  if (ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ cutoff: parseFloat(e.target.value) }));
+  }
+});
+</script>
+</body>
+</html>
