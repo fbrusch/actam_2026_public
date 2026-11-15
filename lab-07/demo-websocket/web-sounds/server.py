@@ -1,5 +1,5 @@
 """
-Option 2: audio engine lives in the browser (Web Audio API).
+Audio engine lives in the browser (Web Audio API).
 Python only sends *control* messages over a WebSocket: which note to play,
 when, and any parameter changes. No audio samples ever cross the wire.
 

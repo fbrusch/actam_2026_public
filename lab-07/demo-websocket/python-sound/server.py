@@ -1,5 +1,5 @@
 """
-Option 3: audio engine lives in Python (the `block(frames)` style from
+Sudio engine lives in Python (the `block(frames)` style from
 lab-06, here a `Saw` oscillator through a real one-pole `LowPass`). Every
 block of raw PCM samples is pushed to the browser over a WebSocket as binary
 frames; the browser just plays back whatever it receives.
