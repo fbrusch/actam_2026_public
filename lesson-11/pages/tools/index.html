@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f5ef">
+  <title>The library · ACTAM 11</title>
+  <style>
+    :root { color-scheme: light; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #182f3a; background: #f7f5ef; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f7f5ef; }
+    main { max-width: 960px; margin: auto; padding: 56px 24px 80px; }
+    .eyebrow { color: #42666a; font-size: .85rem; letter-spacing: .12em; }
+    h1 { font-size: clamp(2.5rem, 7vw, 4.5rem); letter-spacing: -.065em; margin: 24px 0 16px; line-height: 1.06; }
+    p { line-height: 1.7; }
+    .bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 32px 0 0; }
+    button { font: inherit; padding: 10px 16px; border: 1px solid #087e83; background: #087e83; color: #fff; cursor: pointer; }
+    button:focus-visible { outline: 3px solid #cb4f38; outline-offset: 4px; }
+    h2 { font-size: 1.1rem; margin: 48px 0 0; }
+    .status { color: #42666a; font-size: .85rem; }
+    pre { max-width: 100%; margin: 12px 0 0; padding: 18px; overflow-x: auto; background: #182f3a; color: #eef2ef; font-size: .82rem; line-height: 1.55; }
+    .k { color: #f39b86; }
+    .f { color: #7bd2c1; }
+    .b, .d { color: #a9c8ec; }
+    .s { color: #bfdc94; }
+    .n { color: #f2c27c; }
+    .c { color: #93aca9; font-style: italic; }
+    @media (max-width: 620px) { main { padding: 32px 16px; } }
+  </style>
+</head>
+<body>
+<main>
+  <style>.crumbs ol { display: flex; flex-wrap: wrap; gap: 0 .6em; margin: 0; padding: 0; list-style: none; }.crumbs li + li::before { content: '›'; margin-right: .6em; }.crumbs { text-transform: uppercase; margin: 1em 0; }nav.crumbs a { color: inherit; text-decoration: none; padding: 0; border: 0; background: none; }nav.crumbs a:hover { text-decoration: underline; text-underline-offset: 3px; }</style><nav class="eyebrow crumbs" aria-label="Breadcrumb"><ol><li><a href="../../">ACTAM</a></li><li><a href="../../#lesson-11">Lesson 11</a></li><li><span aria-current="page">The library</span></li></ol></nav>
+  <h1>The library.</h1>
+  <p>The first cells of the notebook: tools, sources, instruments, keys and the tune. Paste each part into a cell of a new notebook and run them in order. In a local Jupyter, run %pip install sounddevice first.</p>
+  <h2>Setup</h2>
+  <div class="bar">
+    <span class="status" role="status"></span>
+    <button type="button" class="copy">Copy code</button>
+  </div>
+  <pre><code><span class="k">import</span> sounddevice <span class="k">as</span> sd
+<span class="k">import</span> numpy <span class="k">as</span> np
+<span class="k">import</span> asyncio
+
+SR = <span class="n">48000</span>
+</code></pre>
+  <h2>Clips, scales and instruments</h2>
+  <div class="bar">
+    <span class="status" role="status"></span>
+    <button type="button" class="copy">Copy code</button>
+  </div>
+  <pre><code><span class="k">from</span> IPython.display <span class="k">import</span> Audio
+<span class="k">from</span> dataclasses <span class="k">import</span> dataclass
+
+<span class="k">def</span> <span class="f">play</span>(wave):
+    <span class="k">return</span> Audio(wave, rate=SR, normalize=<span class="k">False</span>, autoplay=<span class="k">False</span>)
+
+<span class="k">def</span> <span class="f">pluck</span>(f, dur_s=<span class="n">1.0</span>, tau=<span class="n">0.3</span>, amplitude=<span class="n">0.25</span>):
+    t = np.arange(<span class="b">round</span>(dur_s * SR)) / SR
+    env = np.exp(-t / tau)
+    wave = np.sin(<span class="n">2</span> * np.pi * f * t)
+    <span class="k">return</span> amplitude * env * wave
+
+<span class="k">def</span> <span class="f">mix_sounds</span>(sounds):                      <span class="c"># a sound is (onset_s, wave)</span>
+    dur_s = <span class="b">max</span>([onset_s + <span class="b">len</span>(wave) / SR <span class="k">for</span> onset_s, wave <span class="k">in</span> sounds])
+    out = np.zeros(<span class="b">round</span>(dur_s * SR))
+    <span class="k">for</span> onset_s, wave <span class="k">in</span> sounds:
+        onset = <span class="b">round</span>(onset_s * SR)
+        out[onset:onset + <span class="b">len</span>(wave)] += wave
+    <span class="k">return</span> out
+
+note_names = [<span class="s">&quot;C&quot;</span>, <span class="s">&quot;C#&quot;</span>, <span class="s">&quot;D&quot;</span>, <span class="s">&quot;D#&quot;</span>, <span class="s">&quot;E&quot;</span>, <span class="s">&quot;F&quot;</span>, <span class="s">&quot;F#&quot;</span>, <span class="s">&quot;G&quot;</span>, <span class="s">&quot;G#&quot;</span>, <span class="s">&quot;A&quot;</span>, <span class="s">&quot;A#&quot;</span>, <span class="s">&quot;B&quot;</span>]
+
+<span class="k">class</span> <span class="f">Pitch</span>:
+    <span class="k">def</span> <span class="f">__init__</span>(<span class="b">self</span>, value):
+        <span class="k">if</span> <span class="b">isinstance</span>(value, <span class="b">str</span>):           <span class="c"># a name like &quot;C4&quot;: the octave last, the note before</span>
+            value = <span class="n">12</span> * (<span class="b">int</span>(value[-<span class="n">1</span>]) + <span class="n">1</span>) + note_names.index(value[:-<span class="n">1</span>])
+        <span class="b">self</span>.midi = value
+
+    <span class="d">@</span><span class="d">property</span>
+    <span class="k">def</span> <span class="f">f</span>(<span class="b">self</span>):                             <span class="c"># the frequency in Hz</span>
+        <span class="k">return</span> <span class="n">440</span> * <span class="n">2</span> ** ((<span class="b">self</span>.midi - <span class="n">69</span>) / <span class="n">12</span>)
+
+    <span class="k">def</span> <span class="f">__add__</span>(<span class="b">self</span>, semitones):
+        <span class="k">if</span> <span class="b">isinstance</span>(semitones, Pitch):
+            <span class="k">raise</span> <span class="b">TypeError</span>(<span class="s">&quot;Add semitones, not a pitch.&quot;</span>)
+        <span class="k">return</span> Pitch(<span class="b">self</span>.midi + semitones)
+
+    <span class="k">def</span> <span class="f">__sub__</span>(<span class="b">self</span>, other):
+        <span class="k">if</span> <span class="b">isinstance</span>(other, Pitch):
+            <span class="k">return</span> <span class="b">self</span>.midi - other.midi    <span class="c"># an interval</span>
+        <span class="k">return</span> Pitch(<span class="b">self</span>.midi - other)      <span class="c"># a lower pitch</span>
+
+    <span class="k">def</span> <span class="f">__eq__</span>(<span class="b">self</span>, other):
+        <span class="k">return</span> <span class="b">isinstance</span>(other, Pitch) <span class="k">and</span> <span class="b">self</span>.midi == other.midi
+
+    <span class="k">def</span> <span class="f">__repr__</span>(<span class="b">self</span>):
+        <span class="k">return</span> note_names[<span class="b">self</span>.midi % <span class="n">12</span>] + <span class="b">str</span>(<span class="b">self</span>.midi // <span class="n">12</span> - <span class="n">1</span>)
+
+<span class="d">@</span><span class="d">dataclass</span>
+<span class="k">class</span> <span class="f">Clip</span>:
+    events: <span class="b">list</span>      <span class="c"># (onset, data): onset in beats</span>
+    length: <span class="b">float</span>     <span class="c"># in beats: where the next clip starts</span>
+
+    <span class="k">def</span> <span class="f">__rshift__</span>(<span class="b">self</span>, other):          <span class="c"># then</span>
+        moved = [(onset + <span class="b">self</span>.length, data) <span class="k">for</span> onset, data <span class="k">in</span> other.events]
+        <span class="k">return</span> Clip(<span class="b">self</span>.events + moved, <span class="b">self</span>.length + other.length)
+
+    <span class="k">def</span> <span class="f">__mul__</span>(<span class="b">self</span>, times):             <span class="c"># again</span>
+        out = Clip([], <span class="n">0</span>)
+        <span class="k">for</span> _ <span class="k">in</span> <span class="b">range</span>(times):
+            out = out &gt;&gt; <span class="b">self</span>
+        <span class="k">return</span> out
+
+    <span class="k">def</span> <span class="f">__add__</span>(<span class="b">self</span>, n):
+        <span class="k">return</span> Clip([(onset, data + n) <span class="k">for</span> onset, data <span class="k">in</span> <span class="b">self</span>.events], <span class="b">self</span>.length)
+
+    <span class="k">def</span> <span class="f">__or__</span>(<span class="b">self</span>, other):              <span class="c"># together</span>
+        <span class="k">return</span> Clip(<span class="b">self</span>.events + other.events, <span class="b">max</span>(<span class="b">self</span>.length, other.length))
+
+<span class="k">def</span> <span class="f">note</span>(data, length=<span class="n">1</span>):
+    <span class="k">return</span> Clip([(<span class="n">0</span>, data)], length)
+
+<span class="k">def</span> <span class="f">rest</span>(length):
+    <span class="k">return</span> Clip([], length)
+
+<span class="k">class</span> <span class="f">Scale</span>:
+    <span class="k">def</span> <span class="f">__init__</span>(<span class="b">self</span>, steps, root):
+        <span class="b">self</span>.root = root
+        <span class="b">self</span>.distances = []
+        distance = <span class="n">0</span>
+        <span class="k">for</span> step <span class="k">in</span> steps:
+            <span class="b">self</span>.distances.append(distance)
+            distance += step
+
+    <span class="k">def</span> <span class="f">__getitem__</span>(<span class="b">self</span>, degree):
+        octave = degree // <span class="b">len</span>(<span class="b">self</span>.distances)
+        step = degree % <span class="b">len</span>(<span class="b">self</span>.distances)
+        <span class="k">return</span> <span class="b">self</span>.root + (<span class="n">12</span> * octave) + <span class="b">self</span>.distances[step]
+
+<span class="k">def</span> <span class="f">play_clip</span>(clip, scale, beat_s=<span class="n">0.5</span>):
+    sounds = [(onset * beat_s, pluck(scale[data].f)) <span class="k">for</span> onset, data <span class="k">in</span> clip.events]
+    <span class="k">return</span> play(mix_sounds(sounds))
+
+<span class="k">def</span> <span class="f">pad</span>(f, dur_s=<span class="n">10.0</span>, tau=<span class="n">4</span>, amplitude=<span class="n">0.25</span>, attack=<span class="n">3</span>):
+    t = np.arange(<span class="b">round</span>(dur_s * SR)) / SR
+    env = np.exp(-t / tau)
+    wave1 = np.sin(<span class="n">2</span> * np.pi * f * t)
+    wave2 = np.sin(<span class="n">2</span> * np.pi * (f + <span class="n">0.5</span>) * t)
+    wave = wave1 + wave2
+    rise = np.minimum(<span class="n">1</span>, t/attack)
+    <span class="k">return</span> amplitude * env * wave * rise
+</code></pre>
+  <h2>Sources</h2>
+  <div class="bar">
+    <span class="status" role="status"></span>
+    <button type="button" class="copy">Copy code</button>
+  </div>
+  <pre><code><span class="k">class</span> <span class="f">Sine</span>:
+    <span class="k">def</span> <span class="f">__init__</span>(<span class="b">self</span>, f, amp=<span class="n">0.2</span>):
+        <span class="b">self</span>.f = f
+        <span class="b">self</span>.amp = amp
+        <span class="b">self</span>.phase = <span class="n">0.0</span>
+
+    <span class="k">def</span> <span class="f">block</span>(<span class="b">self</span>, frames):
+        phases = <span class="b">self</span>.phase + <span class="n">2</span> * np.pi * <span class="b">self</span>.f * np.arange(frames) / SR
+        <span class="b">self</span>.phase += <span class="n">2</span> * np.pi * <span class="b">self</span>.f * frames / SR
+        <span class="k">return</span> <span class="b">self</span>.amp * np.sin(phases)
+
+<span class="k">class</span> <span class="f">Voice</span>:
+    <span class="k">def</span> <span class="f">__init__</span>(<span class="b">self</span>, wave, delay=<span class="n">0</span>):
+        <span class="b">self</span>.wave = np.concatenate([np.zeros(delay), wave])     <span class="c"># wait delay samples, then play</span>
+        <span class="b">self</span>.i = <span class="n">0</span>
+
+    <span class="k">def</span> <span class="f">block</span>(<span class="b">self</span>, frames):
+        out = np.zeros(frames)
+        chunk = <span class="b">self</span>.wave[<span class="b">self</span>.i : <span class="b">self</span>.i + frames]
+        out[:<span class="b">len</span>(chunk)] = chunk
+        <span class="b">self</span>.i += frames
+        <span class="k">return</span> out
+
+    <span class="d">@</span><span class="d">property</span>
+    <span class="k">def</span> <span class="f">done</span>(<span class="b">self</span>):
+        <span class="k">return</span> <span class="b">self</span>.i &gt;= <span class="b">len</span>(<span class="b">self</span>.wave)
+
+<span class="k">class</span> <span class="f">Mixer</span>:
+    <span class="k">def</span> <span class="f">__init__</span>(<span class="b">self</span>, sources):
+        <span class="b">self</span>.sources = sources
+
+    <span class="k">def</span> <span class="f">block</span>(<span class="b">self</span>, frames):
+        out = np.zeros(frames)
+        <span class="k">for</span> source <span class="k">in</span> <span class="b">list</span>(<span class="b">self</span>.sources):
+            out += source.block(frames)
+            <span class="k">if</span> <span class="b">getattr</span>(source, <span class="s">&quot;done&quot;</span>, <span class="k">False</span>):
+                <span class="b">self</span>.sources.remove(source)
+        <span class="k">return</span> out
+
+<span class="k">def</span> <span class="f">stream_of</span>(source, blocksize=<span class="n">512</span>):
+    <span class="k">def</span> <span class="f">callback</span>(outdata, frames, time, status):
+        outdata[:, <span class="n">0</span>] = np.clip(source.block(frames), -<span class="n">1</span>, <span class="n">1</span>)
+    <span class="k">return</span> sd.OutputStream(samplerate=SR, channels=<span class="n">1</span>, blocksize=blocksize, callback=callback)
+</code></pre>
+  <h2>Instruments and drums</h2>
+  <div class="bar">
+    <span class="status" role="status"></span>
+    <button type="button" class="copy">Copy code</button>
+  </div>
+  <pre><code>rng = np.random.default_rng(<span class="n">808</span>)
+
+<span class="k">def</span> <span class="f">decay</span>(dur_s, tau):
+    t = np.arange(<span class="b">round</span>(dur_s * SR)) / SR
+    <span class="k">return</span> np.exp(-t / tau)
+
+<span class="k">def</span> <span class="f">kick</span>(dur_s=<span class="n">0.3</span>):
+    t = np.arange(<span class="b">round</span>(dur_s * SR)) / SR
+    f = <span class="n">45</span> + <span class="n">135</span> * np.exp(-t / <span class="n">0.03</span>)                 <span class="c"># the pitch falls fast</span>
+    <span class="k">return</span> <span class="n">0.5</span> * np.sin(<span class="n">2</span> * np.pi * np.cumsum(f) / SR) * decay(dur_s, <span class="n">0.07</span>)
+
+<span class="k">def</span> <span class="f">snare</span>(dur_s=<span class="n">0.2</span>):
+    t = np.arange(<span class="b">round</span>(dur_s * SR)) / SR
+    tone = <span class="n">0.5</span> * np.sin(<span class="n">2</span> * np.pi * <span class="n">190</span> * t) * decay(dur_s, <span class="n">0.03</span>)
+    noise = <span class="n">0.7</span> * rng.uniform(-<span class="n">1</span>, <span class="n">1</span>, <span class="b">len</span>(t)) * decay(dur_s, <span class="n">0.05</span>)
+    <span class="k">return</span> <span class="n">0.25</span> * (tone + noise)
+
+<span class="k">def</span> <span class="f">hat</span>(dur_s=<span class="n">0.05</span>):
+    <span class="k">return</span> <span class="n">0.12</span> * np.diff(rng.uniform(-<span class="n">1</span>, <span class="n">1</span>, <span class="b">round</span>(dur_s * SR)), prepend=<span class="n">0</span>) * decay(dur_s, <span class="n">0.008</span>)
+
+kit = {<span class="s">&quot;k&quot;</span>: kick(), <span class="s">&quot;s&quot;</span>: snare(), <span class="s">&quot;h&quot;</span>: hat()}
+
+<span class="k">def</span> <span class="f">drum</span>(name):
+    <span class="k">return</span> kit[name]
+
+<span class="k">def</span> <span class="f">time_axis</span>(dur_s):
+    <span class="k">return</span> np.arange(<span class="b">round</span>(dur_s * SR)) / SR
+
+<span class="k">def</span> <span class="f">timpani</span>(f, dur_s=<span class="n">2.5</span>):
+    t = time_axis(dur_s)
+    pitch = f * (<span class="n">1</span> + <span class="n">0.04</span> * np.exp(-t / <span class="n">0.05</span>))          <span class="c"># the skin is tighter at the hit</span>
+    body = np.sin(<span class="n">2</span> * np.pi * np.cumsum(pitch) / SR) * np.exp(-t / <span class="n">0.7</span>)
+    hit = rng.uniform(-<span class="n">1</span>, <span class="n">1</span>, <span class="b">len</span>(t)) * np.exp(-t / <span class="n">0.01</span>)
+    <span class="k">return</span> <span class="n">0.3</span> * body + <span class="n">0.05</span> * hit
+
+<span class="k">def</span> <span class="f">bass</span>(f, dur_s=<span class="n">1.5</span>, tau=<span class="n">0.6</span>, amp=<span class="n">0.25</span>):
+    t = time_axis(dur_s)
+    wave = <span class="b">sum</span>(np.sin(<span class="n">2</span> * np.pi * k * f * t) / k * np.exp(-t * k / tau) <span class="k">for</span> k <span class="k">in</span> <span class="b">range</span>(<span class="n">1</span>, <span class="n">8</span>))
+    <span class="k">return</span> amp * wave                                    <span class="c"># high harmonics die first: a plucked string</span>
+
+<span class="k">def</span> <span class="f">reed</span>(f, dur_s=<span class="n">1.2</span>, attack=<span class="n">0.06</span>):
+    t = time_axis(dur_s)
+    wave = <span class="b">sum</span>(np.sin(<span class="n">2</span> * np.pi * k * f * t) / k <span class="k">for</span> k <span class="k">in</span> [<span class="n">1</span>, <span class="n">3</span>, <span class="n">5</span>, <span class="n">7</span>])       <span class="c"># odd harmonics: hollow</span>
+    env = np.minimum(<span class="n">1</span>, t / attack) * np.minimum(<span class="n">1</span>, (dur_s - t) / <span class="n">0.2</span>)
+    <span class="k">return</span> <span class="n">0.08</span> * wave * env
+
+<span class="k">def</span> <span class="f">bell</span>(f, dur_s=<span class="n">3.0</span>, amp=<span class="n">0.1</span>):
+    t = time_axis(dur_s)
+    partials = [(<span class="n">1</span>, <span class="n">1.0</span>, <span class="n">1.5</span>), (<span class="n">2.76</span>, <span class="n">0.5</span>, <span class="n">0.8</span>), (<span class="n">5.40</span>, <span class="n">0.25</span>, <span class="n">0.4</span>), (<span class="n">8.93</span>, <span class="n">0.12</span>, <span class="n">0.2</span>)]   <span class="c"># (ratio, amp, decay)</span>
+    <span class="k">return</span> amp * <span class="b">sum</span>(a * np.sin(<span class="n">2</span> * np.pi * r * f * t) * np.exp(-t / d) <span class="k">for</span> r, a, d <span class="k">in</span> partials)
+</code></pre>
+  <h2>Keys</h2>
+  <div class="bar">
+    <span class="status" role="status"></span>
+    <button type="button" class="copy">Copy code</button>
+  </div>
+  <pre><code>minor = [<span class="n">2</span>, <span class="n">1</span>, <span class="n">2</span>, <span class="n">2</span>, <span class="n">1</span>, <span class="n">2</span>, <span class="n">2</span>]
+major = [<span class="n">2</span>, <span class="n">2</span>, <span class="n">1</span>, <span class="n">2</span>, <span class="n">2</span>, <span class="n">2</span>, <span class="n">1</span>]
+hijaz = [<span class="n">1</span>, <span class="n">3</span>, <span class="n">1</span>, <span class="n">2</span>, <span class="n">1</span>, <span class="n">2</span>, <span class="n">2</span>]          <span class="c"># a minor second, then an augmented one</span>
+whole_tone = [<span class="n">2</span>, <span class="n">2</span>, <span class="n">2</span>, <span class="n">2</span>, <span class="n">2</span>, <span class="n">2</span>]        <span class="c"># six notes, all the same distance</span>
+
+key = Scale(minor, Pitch(<span class="s">&quot;D3&quot;</span>))
+
+<span class="k">def</span> <span class="f">played</span>(instrument, octave=<span class="n">0</span>, **options):
+    <span class="s">&quot;&quot;&quot;A sound for Loop: a degree of the key, now, played by an instrument (options go to it).&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="f">sound</span>(degree):
+        pitch = key[degree + octave * <span class="b">len</span>(key.distances)]
+        <span class="k">return</span> instrument(pitch.f, **options)
+    <span class="k">return</span> sound
+</code></pre>
+  <h2>The tune, and ways to change it</h2>
+  <div class="bar">
+    <span class="status" role="status"></span>
+    <button type="button" class="copy">Copy code</button>
+  </div>
+  <pre><code>call = note(<span class="n">0</span>) &gt;&gt; note(<span class="n">1</span>) &gt;&gt; note(<span class="n">2</span>) &gt;&gt; note(<span class="n">0</span>)
+climb = note(<span class="n">2</span>) &gt;&gt; note(<span class="n">3</span>) &gt;&gt; note(<span class="n">4</span>, <span class="n">2</span>)
+bells = note(<span class="n">4</span>, <span class="n">0.5</span>) &gt;&gt; note(<span class="n">5</span>, <span class="n">0.5</span>) &gt;&gt; note(<span class="n">4</span>, <span class="n">0.5</span>) &gt;&gt; note(<span class="n">3</span>, <span class="n">0.5</span>) &gt;&gt; note(<span class="n">2</span>) &gt;&gt; note(<span class="n">0</span>)
+ending = note(<span class="n">0</span>) &gt;&gt; note(-<span class="n">3</span>) &gt;&gt; note(<span class="n">0</span>, <span class="n">2</span>)
+fm = call * <span class="n">2</span> &gt;&gt; climb * <span class="n">2</span> &gt;&gt; bells * <span class="n">2</span> &gt;&gt; ending * <span class="n">2</span>
+
+<span class="k">def</span> <span class="f">durations</span>(clip):
+    onsets = [onset <span class="k">for</span> onset, _ <span class="k">in</span> clip.events] + [clip.length]
+    <span class="k">return</span> [b - a <span class="k">for</span> a, b <span class="k">in</span> <span class="b">zip</span>(onsets, onsets[<span class="n">1</span>:])]
+
+<span class="k">def</span> <span class="f">backwards</span>(clip):
+    events = <span class="b">sorted</span>(clip.events)
+    durs = durations(Clip(events, clip.length))
+    <span class="k">return</span> Clip([(clip.length - onset - d, data) <span class="k">for</span> (onset, data), d <span class="k">in</span> <span class="b">zip</span>(events, durs)], clip.length)
+
+<span class="k">def</span> <span class="f">upside_down</span>(clip):
+    <span class="k">return</span> Clip([(onset, -data) <span class="k">for</span> onset, data <span class="k">in</span> clip.events], clip.length)
+
+<span class="k">def</span> <span class="f">faster</span>(clip, k):
+    <span class="k">return</span> Clip([(onset / k, data) <span class="k">for</span> onset, data <span class="k">in</span> clip.events], clip.length / k)
+</code></pre>
+  <h2>One stream, always on</h2>
+  <div class="bar">
+    <span class="status" role="status"></span>
+    <button type="button" class="copy">Copy code</button>
+  </div>
+  <pre><code>m = Mixer([])
+out = stream_of(m)
+out.start()
+
+tick = pluck(Pitch(<span class="s">&quot;A5&quot;</span>).f, dur_s=<span class="n">0.05</span>)
+plucked = played(pluck)
+</code></pre>
+</main>
+<script>
+  for (const button of document.querySelectorAll('button.copy')) {
+    const status = button.parentElement.querySelector('.status');
+    const code = button.parentElement.nextElementSibling;
+    button.addEventListener('click', async () => {
+      for (const other of document.querySelectorAll('.status')) other.textContent = '';
+      try {
+        await navigator.clipboard.writeText(code.textContent);
+        status.textContent = 'Copied.';
+      } catch {
+        const range = document.createRange();
+        range.selectNodeContents(code);
+        const selection = getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        status.textContent = 'Selected: press Ctrl+C or ⌘C.';
+      }
+    });
+  }
+</script>
+</body>
+</html>
