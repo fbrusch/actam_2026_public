@@ -32,7 +32,7 @@
 <main>
   <style>.crumbs ol { display: flex; flex-wrap: wrap; gap: 0 .6em; margin: 0; padding: 0; list-style: none; }.crumbs li + li::before { content: '›'; margin-right: .6em; }.crumbs { text-transform: uppercase; margin: 1em 0; }nav.crumbs a { color: inherit; text-decoration: none; padding: 0; border: 0; background: none; }nav.crumbs a:hover { text-decoration: underline; text-underline-offset: 3px; }</style><nav class="eyebrow crumbs" aria-label="Breadcrumb"><ol><li><a href="../../">ACTAM</a></li><li><a href="../../#lesson-11">Lesson 11</a></li><li><span aria-current="page">The library</span></li></ol></nav>
   <h1>The library.</h1>
-  <p>The first cells of the notebook: tools, sources, instruments, keys and the tune. Paste each part into a cell of a new notebook and run them in order. In a local Jupyter, run %pip install sounddevice first.</p>
+  <p>Everything the notebook builds on: tools, sources, instruments, keys and the tune, a clock, loops and steps. Paste each part into a cell of a new notebook and run them in order. In a local Jupyter, run %pip install sounddevice first.</p>
   <h2>Setup</h2>
   <div class="bar">
     <span class="status" role="status"></span>
@@ -301,12 +301,122 @@ fm = call * <span class="n">2</span> &gt;&gt; climb * <span class="n">2</span> &
 <span class="k">def</span> <span class="f">faster</span>(clip, k):
     <span class="k">return</span> Clip([(onset / k, data) <span class="k">for</span> onset, data <span class="k">in</span> clip.events], clip.length / k)
 </code></pre>
+  <h2>A clock that counts beats, and a band that moves it</h2>
+  <div class="bar">
+    <span class="status" role="status"></span>
+    <button type="button" class="copy">Copy code</button>
+  </div>
+  <pre><code><span class="k">class</span> <span class="f">Clock</span>:
+    <span class="k">def</span> <span class="f">__init__</span>(<span class="b">self</span>, bpm=<span class="n">120</span>):
+        <span class="b">self</span>.bpm = bpm
+        <span class="b">self</span>.beat = <span class="n">0.0</span>                      <span class="c"># where the block being played starts, in beats</span>
+        <span class="b">self</span>.end = <span class="n">0.0</span>                       <span class="c"># where it ends</span>
+
+    <span class="d">@</span><span class="d">property</span>
+    <span class="k">def</span> <span class="f">beat_s</span>(<span class="b">self</span>):
+        <span class="k">return</span> <span class="n">60</span> / <span class="b">self</span>.bpm
+
+    <span class="k">def</span> <span class="f">tick</span>(<span class="b">self</span>, frames):                  <span class="c"># one block more</span>
+        <span class="b">self</span>.beat = <span class="b">self</span>.end
+        <span class="b">self</span>.end = <span class="b">self</span>.beat + frames / SR / <span class="b">self</span>.beat_s
+
+<span class="k">class</span> <span class="f">Band</span>(Mixer):
+    <span class="s">&quot;&quot;&quot;A mixer that keeps time: before each block, it moves its clock on.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="f">__init__</span>(<span class="b">self</span>, clock, sources=<span class="k">None</span>):
+        <span class="b">super</span>().__init__(sources <span class="k">if</span> sources <span class="k">is</span> <span class="k">not</span> <span class="k">None</span> <span class="k">else</span> [])
+        <span class="b">self</span>.clock = clock
+
+    <span class="k">def</span> <span class="f">block</span>(<span class="b">self</span>, frames):
+        <span class="b">self</span>.clock.tick(frames)
+        <span class="k">return</span> <span class="b">super</span>().block(frames)
+</code></pre>
+  <h2>A loop that reads the clock, and a clip played once</h2>
+  <div class="bar">
+    <span class="status" role="status"></span>
+    <button type="button" class="copy">Copy code</button>
+  </div>
+  <pre><code><span class="k">import</span> math
+
+<span class="k">class</span> <span class="f">Loop</span>:
+    <span class="k">def</span> <span class="f">__init__</span>(<span class="b">self</span>, clip, sound, clock, start=<span class="k">None</span>, bar=<span class="n">4</span>):
+        <span class="b">self</span>.clip = clip
+        <span class="b">self</span>.sound = sound
+        <span class="b">self</span>.clock = clock
+        <span class="b">self</span>.<span class="b">next</span> = <span class="k">None</span>
+        <span class="k">if</span> start <span class="k">is</span> <span class="k">None</span>:                    <span class="c"># by default, at the start of the next bar</span>
+            start = math.ceil(clock.end / bar) * bar
+        <span class="b">self</span>.start = start                   <span class="c"># the beat of the clock where round 0 starts</span>
+        <span class="b">self</span>.voices = Mixer([])
+
+    <span class="k">def</span> <span class="f">start_voices</span>(<span class="b">self</span>, a, b):
+        <span class="s">&quot;&quot;&quot;Start every note that falls in [a, b), in beats of the clock, each one exactly in its place.&quot;&quot;&quot;</span>
+        length = <span class="b">self</span>.clip.length
+        <span class="k">for</span> onset, data <span class="k">in</span> <span class="b">self</span>.clip.events:
+            k = <span class="b">max</span>(<span class="n">0</span>, math.ceil((a - <span class="b">self</span>.start - onset) / length))     <span class="c"># the first round not before a</span>
+            t = <span class="b">self</span>.start + onset + k * length
+            <span class="k">while</span> t &lt; b:
+                delay = <span class="b">round</span>((t - <span class="b">self</span>.clock.beat) * <span class="b">self</span>.clock.beat_s * SR)     <span class="c"># from the start of the block</span>
+                <span class="b">self</span>.voices.sources.append(Voice(<span class="b">self</span>.sound(data), delay))
+                t += length
+
+    <span class="k">def</span> <span class="f">block</span>(<span class="b">self</span>, frames):
+        a, b = <span class="b">self</span>.clock.beat, <span class="b">self</span>.clock.end
+        <span class="k">if</span> <span class="b">self</span>.<span class="b">next</span> <span class="k">is</span> <span class="k">not</span> <span class="k">None</span>:
+            <span class="k">if</span> a &lt; <span class="b">self</span>.start:               <span class="c"># not started yet: change at once</span>
+                <span class="b">self</span>.clip, <span class="b">self</span>.<span class="b">next</span> = <span class="b">self</span>.<span class="b">next</span>, <span class="k">None</span>
+            <span class="k">else</span>:
+                edge = <span class="b">self</span>.start + math.ceil((a - <span class="b">self</span>.start) / <span class="b">self</span>.clip.length) * <span class="b">self</span>.clip.length
+                <span class="k">if</span> edge &lt; b:                 <span class="c"># a round ends inside this block</span>
+                    <span class="b">self</span>.start_voices(a, edge)
+                    <span class="b">self</span>.clip, <span class="b">self</span>.<span class="b">next</span>, <span class="b">self</span>.start = <span class="b">self</span>.<span class="b">next</span>, <span class="k">None</span>, edge
+                    a = edge
+        <span class="b">self</span>.start_voices(a, b)
+        <span class="k">return</span> <span class="b">self</span>.voices.block(frames)
+
+<span class="k">class</span> <span class="f">Once</span>(Loop):
+    <span class="s">&quot;&quot;&quot;Only round 0. Done when it is over and its last sound has rung out.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="f">start_voices</span>(<span class="b">self</span>, a, b):
+        <span class="k">for</span> onset, data <span class="k">in</span> <span class="b">self</span>.clip.events:
+            t = <span class="b">self</span>.start + onset
+            <span class="k">if</span> a &lt;= t &lt; b:
+                <span class="b">self</span>.voices.sources.append(Voice(<span class="b">self</span>.sound(data), <span class="b">round</span>((t - <span class="b">self</span>.clock.beat) * <span class="b">self</span>.clock.beat_s * SR)))
+
+    <span class="d">@</span><span class="d">property</span>
+    <span class="k">def</span> <span class="f">done</span>(<span class="b">self</span>):
+        <span class="k">return</span> <span class="b">self</span>.clock.beat &gt;= <span class="b">self</span>.start + <span class="b">self</span>.clip.length <span class="k">and</span> <span class="k">not</span> <span class="b">self</span>.voices.sources
+</code></pre>
+  <h2>A step sequencer</h2>
+  <div class="bar">
+    <span class="status" role="status"></span>
+    <button type="button" class="copy">Copy code</button>
+  </div>
+  <pre><code><span class="k">class</span> <span class="f">Steps</span>:
+    <span class="k">def</span> <span class="f">__init__</span>(<span class="b">self</span>, text, name, step=<span class="n">0.25</span>):
+        <span class="b">self</span>.steps = [symbol == <span class="s">&quot;x&quot;</span> <span class="k">for</span> symbol <span class="k">in</span> text]
+        <span class="b">self</span>.name = name
+        <span class="b">self</span>.step = step                     <span class="c"># in beats: 0.25 is a sixteenth</span>
+
+    <span class="d">@</span><span class="d">property</span>
+    <span class="k">def</span> <span class="f">events</span>(<span class="b">self</span>):
+        <span class="k">return</span> [(i * <span class="b">self</span>.step, <span class="b">self</span>.name) <span class="k">for</span> i, on <span class="k">in</span> <span class="b">enumerate</span>(<span class="b">self</span>.steps) <span class="k">if</span> on]
+
+    <span class="d">@</span><span class="d">property</span>
+    <span class="k">def</span> <span class="f">length</span>(<span class="b">self</span>):
+        <span class="k">return</span> <span class="b">len</span>(<span class="b">self</span>.steps) * <span class="b">self</span>.step
+
+    <span class="k">def</span> <span class="f">toggle</span>(<span class="b">self</span>, i):
+        <span class="b">self</span>.steps[i] = <span class="k">not</span> <span class="b">self</span>.steps[i]
+
+    <span class="k">def</span> <span class="f">__repr__</span>(<span class="b">self</span>):
+        <span class="k">return</span> <span class="s">&quot;&quot;</span>.join(<span class="s">&quot;x&quot;</span> <span class="k">if</span> on <span class="k">else</span> <span class="s">&quot;.&quot;</span> <span class="k">for</span> on <span class="k">in</span> <span class="b">self</span>.steps)
+</code></pre>
   <h2>One stream, always on</h2>
   <div class="bar">
     <span class="status" role="status"></span>
     <button type="button" class="copy">Copy code</button>
   </div>
-  <pre><code>m = Mixer([])
+  <pre><code>clock = Clock(<span class="n">110</span>)
+m = Band(clock)
 out = stream_of(m)
 out.start()
 
