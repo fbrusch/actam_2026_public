@@ -154,6 +154,10 @@ const browserSounddevice = publicLayout
   ? path.join(lesson09, 'sounddevice.py')
   : path.join(root, 'lesson_09', 'browser', 'sounddevice.py')
 await cp(browserSounddevice, path.join(dist, 'lesson-09', 'sounddevice.py'))
+// A blank notebook, linked from the home page, that runs in the browser with the same stand-in.
+await mkdir(path.join(dist, 'playground'), { recursive: true })
+await cp(path.join(root, 'site', 'notebooks', 'playground.ipynb'), path.join(dist, 'playground', 'notebook.ipynb'))
+await cp(browserSounddevice, path.join(dist, 'playground', 'sounddevice.py'))
 buildSlides(
   'slides.md',
   lesson09,
