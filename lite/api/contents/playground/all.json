@@ -1,0 +1,43 @@
+{
+  "content": [
+    {
+      "content": null,
+      "created": "2026-11-18T13:31:08.569372Z",
+      "format": null,
+      "hash": null,
+      "hash_algorithm": null,
+      "last_modified": "2026-11-18T13:31:08.569372Z",
+      "mimetype": "text/x-python",
+      "name": "sounddevice.py",
+      "path": "playground/sounddevice.py",
+      "size": 11512,
+      "type": "file",
+      "writable": true
+    },
+    {
+      "content": null,
+      "created": "2026-11-18T13:31:08.567931Z",
+      "format": null,
+      "hash": null,
+      "hash_algorithm": null,
+      "last_modified": "2026-11-18T13:31:08.567931Z",
+      "mimetype": null,
+      "name": "notebook.ipynb",
+      "path": "playground/notebook.ipynb",
+      "size": 433,
+      "type": "notebook",
+      "writable": true
+    }
+  ],
+  "created": "2026-11-18T13:31:09.419283Z",
+  "format": "json",
+  "hash": null,
+  "hash_algorithm": null,
+  "last_modified": "2026-11-18T13:31:09.419542Z",
+  "mimetype": null,
+  "name": "playground",
+  "path": "playground",
+  "size": null,
+  "type": "directory",
+  "writable": true
+}
