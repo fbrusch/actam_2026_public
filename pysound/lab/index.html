@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Python in a web page</title>
+<link rel="stylesheet" href="shared.css" />
+<style>
+  body.embed header { display: none; }
+  body.embed .work { padding: 8px; gap: 8px; }
+  body.embed .legend { display: none; }
+  body.embed .tabs button { padding: .35rem .55rem; font-size: .72rem; }
+  body.embed .editor textarea, body.embed .editor pre { font-size: 11.5px; padding: .5rem; }
+</style>
+</head>
+<body>
+<header>
+  <div class="top"><h1>Python in a web page</h1><a href="../round/">Fra Martino ↗</a></div>
+  <nav class="steps" id="steps"></nav>
+  <div class="about">
+    <div><h2 id="title"></h2><p id="text"></p></div>
+    <div><div class="try-title">TO TRY</div><ul id="try"></ul></div>
+  </div>
+</header>
+<div class="work">
+  <section class="pane">
+    <div class="tabs" id="tabs">
+      <button data-file="py">main.py</button>
+      <button data-file="js">main.js</button>
+      <button data-file="html">page.html</button>
+      <span class="acts">
+      <button class="act" id="reset" title="back to the step as it was">↺ reset</button>
+      <button class="act" id="save" title="download this page as one HTML file">⤓ download</button>
+      <button class="act" id="pen" title="open this page on CodePen">CodePen ↗</button>
+      <button class="act run" id="run" title="Ctrl/⌘ + Enter">▶ run</button>
+      </span>
+    </div>
+    <div class="editor"><pre id="marks"></pre><textarea id="code" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea></div>
+    <div class="legend"><span><i></i>new since the step before</span><span><code>&lt;script src="main.js"&gt;</code> runs main.js, which gets main.py as <code>PYTHON</code></span></div>
+  </section>
+  <section class="pane">
+    <iframe class="preview" id="preview" title="the page" allow="autoplay"></iframe>
+  </section>
+</div>
+
+<script type="module">
+import { steps } from './steps.js'
+import { SITE, PUBLIC, codeEditor, compose, downloadText, openPen } from './shared.js'
+
+const $ = (id) => document.getElementById(id)
+const params = new URLSearchParams(location.search)
+if (params.has('embed')) document.body.classList.add('embed')
+const toPublic = (t) => t.replaceAll(SITE, PUBLIC)
+
+const files = { py: 'main.py', js: 'main.js', html: 'page.html' }
+const cache = {}
+async function load(n) {                                       // the three files of step n, as written
+  if (!cache[n]) {
+    const entries = await Promise.all(Object.entries(files).map(async ([k, f]) =>
+      [k, (await (await fetch(`steps/${n}/${f}`)).text()).replaceAll('{{SITE}}', SITE)]))
+    cache[n] = Object.fromEntries(entries)
+  }
+  return cache[n]
+}
+
+let step = Math.min(Math.max(Number(params.get('step')) || 1, 1), steps.length)
+const editor = codeEditor({ tabs: $('tabs'), textarea: $('code'), marks: $('marks'), onRun: run })
+
+function run() {
+  const compact = document.body.classList.contains('embed') ? 'html { font-size: 13px; } body { margin: 1rem; }' : ''
+  $('preview').srcdoc = compose(editor.files(), { extraCss: compact }).html
+}
+
+// --- Steps ---
+$('steps').innerHTML = steps.map((s, i) => `<button data-step="${i + 1}">${i + 1} · ${s.title}</button>`).join('')
+$('steps').onclick = (e) => { const b = e.target.closest('[data-step]'); if (b) go(Number(b.dataset.step)) }
+
+async function go(n, keepTab = false) {
+  step = n
+  const s = steps[n - 1]
+  const [mine, prev] = await Promise.all([load(n), n > 1 ? load(n - 1) : null])
+  editor.load(mine, prev, keepTab ? editor.current : s.focus)
+  $('title').textContent = `${n} · ${s.title}`
+  $('text').innerHTML = s.text
+  $('try').innerHTML = s.try.map((t) => `<li>${t}</li>`).join('')
+  for (const b of $('steps').children) b.classList.toggle('current', Number(b.dataset.step) === n)
+  const url = new URL(location.href); url.searchParams.set('step', n); history.replaceState(null, '', url)
+  run()
+}
+
+$('run').onclick = run
+$('reset').onclick = () => go(step, true)
+$('pen').onclick = () => openPen(`Python in a web page · ${steps[step - 1].title}`, editor.files(), toPublic)
+$('save').onclick = () => downloadText(`pysound-step-${step}.html`, compose(editor.files(), { swap: toPublic }).html)
+
+go(step)
+</script>
+  <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"f0427f56e626492fad6cdcf05fbce5bb","spa":false}'></script>
+</body>
+</html>
