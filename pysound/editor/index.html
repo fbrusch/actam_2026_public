@@ -103,9 +103,8 @@ const TEMPLATE = {
   <pre id="out">loading Python…</pre>
 
   <script type="module" src="main.js"><\/script>
-  <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"f0427f56e626492fad6cdcf05fbce5bb","spa":false}'></script>
-</body>
-</html>
+<\/body>
+<\/html>
 `,
   js: `import { startPython } from '${PUBLIC}pysound.js'
 
@@ -397,5 +396,6 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
 const saved = await all()
 open(saved.find((p) => p.id === lastId()) ?? saved.sort((a, b) => b.updated - a.updated)[0] ?? blankPath())
 </script>
+  <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"f0427f56e626492fad6cdcf05fbce5bb","spa":false}'></script>
 </body>
 </html>
