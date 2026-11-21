@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JavaScript and Python</title>
+  <style>
+    body { font-family: ui-monospace, Menlo, monospace; margin: 1.5rem; background: #f7f5ef; color: #182f3a; line-height: 1.5; }
+    h1 { font-size: 1.4rem; margin: 0 0 1rem; }
+    button { font: inherit; padding: .4rem .8rem; margin: 0 .3rem .3rem 0; border: 1px solid #087e83; background: #fff; color: #087e83; cursor: pointer; }
+    button:disabled { opacity: .45; cursor: default; }
+    input { font: inherit; accent-color: #087e83; }
+    pre { white-space: pre-wrap; background: #fff; border: 1px solid #b9c6c0; padding: .75rem; }
+  </style>
+</head>
+<body>
+  <h1>JavaScript and Python</h1>
+  <p>
+    <input id="expr" list="examples" value="2 ** 100" size="30" spellcheck="false" />
+    <button id="evaluate">py.runPython(expr)</button>
+  </p>
+  <datalist id="examples">
+    <option value="1 + 1"></option>
+    <option value="2 ** 100"></option>
+    <option value="3 / 2"></option>
+    <option value="'fra martino'.title()"></option>
+    <option value="[1, 2, 3] * 2"></option>
+    <option value="{'do': 0, 're': 2}"></option>
+    <option value="sum(range(10))"></option>
+  </datalist>
+  <p>
+    <input id="word" value="fra martino" spellcheck="false" />
+    <button id="shout">shout(word, 3)</button>
+    <button id="notes">notes(10)</button>
+    <button id="write">write(word)</button>
+  </p>
+  <pre id="out">loading Python…</pre>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

@@ -47,6 +47,9 @@ const lesson10 = publicLayout
   ? path.join(root, 'lesson-10')
   : path.join(root, 'lesson_10', 'publish', 'lesson-10')
 const lesson10Pages = path.join(lesson10, 'pages')
+const lesson12 = publicLayout
+  ? path.join(root, 'lesson-12')
+  : path.join(root, 'lesson_12', 'publish', 'lesson-12')
 const lesson11Pages = publicLayout
   ? path.join(root, 'lesson-11', 'pages')
   : path.join(root, 'lesson_11', 'publish', 'lesson-11', 'pages')
@@ -158,6 +161,8 @@ await cp(browserSounddevice, path.join(dist, 'lesson-09', 'sounddevice.py'))
 await mkdir(path.join(dist, 'playground'), { recursive: true })
 await cp(path.join(root, 'site', 'notebooks', 'playground.ipynb'), path.join(dist, 'playground', 'notebook.ipynb'))
 await cp(browserSounddevice, path.join(dist, 'playground', 'sounddevice.py'))
+// pysound: Python with sounddevice in any web page, and a synth made with it.
+await cp(path.join(root, 'site', 'pysound'), path.join(dist, 'pysound'), { recursive: true })
 buildSlides(
   'slides.md',
   lesson09,
@@ -169,6 +174,12 @@ buildSlides(
   lesson10,
   `${basePath}lesson-10/slides/`,
   path.join(dist, 'lesson-10', 'slides'),
+)
+buildSlides(
+  'slides.md',
+  lesson12,
+  `${basePath}lesson-12/slides/`,
+  path.join(dist, 'lesson-12', 'slides'),
 )
 
 // Every notebook copied above gets a read-only page next to it, and the
@@ -203,6 +214,11 @@ if (process.env.SITE_ANALYTICS_TOKEN) {
     'lesson-10/tools/index.html',
     'lesson-10/slides/index.html',
     'lesson-11/tools/index.html',
+    'pysound/index.html',
+    'pysound/lab/index.html',
+    'pysound/editor/index.html',
+    'pysound/round/index.html',
+    'lesson-12/slides/index.html',
   ]
   for (const file of pages) {
     const target = path.join(dist, file)
@@ -222,6 +238,7 @@ const slideRoutes = [
   ['lesson-07/slides', lesson07, 'slides.md'],
   ['lesson-09/slides', lesson09, 'slides.md'],
   ['lesson-10/slides', lesson10, 'slides.md'],
+  ['lesson-12/slides', lesson12, 'slides.md'],
   ['lesson-01/exercise', exerciseFolder, 'exercise.md'],
 ]
 for (const [route, folder, source] of slideRoutes) {

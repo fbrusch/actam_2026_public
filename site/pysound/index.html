@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>A synth in Python</title>
+<style>
+  :root { color-scheme: light; font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+          --bg: #f7f5ef; --ink: #182f3a; --muted: #53656c; --line: #b9c6c0; --accent: #087e83; --key: #fff; --keyDown: #cfe7e6; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); }
+  main { max-width: 900px; margin: 0 auto; padding: 2rem 16px 4rem; }
+  h1 { margin: 0; font-size: clamp(1.6rem, 4vw, 2.6rem); letter-spacing: -.05em; font-weight: 650; }
+  p { color: var(--muted); line-height: 1.6; max-width: 640px; }
+  button, select { font: inherit; }
+  .bar { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; margin: 1.5rem 0; }
+  .go { padding: .5rem 1rem; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; }
+  .go:disabled { background: transparent; color: var(--accent); cursor: default; }
+  #state { font-size: .85rem; color: var(--muted); }
+  .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem 1.5rem; margin: 1rem 0 1.5rem; }
+  label { display: grid; gap: .35rem; font-size: .85rem; }
+  label span { color: var(--muted); }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  .keys { display: flex; position: relative; height: 140px; user-select: none; touch-action: none; }
+  .key { flex: 1; border: 1px solid var(--line); background: var(--key); display: flex; align-items: flex-end; justify-content: center;
+         padding-bottom: .4rem; font-size: .75rem; color: var(--muted); cursor: pointer; }
+  .key.black { position: absolute; height: 85px; background: var(--ink); color: #9fb; border-color: var(--ink); z-index: 1; }
+  .key.down { background: var(--keyDown); }
+  .key.black.down { background: var(--accent); }
+  h2 { margin: 2.5rem 0 .75rem; font-size: .8rem; color: var(--accent); font-weight: 500; letter-spacing: .08em; }
+  textarea { width: 100%; min-height: 28rem; font: inherit; font-size: .82rem; line-height: 1.5; padding: .75rem; color: var(--ink);
+             background: #fff; border: 1px solid var(--line); tab-size: 4; }
+  pre { overflow-x: auto; padding: .75rem; border: 1px solid var(--line); font-size: .8rem; line-height: 1.5; }
+  #error { white-space: pre-wrap; color: #a3271f; font-size: .8rem; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { color-scheme: dark; --bg: #11191d; --ink: #e3ece9; --muted: #9db0b2; --line: #36484d; --key: #1d2a2f; --keyDown: #1e5357; }
+    :root:not([data-theme="light"]) textarea { background: #182327; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>A synth in Python</h1>
+  <p>The page holds the buttons and the sliders; the sound is made by the Python below, in the browser, with sounddevice.
+     The callback fills each block of samples a little ahead of time, and the page plays them.</p>
+
+  <div class="bar">
+    <button class="go" id="go" disabled>loading Python…</button>
+    <span id="state"></span>
+  </div>
+
+  <div class="controls">
+    <label><span>wave</span>
+      <select data-param="wave"><option>saw</option><option>square</option><option>sine</option></select></label>
+    <label><span>cutoff <output>1200</output> Hz</span>
+      <input type="range" data-param="cutoff" min="100" max="8000" step="10" value="1200" /></label>
+    <label><span>release <output>0.3</output> s</span>
+      <input type="range" data-param="release" min="0.01" max="2" step="0.01" value="0.3" /></label>
+    <label><span>volume <output>0.3</output></span>
+      <input type="range" data-param="volume" min="0" max="0.8" step="0.01" value="0.3" /></label>
+  </div>
+
+  <div class="keys" id="keys"></div>
+  <p>Keys A W S E D F T G Y H U J K on the keyboard play too.</p>
+
+  <h2>THE PYTHON</h2>
+  <textarea id="code" spellcheck="false"></textarea>
+  <div class="bar"><button class="go" id="run" disabled>run again</button><span id="error"></span></div>
+
+  <h2>IN YOUR OWN PAGE</h2>
+  <p>Any page, or a pen on CodePen, can do the same with one import:</p>
+  <pre><code>&lt;button id="audio"&gt;audio&lt;/button&gt;
+&lt;script type="module"&gt;
+import { startPython } from 'https://actam.bruschi.dev/pysound/pysound.js'
+
+const py = await startPython({ button: '#audio' })   // Pyodide, numpy, sounddevice
+await py.runPythonAsync(`
+import numpy as np
+import sounddevice as sd
+
+phase = 0
+def callback(outdata, frames, time, status):
+    global phase
+    n = phase + np.arange(frames)
+    outdata[:, 0] = 0.2 * np.sin(2 * np.pi * 440 * n / 48000)
+    phase += frames
+
+stream = sd.OutputStream(samplerate=48000, blocksize=256, channels=1, callback=callback)
+stream.start()
+`)
+&lt;/script&gt;</code></pre>
+  <p>From the page's JavaScript, <code>py.runPython("stream.stop()")</code> or <code>py.globals.get("name")</code> reach the Python.</p>
+</main>
+
+<script type="module">
+import { startPython, audio } from './pysound.js'
+
+const $ = (id) => document.getElementById(id)
+const state = $('state'), code = $('code'), error = $('error')
+
+// Calling Python from the page: look the function up by name each time, so "run again" can redefine it.
+let py = null
+function call(name, ...args) {
+  if (!py) return
+  const f = py.globals.get(name)
+  if (!f) return
+  try { f(...args) } catch (e) { error.textContent = String(e) } finally { f.destroy() }
+}
+
+async function run() {
+  error.textContent = ''
+  try {
+    await py.runPythonAsync('import sounddevice as sd; sd.stop()')
+    await py.runPythonAsync(code.value)
+    for (const el of document.querySelectorAll('[data-param]')) setParam(el)
+  } catch (e) { error.textContent = String(e) }
+}
+
+function setParam(el) {
+  const value = el.type === 'range' ? Number(el.value) : el.value
+  const out = el.parentElement.querySelector('output')
+  if (out) out.textContent = el.value
+  call('set_param', el.dataset.param, value)
+}
+for (const el of document.querySelectorAll('[data-param]')) el.addEventListener('input', () => setParam(el))
+
+// The keyboard: one octave and a bit, from C4.
+const names = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'C']
+const letters = 'awsedftgyhujk'
+const keys = $('keys'), whites = names.filter((n) => !n.includes('#')).length
+let held = []
+names.forEach((name, i) => {
+  const key = document.createElement('div'), midi = 60 + i, black = name.includes('#')
+  key.className = 'key' + (black ? ' black' : '')
+  key.textContent = letters[i].toUpperCase()
+  key.dataset.midi = midi
+  if (black) {
+    const left = names.slice(0, i).filter((n) => !n.includes('#')).length
+    key.style.left = `calc(${(left / whites) * 100}% - ${(0.3 / whites) * 100}%)`
+    key.style.width = `${(0.6 / whites) * 100}%`
+  }
+  keys.append(key)
+})
+function press(midi) {
+  held = held.filter((m) => m !== midi).concat(midi)
+  call('note_on', midi); show()
+}
+function release(midi) {
+  held = held.filter((m) => m !== midi)
+  if (held.length) call('note_on', held.at(-1)); else call('note_off')
+  show()
+}
+function show() { for (const k of keys.children) k.classList.toggle('down', held.includes(Number(k.dataset.midi))) }
+keys.addEventListener('pointerdown', (e) => {
+  const k = e.target.closest('.key'); if (!k) return
+  keys.setPointerCapture(e.pointerId); press(Number(k.dataset.midi))
+  const up = () => { release(Number(k.dataset.midi)); keys.removeEventListener('pointerup', up); keys.removeEventListener('pointercancel', up) }
+  keys.addEventListener('pointerup', up); keys.addEventListener('pointercancel', up)
+})
+addEventListener('keydown', (e) => {
+  if (e.repeat || e.target === code) return
+  const i = letters.indexOf(e.key.toLowerCase()); if (i >= 0) press(60 + i)
+})
+addEventListener('keyup', (e) => {
+  if (e.target === code) return
+  const i = letters.indexOf(e.key.toLowerCase()); if (i >= 0) release(60 + i)
+})
+
+$('go').addEventListener('click', () => { $('go').disabled = true; $('go').textContent = 'audio on' })
+$('run').onclick = run
+
+setInterval(() => {
+  if (audio.ready) state.textContent = `audio on (${audio.engine}) · ${(audio.played / audio.rate).toFixed(1)} s played · underflows: ${audio.underflows}`
+}, 250)
+
+// Load Python, numpy, the stand-in for sounddevice and the synth.
+state.textContent = 'loading Python and numpy…'
+py = await startPython({ button: '#go' })
+window.pyodide = py                      // for the console: pyodide.runPython("note_on(64)")
+code.value = await (await fetch('synth.py')).text()
+await run()
+state.textContent = 'Python ready: press the button to hear it'
+$('go').disabled = false; $('go').textContent = '▶ start audio'
+$('run').disabled = false
+window.synthReady = true
+</script>
+</body>
+</html>

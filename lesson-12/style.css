@@ -1,0 +1,32 @@
+@import '../presentation-theme.css';
+.slidev-layout .notebook-cue { position: absolute; bottom: 22px; left: 56px; right: 56px; padding-top: 10px; border-top: 1px solid #ccd4cf; font-size: 13px; color: var(--muted); }
+.slidev-layout .notebook-cue strong { margin-right: 12px; }
+.slidev-layout .notebook-cue a { text-decoration: none; }
+.slidev-layout .chapter { max-width: 790px; margin-top: 76px; }
+.slidev-layout .chapter h1 { font-size: 70px; line-height: 1.02; letter-spacing: -3px; margin: 18px 0 30px; }
+.slidev-layout .cover-title { font-size: 70px; line-height: 1.02; letter-spacing: -3px; margin: 40px 0 26px; }
+.slidev-layout .cover-meta { position: absolute; bottom: 28px; font: 14px Menlo, monospace; color: #bfcec9; }
+.slidev-layout.code-sm pre { --slidev-code-font-size: 15px; --slidev-code-line-height: 1.45; }
+.slidev-layout.table-sm table { font-size: 17px; }
+.slidev-layout.table-sm td, .slidev-layout.table-sm th { padding-top: 5px; padding-bottom: 5px; }
+
+/* Stacks of layers: each layer runs on the one below it. */
+.slidev-layout .stack { display: grid; gap: 6px; font: 17px/1.3 Menlo, monospace; }
+.slidev-layout .stack div { border: 1px solid #ccd4cf; background: #edf0eb; padding: 9px 14px; display: flex; justify-content: space-between; gap: 12px; }
+.slidev-layout .stack div small { color: var(--muted); font-size: 13px; }
+.slidev-layout .stack .hot { border-color: var(--teal); background: #dcefeb; }
+.slidev-layout .stack .alien { border-color: var(--accent); background: #f6e3dc; }
+.slidev-layout .stack .gap { border-style: dashed; background: transparent; color: var(--accent); }
+.slidev-layout .stack-title { font: 13px Menlo, monospace; color: var(--muted); letter-spacing: 1px; margin-bottom: 8px; text-transform: uppercase; }
+
+/* A row of boxes joined by arrows. */
+.slidev-layout .flow { display: flex; align-items: center; gap: 10px; font: 16px/1.3 Menlo, monospace; margin: 26px 0; }
+.slidev-layout .flow div { border: 1px solid #ccd4cf; background: #edf0eb; padding: 12px 14px; text-align: center; flex: 1; }
+.slidev-layout .flow div small { display: block; color: var(--muted); font-size: 12px; margin-top: 4px; }
+.slidev-layout .flow .hot { border-color: var(--teal); background: #dcefeb; }
+.slidev-layout .flow b { color: var(--muted); font-weight: 400; }
+
+.slidev-layout .lab-frame { border: 1px solid #ccd4cf; background: #f7f5ef; margin-top: 8px; }
+.slidev-layout .lab-frame iframe { width: 100%; height: 100%; border: 0; }
+.slidev-layout .lab-frame button { width: 100%; height: 100%; border: 0; background: transparent; cursor: pointer; font: 18px Menlo, monospace; color: var(--teal); display: grid; place-content: center; gap: 8px; }
+.slidev-layout .lab-frame button small { font-size: 12px; color: var(--muted); }

@@ -1,0 +1,54 @@
+/* The look of the lab and the editor. */
+:root { color-scheme: light; font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+        --bg: #f7f5ef; --panel: #fff; --ink: #182f3a; --muted: #53656c; --line: #b9c6c0; --soft: #e4e9e4;
+        --accent: #087e83; --accent-soft: #d8eeec; --new: #fff1c9; --new-mark: #e0a800; --del: #fbe3df; --del-mark: #c4472f; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { color-scheme: dark; --bg: #11191d; --panel: #182327; --ink: #e3ece9; --muted: #9db0b2;
+    --line: #36484d; --soft: #22323a; --accent: #3fb5b0; --accent-soft: #1e3e40; --new: #3a3218; --new-mark: #e0b040; --del: #3d2420; --del-mark: #e07a62; }
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); display: flex; flex-direction: column; }
+button, select { font: inherit; color: inherit; cursor: pointer; }
+header { padding: 1rem 16px .5rem; display: grid; gap: .6rem; }
+.top { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; align-items: baseline; }
+.top h1 { margin: 0; font-size: 1.3rem; letter-spacing: -.04em; }
+.top a { color: var(--muted); font-size: .8rem; }
+.steps { display: flex; flex-wrap: wrap; gap: .35rem; }
+.steps button { border: 1px solid var(--line); background: var(--panel); padding: .3rem .65rem; font-size: .8rem; }
+.steps button.current { background: var(--accent); border-color: var(--accent); color: #fff; }
+.about { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: .5rem 2rem; font-size: .85rem; line-height: 1.55; }
+.about p { margin: 0; }
+.about h2 { margin: 0 0 .2rem; font-size: 1rem; }
+.about ul { margin: 0; padding-left: 1.1rem; color: var(--muted); }
+.about .try-title { font-size: .75rem; color: var(--accent); letter-spacing: .08em; margin-bottom: .2rem; }
+code { background: var(--soft); padding: 0 .2rem; }
+
+.work { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; padding: .5rem 16px 16px; }
+.pane { display: flex; flex-direction: column; min-height: 0; border: 1px solid var(--line); background: var(--panel); }
+.tabs { display: flex; align-items: stretch; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.tabs .acts { display: flex; margin-left: auto; flex: none; }
+.tabs button { border: 0; border-right: 1px solid var(--line); background: none; padding: .45rem .75rem; font-size: .8rem; color: var(--muted); white-space: nowrap; flex: none; }
+.tabs button.current { color: var(--ink); background: var(--bg); box-shadow: inset 0 -2px 0 var(--accent); }
+.tabs button sup { color: var(--new-mark); margin-left: .2rem; }
+.tabs .act { border-right: 0; border-left: 1px solid var(--line); color: var(--accent); }
+.tabs .act.run { background: var(--accent); color: #fff; }
+.editor { position: relative; flex: 1; min-height: 0; }
+.editor textarea, .editor pre { position: absolute; inset: 0; margin: 0; padding: .75rem; border: 0; font: 13px/1.55 ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  white-space: pre; overflow: auto; tab-size: 4; }
+.editor pre { color: transparent; pointer-events: none; }
+.editor pre div { min-height: 1.55em; margin: 0 -.75rem; padding: 0 .75rem; }
+.editor pre div.new { background: var(--new); box-shadow: inset 3px 0 0 var(--new-mark); }
+.editor pre div.del { background: var(--del); box-shadow: inset 3px 0 0 var(--del-mark); color: var(--muted); text-decoration: line-through; }
+.editor.view pre { color: var(--ink); pointer-events: auto; }
+.editor.view textarea { display: none; }
+.editor textarea { background: transparent; color: var(--ink); resize: none; outline: none; caret-color: var(--accent); }
+.preview { flex: 1; min-height: 0; border: 0; width: 100%; background: #f7f5ef; }
+.legend { font-size: .72rem; color: var(--muted); padding: .3rem .75rem; border-top: 1px solid var(--line); display: flex; gap: 1rem; flex-wrap: wrap; }
+.legend i { display: inline-block; width: .8rem; height: .8rem; background: var(--new); box-shadow: inset 3px 0 0 var(--new-mark); vertical-align: middle; margin-right: .3rem; }
+@media (max-width: 800px) {
+  body { height: auto; }
+  .about { grid-template-columns: 1fr; }
+  .work { grid-template-columns: 1fr; }
+  .pane { height: 70vh; }
+}

@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Step editor</title>
+<link rel="stylesheet" href="../lab/shared.css" />
+<style>
+  .top { align-items: center; }
+  .name { font: inherit; font-size: 1.3rem; font-weight: 700; letter-spacing: -.04em; color: var(--ink); background: none;
+          border: 1px solid transparent; padding: .1rem .3rem; margin-left: -.3rem; min-width: 12ch; field-sizing: content; }
+  .name:hover, .name:focus { border-color: var(--line); background: var(--panel); outline: none; }
+  .tools { display: flex; flex-wrap: wrap; gap: .3rem; align-items: center; }
+  .tools button, .tools select, .step-tools button, .steps .add {
+    border: 1px solid var(--line); background: var(--panel); padding: .25rem .55rem; font-size: .75rem; }
+  .tools select { max-width: 22ch; }
+  .status { font-size: .75rem; color: var(--muted); }
+  .status button { border: 0; background: none; padding: 0; color: var(--accent); text-decoration: underline; font-size: inherit; }
+  .status.warn { color: var(--del-mark); }
+  .steps .add { border-style: dashed; color: var(--accent); }
+  .about { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); align-items: start; }
+  .meta { display: grid; gap: .35rem; }
+  .meta input, .meta textarea { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); padding: .3rem .5rem; width: 100%; }
+  .meta input { font-weight: 700; }
+  .meta textarea { resize: vertical; min-height: 2.6rem; color: var(--muted); }
+  .step-tools { display: grid; gap: .4rem; font-size: .8rem; color: var(--muted); }
+  .step-tools select { font-size: .8rem; border: 1px solid var(--line); background: var(--panel); padding: .15rem .3rem; }
+  .step-tools .row { display: flex; flex-wrap: wrap; gap: .3rem; align-items: center; }
+  .legend i.del { background: var(--del); box-shadow: inset 3px 0 0 var(--del-mark); }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <input id="name" class="name" aria-label="name" spellcheck="false" />
+    <div class="tools">
+      <select id="paths" aria-label="saved"></select>
+      <button id="new" title="a new set of steps">new</button>
+      <button id="fromLab" title="a copy of the steps of the lab, to change">from the lab</button>
+      <button id="import" title="open a .json exported before">import</button>
+      <button id="export" title="all the steps in one .json file">export</button>
+      <button id="openFolder" class="fs" title="open steps saved in a folder">open folder</button>
+      <button id="saveFolder" class="fs" title="write the steps into a folder, and keep it up to date">save to folder</button>
+      <button id="remove" title="delete these steps from this browser">delete</button>
+      <input type="file" id="importFile" accept=".json,application/json" hidden />
+    </div>
+    <span class="status" id="status"></span>
+  </div>
+  <nav class="steps"><span class="steps" id="steps"></span><button class="add" id="addStep" title="a copy of this step, after it">+ step</button></nav>
+  <div class="about">
+    <div class="meta">
+      <input id="stepTitle" placeholder="title of the step" spellcheck="false" />
+      <textarea id="notes" rows="2" placeholder="notes"></textarea>
+    </div>
+    <div class="step-tools">
+      <div class="row"><label>compare with <select id="compare"></select></label></div>
+      <div class="row"><label><input type="checkbox" id="showRemoved" /> show removed lines</label></div>
+      <div class="row"><button id="left">← move</button><button id="right">move →</button><button id="deleteStep">delete step</button></div>
+    </div>
+  </div>
+</header>
+<div class="work">
+  <section class="pane">
+    <div class="tabs" id="tabs">
+      <button data-file="py">main.py</button>
+      <button data-file="js">main.js</button>
+      <button data-file="css">style.css</button>
+      <button data-file="html">page.html</button>
+      <span class="acts">
+      <button class="act" id="save" title="download this page as one HTML file">⤓ download</button>
+      <button class="act" id="pen" title="open this page on CodePen">CodePen ↗</button>
+      <button class="act run" id="run" title="Ctrl/⌘ + Enter">▶ run</button>
+      </span>
+    </div>
+    <div class="editor"><pre id="marks"></pre><textarea id="code" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea></div>
+    <div class="legend"><span><i></i>new</span><span><i class="del"></i>removed</span><span><code>&lt;link href="style.css"&gt;</code> and <code>&lt;script src="main.js"&gt;</code> bring in the other files; main.js gets main.py as <code>PYTHON</code></span></div>
+  </section>
+  <section class="pane">
+    <iframe class="preview" id="preview" title="the page" allow="autoplay"></iframe>
+  </section>
+</div>
+
+<script type="module">
+import { SITE, PUBLIC, codeEditor, compose, downloadText, openPen } from '../lab/shared.js'
+
+const $ = (id) => document.getElementById(id)
+const toLocal = (t) => t.replaceAll(PUBLIC, SITE)       // the preview uses the files of this server
+const FILES = { py: 'main.py', js: 'main.js', css: 'style.css', html: 'page.html' }
+const FORMAT = 'pysound-steps'
+
+const TEMPLATE = {
+  html: `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A page</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>A page</h1>
+  <pre id="out">loading Python…</pre>
+
+  <script type="module" src="main.js"><\/script>
+</body>
+</html>
+`,
+  js: `import { startPython } from '${PUBLIC}pysound.js'
+
+const py = await startPython()
+document.getElementById('out').textContent = py.runPython(PYTHON)
+`,
+  py: `import sys
+
+f"Python {sys.version.split()[0]}, in the page"
+`,
+  css: `body { font-family: ui-monospace, Menlo, monospace; margin: 1.5rem; background: #f7f5ef; color: #182f3a; line-height: 1.5; }
+h1 { font-size: 1.4rem; margin: 0 0 1rem; }
+button { font: inherit; padding: .4rem .8rem; margin: 0 .3rem .3rem 0; border: 1px solid #087e83; background: #fff; color: #087e83; cursor: pointer; }
+pre { white-space: pre-wrap; background: #fff; border: 1px solid #b9c6c0; padding: .75rem; }
+`,
+}
+
+// --- Storage: every set of steps is a record in IndexedDB ---
+const newId = () => globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`
+let db = null
+try {
+  db = await new Promise((ok, ko) => {
+    const r = indexedDB.open('pysound-editor', 1)
+    r.onupgradeneeded = () => r.result.createObjectStore('paths', { keyPath: 'id' })
+    r.onsuccess = () => ok(r.result)
+    r.onerror = () => ko(r.error)
+  })
+} catch { db = null }
+function store(mode, f) {
+  return new Promise((ok, ko) => {
+    const t = db.transaction('paths', mode), r = f(t.objectStore('paths'))
+    t.oncomplete = () => ok(r?.result)
+    t.onerror = () => ko(t.error)
+  })
+}
+const all = async () => db ? (await store('readonly', (s) => s.getAll())) : []
+const put = (p) => db ? store('readwrite', (s) => s.put(p)) : Promise.resolve()
+const drop = (id) => db ? store('readwrite', (s) => s.delete(id)) : Promise.resolve()
+const remember = (id) => { try { localStorage.setItem('pysound-editor-last', id) } catch {} }
+const lastId = () => { try { return localStorage.getItem('pysound-editor-last') } catch { return null } }
+
+function blankPath(name = 'Untitled') {
+  return { id: newId(), name, steps: [{ title: '', notes: '', files: { ...TEMPLATE } }], current: 0, compare: 'prev', updated: Date.now() }
+}
+
+let path = null          // the set of steps being edited
+let folderAll = true     // the folder needs every step written, not only the current one
+
+// --- The editor ---
+const editor = codeEditor({ tabs: $('tabs'), textarea: $('code'), marks: $('marks'), onRun: run, onChange: changed, showRemoved: true })
+const step = () => path.steps[path.current]
+function commit() { if (path) step().files = editor.files() }
+
+function run() {
+  commit()
+  $('preview').srcdoc = compose(step().files, { swap: toLocal }).html
+}
+
+function compareFiles(i) {
+  const c = path.compare
+  if (c === 'none') return null
+  if (c === 'prev') return i > 0 ? path.steps[i - 1].files : null
+  const k = Number(c)
+  return k >= 0 && k < path.steps.length && k !== i ? path.steps[k].files : null
+}
+
+function paintSteps() {
+  $('steps').replaceChildren(...path.steps.map((s, i) => {
+    const b = document.createElement('button')
+    b.dataset.step = i
+    b.textContent = s.title ? `${i + 1} · ${s.title}` : `${i + 1}`
+    b.classList.toggle('current', i === path.current)
+    return b
+  }))
+  const options = [['prev', 'the step before'], ['none', 'nothing'],
+    ...path.steps.map((s, i) => [String(i), `step ${i + 1}${s.title ? ` · ${s.title}` : ''}`])]
+  $('compare').replaceChildren(...options.map(([v, t]) => new Option(t, v)))
+  if (!options.some(([v]) => v === String(path.compare))) path.compare = 'prev'
+  $('compare').value = String(path.compare)
+  $('left').disabled = path.current === 0
+  $('right').disabled = path.current === path.steps.length - 1
+  $('deleteStep').disabled = path.steps.length === 1
+}
+
+function go(i, keepTab = true, keep = true) {   // keep: put what is in the editor into the current step first
+  if (keep) commit()
+  path.current = Math.min(Math.max(i, 0), path.steps.length - 1)
+  const s = step()
+  editor.load(s.files, compareFiles(path.current), keepTab && editor.current ? editor.current : 'py')
+  $('stepTitle').value = s.title
+  $('notes').value = s.notes
+  paintSteps()
+  run()
+  save()
+}
+
+async function paintPaths() {
+  const list = (await all()).sort((a, b) => b.updated - a.updated)
+  if (!list.some((p) => p.id === path.id)) list.unshift(path)
+  $('paths').replaceChildren(...list.map((p) => new Option(p.id === path.id ? path.name : p.name, p.id)))
+  $('paths').value = path.id
+}
+
+async function open(p) {
+  if (path) { commit(); await put(path) }
+  path = p
+  folderAll = true
+  remember(p.id)
+  $('name').value = p.name
+  go(p.current ?? 0, false, false)
+  await paintPaths()
+}
+
+// --- Saving: a moment after every change, to IndexedDB and, when there is one, to the folder ---
+let timer = null
+function changed() { clearTimeout(timer); timer = setTimeout(save, 400); status('…') }
+async function save() {
+  clearTimeout(timer)
+  commit()
+  path.updated = Date.now()
+  try { await put(path) } catch (e) { status(`not saved: ${e.message}`, true); return }
+  if (!db) { status('not kept by this browser: export to keep it', true); return }
+  if (path.folder) await toFolder()
+  else status('saved')
+}
+function status(text, warn = false) {
+  $('status').textContent = text
+  $('status').classList.toggle('warn', warn)
+}
+
+// --- Folders (Chrome): steps.json, and one folder per step with its four files ---
+const canFolder = 'showDirectoryPicker' in window
+for (const b of document.querySelectorAll('.fs')) b.hidden = !canFolder
+
+async function allowed(dir, ask) {
+  const opts = { mode: 'readwrite' }
+  if ((await dir.queryPermission(opts)) === 'granted') return true
+  return ask && (await dir.requestPermission(opts)) === 'granted'
+}
+async function writeFile(dir, name, text) {
+  const w = await (await dir.getFileHandle(name, { create: true })).createWritable()
+  await w.write(text)
+  await w.close()
+}
+async function writeStep(dir, i) {
+  const d = await dir.getDirectoryHandle(String(i + 1), { create: true })
+  for (const [k, f] of Object.entries(FILES)) await writeFile(d, f, path.steps[i].files[k] ?? '')
+}
+let writing = Promise.resolve()
+function toFolder(ask = false) {
+  writing = writing.catch(() => {}).then(async () => {
+    const dir = path.folder
+    if (!(await allowed(dir, ask))) {
+      $('status').replaceChildren(`saved here; folder ${dir.name}: `)
+      const b = document.createElement('button'); b.textContent = 'reconnect'
+      b.onclick = () => toFolder(true); $('status').append(b)
+      return
+    }
+    try {
+      const meta = { format: FORMAT, version: 1, name: path.name, steps: path.steps.map(({ title, notes }) => ({ title, notes })) }
+      await writeFile(dir, 'steps.json', JSON.stringify(meta, null, 2) + '\n')
+      if (folderAll) {
+        for (let i = 0; i < path.steps.length; i++) await writeStep(dir, i)
+        for await (const [name, h] of dir.entries())       // steps that are no longer there
+          if (h.kind === 'directory' && /^\d+$/.test(name) && Number(name) > path.steps.length) await dir.removeEntry(name, { recursive: true })
+        folderAll = false
+      } else await writeStep(dir, path.current)
+      status(`saved · folder ${dir.name}`)
+    } catch (e) { status(`folder ${dir.name}: ${e.message}`, true) }
+  })
+  return writing
+}
+async function readFolder(dir) {
+  let meta
+  try { meta = JSON.parse(await (await (await dir.getFileHandle('steps.json')).getFile()).text()) }
+  catch { throw new Error(`no steps.json in ${dir.name}`) }
+  const steps = []
+  for (let i = 0; i < meta.steps.length; i++) {
+    const d = await dir.getDirectoryHandle(String(i + 1)), files = {}
+    for (const [k, f] of Object.entries(FILES))
+      files[k] = await d.getFileHandle(f).then((h) => h.getFile()).then((f) => f.text()).catch(() => '')
+    steps.push({ title: meta.steps[i].title ?? '', notes: meta.steps[i].notes ?? '', files })
+  }
+  return { id: newId(), name: meta.name || dir.name, steps, current: 0, compare: 'prev', updated: Date.now(), folder: dir }
+}
+
+// --- The lab, as a starting point ---
+async function fromLab() {
+  const { steps } = await import('../lab/steps.js')
+  const text = (html) => new DOMParser().parseFromString(html, 'text/html').body.textContent
+  const lab = new URL('../lab/steps/', import.meta.url)
+  const out = await Promise.all(steps.map(async (s, i) => {
+    const files = { css: '' }
+    for (const [k, f] of Object.entries(FILES)) if (k !== 'css')
+      files[k] = (await (await fetch(new URL(`${i + 1}/${f}`, lab))).text()).replaceAll('{{SITE}}', PUBLIC)
+    return { title: s.title, notes: text(s.text), files }
+  }))
+  return { ...blankPath('Python in a web page'), steps: out }
+}
+
+// --- Controls ---
+$('steps').onclick = (e) => { const b = e.target.closest('[data-step]'); if (b) go(Number(b.dataset.step)) }
+$('addStep').onclick = () => {
+  commit()
+  const copy = structuredClone(step())
+  copy.title = ''
+  copy.notes = ''
+  path.steps.splice(path.current + 1, 0, copy)
+  folderAll = true
+  go(path.current + 1)
+}
+$('deleteStep').onclick = () => {
+  if (path.steps.length === 1 || !confirm(`Delete step ${path.current + 1}?`)) return
+  path.steps.splice(path.current, 1)
+  folderAll = true
+  go(Math.min(path.current, path.steps.length - 1), true, false)   // the editor holds the step that is gone
+}
+function move(by) {
+  commit()
+  const i = path.current, j = i + by
+  if (j < 0 || j >= path.steps.length) return
+  ;[path.steps[i], path.steps[j]] = [path.steps[j], path.steps[i]]
+  path.current = j
+  folderAll = true
+  go(j)
+}
+$('left').onclick = () => move(-1)
+$('right').onclick = () => move(1)
+$('stepTitle').addEventListener('input', () => { step().title = $('stepTitle').value; paintSteps(); changed() })
+$('notes').addEventListener('input', () => { step().notes = $('notes').value; changed() })
+$('name').addEventListener('input', () => { path.name = $('name').value; $('paths').selectedOptions[0].text = path.name; changed() })
+$('compare').onchange = () => { path.compare = $('compare').value; editor.compare(compareFiles(path.current)); save() }
+$('showRemoved').onchange = () => editor.setView($('showRemoved').checked)
+
+$('paths').onchange = async () => { const p = (await all()).find((p) => p.id === $('paths').value); if (p) open(p) }
+$('new').onclick = () => open(blankPath())
+$('fromLab').onclick = async () => open(await fromLab())
+$('remove').onclick = async () => {
+  if (!confirm(`Delete "${path.name}" from this browser? A folder or an exported file stays as it is.`)) return
+  await drop(path.id)
+  const rest = (await all()).sort((a, b) => b.updated - a.updated)
+  path = null
+  open(rest[0] ?? blankPath())
+}
+$('export').onclick = () => {
+  commit()
+  const data = { format: FORMAT, version: 1, name: path.name, steps: path.steps }
+  const slug = path.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'steps'
+  downloadText(`${slug}.json`, JSON.stringify(data, null, 2) + '\n', 'application/json')
+}
+$('import').onclick = () => $('importFile').click()
+$('importFile').onchange = async () => {
+  const file = $('importFile').files[0]
+  $('importFile').value = ''
+  if (!file) return
+  try {
+    const data = JSON.parse(await file.text())
+    if (data.format !== FORMAT || !Array.isArray(data.steps) || !data.steps.length) throw new Error('not a file of steps')
+    const steps = data.steps.map((s) => ({ title: s.title ?? '', notes: s.notes ?? '',
+      files: Object.fromEntries(Object.keys(FILES).map((k) => [k, s.files?.[k] ?? ''])) }))
+    open({ ...blankPath(data.name || file.name.replace(/\.json$/, '')), steps })
+  } catch (e) { status(`${file.name}: ${e.message}`, true) }
+}
+$('saveFolder').onclick = async () => {
+  try {
+    path.folder = await showDirectoryPicker({ id: 'pysound-steps', mode: 'readwrite' })
+    folderAll = true
+    commit(); await put(path); await toFolder(true)
+  } catch (e) { if (e.name !== 'AbortError') status(e.message, true) }
+}
+$('openFolder').onclick = async () => {
+  try {
+    const dir = await showDirectoryPicker({ id: 'pysound-steps', mode: 'readwrite' })
+    open(await readFolder(dir))
+  } catch (e) { if (e.name !== 'AbortError') status(e.message, true) }
+}
+
+$('run').onclick = run
+$('save').onclick = () => {
+  commit()
+  const slug = path.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'page'
+  downloadText(`${slug}-step-${path.current + 1}.html`, compose(step().files).html)
+}
+$('pen').onclick = () => { commit(); openPen(`${path.name} · ${path.current + 1}`, step().files) }
+document.addEventListener('keydown', (e) => { if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); save() } })
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && path) save() })
+
+// --- Start: the last set of steps opened, or a new one ---
+const saved = await all()
+open(saved.find((p) => p.id === lastId()) ?? saved.sort((a, b) => b.updated - a.updated)[0] ?? blankPath())
+</script>
+</body>
+</html>
