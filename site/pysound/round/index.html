@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Fra Martino</title>
+<style>
+  :root { color-scheme: light; font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+          --bg: #f7f5ef; --panel: #fff; --ink: #182f3a; --muted: #53656c; --line: #b9c6c0; --soft: #e4e9e4;
+          --accent: #087e83; --accent-soft: #cfe7e6; --warm: #b5651d; --warm-soft: #f3e1cf; --error: #a3271f; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { color-scheme: dark; --bg: #11191d; --panel: #182327; --ink: #e3ece9; --muted: #9db0b2;
+      --line: #36484d; --soft: #22323a; --accent: #3fb5b0; --accent-soft: #1e4e50; --warm: #e0a060; --warm-soft: #4a3520; --error: #ff8a80; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); }
+  main { max-width: 1040px; margin: 0 auto; padding: 2rem 16px 4rem; }
+  h1 { margin: 0; font-size: clamp(1.6rem, 4vw, 2.6rem); letter-spacing: -.05em; font-weight: 650; }
+  .intro { color: var(--muted); line-height: 1.6; max-width: 700px; }
+  h2 { margin: 2rem 0 .75rem; font-size: .8rem; color: var(--accent); font-weight: 500; letter-spacing: .08em; }
+  button, select, input { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  .bar { display: flex; flex-wrap: wrap; gap: .75rem 1.5rem; align-items: center; }
+  .go { padding: .5rem 1rem; border: 1px solid var(--accent); background: var(--accent); color: #fff; }
+  .go:disabled { background: transparent; color: var(--accent); cursor: default; }
+  #state { font-size: .8rem; color: var(--muted); }
+  .beats { display: flex; gap: .35rem; align-items: center; font-size: .85rem; }
+  .beats i { width: .8rem; height: .8rem; border-radius: 50%; background: var(--soft); display: inline-block; }
+  .beats i.on { background: var(--accent); }
+  .beats i.on.one { background: var(--warm); }
+  label { display: flex; gap: .5rem; align-items: center; font-size: .85rem; color: var(--muted); }
+  select, input[type=text] { background: var(--panel); border: 1px solid var(--line); padding: .3rem .4rem; }
+  input[type=range] { accent-color: var(--accent); width: 160px; }
+
+  .palette { display: grid; gap: .5rem; padding: .75rem; border: 1px solid var(--line); background: var(--panel); position: sticky; top: 0; z-index: 2; }
+  .palette .row { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; }
+  .palette .row > span { width: 4.5rem; font-size: .75rem; color: var(--muted); }
+  .chip { border: 1px solid var(--line); background: var(--bg); padding: .25rem .6rem; font-size: .85rem; }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+  .chip.part { border-color: var(--accent); }
+  .palette .target { font-size: .75rem; color: var(--muted); }
+  .palette .target b { color: var(--accent); font-weight: 600; }
+
+  .voice { border: 1px solid var(--line); background: var(--panel); padding: .6rem .75rem .75rem; margin-top: .75rem; }
+  .voice.selected { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
+  .voice .head { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; }
+  .voice .name { font-weight: 650; border: 0; background: none; padding: 0; font-size: 1rem; }
+  .voice .plays { font-size: .8rem; color: var(--muted); flex: 1; min-width: 12rem; }
+  .voice .plays code { color: var(--ink); }
+  .voice .status { font-size: .8rem; color: var(--warm); }
+  .voice .remove { border: 0; background: none; color: var(--muted); font-size: 1.1rem; }
+  .voice canvas { width: 100%; height: 72px; display: block; margin: .5rem 0; background: var(--bg); }
+  .voice .expr { display: flex; gap: .5rem; }
+  .voice .expr input { flex: 1; min-width: 0; }
+  .voice .expr button { border: 1px solid var(--accent); background: var(--accent-soft); padding: .3rem .8rem; }
+  .voice .error { color: var(--error); font-size: .78rem; white-space: pre-wrap; }
+  .add { margin-top: .75rem; border: 1px dashed var(--accent); background: none; color: var(--accent); padding: .5rem 1rem; }
+
+  .grid { display: grid; grid-template-columns: 4rem repeat(16, 1fr); gap: 3px; align-items: center; }
+  .grid span { font-size: .8rem; color: var(--muted); }
+  .grid button { height: 30px; border: 1px solid var(--line); background: var(--panel); padding: 0; }
+  .grid button:nth-of-type(4n + 1) { border-left: 2px solid var(--muted); }
+  .grid button.on { background: var(--accent); border-color: var(--accent); }
+  .grid button.now { outline: 2px solid var(--warm); outline-offset: -2px; }
+
+  .log { border: 1px solid var(--line); background: var(--panel); }
+  .log ol { margin: 0; padding: .6rem .75rem .6rem 3rem; max-height: 16rem; overflow-y: auto; font-size: .82rem; line-height: 1.6; }
+  .log li::marker { color: var(--muted); }
+  .log .line { display: flex; gap: .5rem; border-top: 1px solid var(--line); padding: .5rem .75rem; align-items: center; }
+  .log .line span { color: var(--accent); }
+  .log .line input { flex: 1; min-width: 0; border: 0; background: transparent; outline: none; }
+  .log .tools { display: flex; justify-content: space-between; align-items: center; padding: .4rem .75rem; border-bottom: 1px solid var(--line); font-size: .75rem; color: var(--muted); }
+  .log .tools button { border: 1px solid var(--line); background: var(--bg); padding: .15rem .5rem; font-size: .75rem; }
+  #message { font-size: .8rem; color: var(--muted); white-space: pre-wrap; padding: 0 .75rem .5rem; }
+  #message.error { color: var(--error); }
+  details { margin-top: 1rem; }
+  summary { cursor: pointer; color: var(--muted); font-size: .85rem; }
+  pre { overflow-x: auto; padding: .75rem; border: 1px solid var(--line); background: var(--panel); font-size: .78rem; line-height: 1.5; }
+  @media (max-width: 640px) { .grid { grid-template-columns: 2.5rem repeat(16, 1fr); gap: 1px; } .grid button { height: 26px; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Fra Martino</h1>
+  <p class="intro">The band of lesson 11 runs in Python, in this page, through sounddevice. Every control writes a line of Python and runs it:
+    the lines are in the log at the bottom, and they work in a notebook too. A change waits for the end of the round, as <code>next</code> does.</p>
+
+  <div class="bar">
+    <button class="go" id="go" disabled>loading Python…</button>
+    <span class="beats" id="beats"><i></i><i></i><i></i><i></i><b id="where"></b></span>
+    <span id="state"></span>
+  </div>
+
+  <div class="bar" style="margin-top: 1rem">
+    <label>tempo <input type="range" id="bpm" min="40" max="180" value="100" /> <output id="bpmOut">100</output></label>
+    <label>key
+      <select id="root"></select>
+      <select id="scale"><option>minor</option><option>major</option><option>hijaz</option><option>whole_tone</option></select>
+    </label>
+  </div>
+
+  <h2>VOICES</h2>
+  <div class="palette" id="palette">
+    <div class="target">builds the clip of <b id="target">melody</b> · then <b>send</b> (or Enter): it starts at the end of the round</div>
+    <div class="row"><span>parts</span>
+      <button class="chip part" data-part="call">call</button>
+      <button class="chip part" data-part="climb">climb</button>
+      <button class="chip part" data-part="bells">bells</button>
+      <button class="chip part" data-part="ending">ending</button>
+      <button class="chip part" data-part="fm">fm</button>
+      <button class="chip part" data-part="this" title="the clip it plays now">this</button>
+      <button class="chip part" data-part="note(0) >> note(-3)" title="tonic, then the fifth below">note(0) &gt;&gt; note(-3)</button>
+    </div>
+    <div class="row"><span>join</span>
+      <button class="chip" data-join=" >> " title="then">&gt;&gt; then</button>
+      <button class="chip" data-join=" | " title="together">| together</button>
+      <button class="chip" data-op="* 2" title="again">* 2</button>
+    </div>
+    <div class="row"><span>turn</span>
+      <button class="chip" data-wrap="backwards(#)">backwards</button>
+      <button class="chip" data-wrap="upside_down(#)">upside_down</button>
+      <button class="chip" data-wrap="faster(#, 2)">faster ×2</button>
+      <button class="chip" data-wrap="faster(#, 0.5)">slower ×2</button>
+      <button class="chip" data-op="+ 2">+ 2 degrees</button>
+      <button class="chip" data-op="- 7">− 7 (an octave down)</button>
+      <button class="chip" data-clear>clear</button>
+    </div>
+  </div>
+  <div id="voices"></div>
+  <button class="add" id="add">+ add a voice (enters at the next round)</button>
+
+  <h2>DRUMS</h2>
+  <div class="grid" id="grid"></div>
+
+  <h2>THE PYTHON</h2>
+  <div class="log">
+    <div class="tools"><span>what the controls ran, in order</span><button id="copy">copy</button></div>
+    <ol id="log"></ol>
+    <div class="line"><span>&gt;&gt;&gt;</span><input type="text" id="line" spellcheck="false" placeholder="any Python: clock.bpm = 60, melody.next = call * 2, …" /></div>
+    <div id="message"></div>
+  </div>
+  <details><summary>band.py and setup.py, run when the page loaded</summary>
+    <pre id="setup"></pre><pre id="library"></pre></details>
+</main>
+
+<script type="module">
+import { startPython, audio } from '../pysound.js'
+
+const $ = (id) => document.getElementById(id)
+let py = null
+
+// --- Running Python, and the log of what ran ---
+
+const log = $('log'), message = $('message')
+function run(statement, { replace = null } = {}) {
+  try {
+    const result = py.runPython(statement)
+    const last = log.lastElementChild
+    if (replace && last && last.textContent.startsWith(replace)) last.textContent = statement
+    else { const li = document.createElement('li'); li.textContent = statement; log.append(li) }
+    log.scrollTop = log.scrollHeight
+    message.className = ''
+    message.textContent = result === undefined ? '' : String(result)
+    if (result && result.destroy) result.destroy()
+    return true
+  } catch (error) {
+    message.className = 'error'
+    message.textContent = String(error.message || error).trim().split('\n').at(-1)
+    return false
+  }
+}
+
+// --- Voices ---
+
+const instruments = ['pluck', 'bell', 'reed', 'bass', 'timpani']
+const names = ['melody', 'second', 'third', 'fourth', 'fifth', 'sixth']
+const defaults = { melody: ['pluck', 0], second: ['reed', 0], third: ['reed', 1], fourth: ['bell', 1] }
+const voices = new Map()           // name -> { el, canvas, input, text, pending, ... }
+let selected = 'melody'
+
+const sound = (instrument, octave) => `played(${instrument}${octave ? ', ' + octave : ''})`
+
+function addVoiceRow(name, instrument, octave, text) {
+  const el = document.createElement('div')
+  el.className = 'voice'
+  el.innerHTML = `
+    <div class="head">
+      <button class="name"></button>
+      <select class="instrument">${instruments.map((i) => `<option>${i}</option>`).join('')}</select>
+      <select class="octave"><option value="-1">octave −1</option><option value="0">octave 0</option><option value="1">octave +1</option></select>
+      <span class="plays">plays <code></code></span>
+      <span class="status"></span>
+      <button class="remove" title="remove">×</button>
+    </div>
+    <canvas></canvas>
+    <div class="expr"><input type="text" spellcheck="false" /><button>send</button></div>
+    <div class="error"></div>`
+  const v = { name, el, text, pending: null, canvas: el.querySelector('canvas'), input: el.querySelector('input'),
+              plays: el.querySelector('.plays code'), status: el.querySelector('.status'), error: el.querySelector('.error') }
+  el.querySelector('.name').textContent = name
+  el.querySelector('.instrument').value = instrument
+  el.querySelector('.octave').value = String(octave)
+  v.plays.textContent = text
+  v.input.value = text
+  const changeSound = () => run(`${name}.sound = ${sound(el.querySelector('.instrument').value, Number(el.querySelector('.octave').value))}`)
+  el.querySelector('.instrument').onchange = changeSound
+  el.querySelector('.octave').onchange = changeSound
+  el.querySelector('.remove').onclick = () => {
+    if (run(`m.sources.remove(${name})`)) { el.remove(); voices.delete(name); if (selected === name) select([...voices.keys()][0]) }
+  }
+  el.querySelector('.expr button').onclick = () => send(v)
+  v.input.addEventListener('keydown', (e) => { if (e.key === 'Enter') send(v) })
+  el.addEventListener('pointerdown', () => select(name))
+  v.input.addEventListener('focus', () => select(name))
+  $('voices').append(el)
+  voices.set(name, v)
+  select(name)
+  return v
+}
+
+function select(name) {
+  selected = name
+  for (const [n, v] of voices) v.el.classList.toggle('selected', n === name)
+  $('target').textContent = name || '—'
+}
+
+function send(v) {
+  const text = v.input.value.trim()
+  if (!text) return
+  const code = text.replace(/\bthis\b/g, `${v.name}.clip`)
+  if (run(`${v.name}.next = ${code}`)) { v.pending = text; v.error.textContent = '' }
+  else v.error.textContent = message.textContent
+}
+
+$('add').onclick = () => {
+  const name = names.find((n) => !voices.has(n))
+  if (!name) return
+  const [instrument, octave] = defaults[name] || ['pluck', 1]
+  if (run(`${name} = enter(${sound(instrument, octave)})`)) addVoiceRow(name, instrument, octave, 'fm')
+}
+
+// --- The palette: it edits the text of the selected voice ---
+
+const endsOpen = (t) => t === '' || /(>>|\||\(|,)\s*$/.test(t)
+function closed(t) {                          // can t take an operator without parentheses?
+  if (/^\w+$/.test(t)) return true
+  const m = t.match(/^\w+\(/)
+  if (!m || !t.endsWith(')')) return false
+  let depth = 0
+  for (let i = m[0].length - 1; i < t.length; i++) {
+    if (t[i] === '(') depth++
+    if (t[i] === ')') depth--
+    if (depth === 0 && i < t.length - 1) return false
+  }
+  return true
+}
+$('palette').addEventListener('click', (e) => {
+  const chip = e.target.closest('.chip')
+  const v = voices.get(selected)
+  if (!chip || !v) return
+  let t = v.input.value.trim()
+  const d = chip.dataset
+  if (d.part) t = endsOpen(t) ? t + (t && !t.endsWith('(') ? ' ' : '') + d.part : d.part
+  else if (d.join) t = t + d.join
+  else if (d.op) t = t ? `${closed(t) ? t : '(' + t + ')'} ${d.op}` : t
+  else if (d.wrap) t = d.wrap.replace('#', t || 'this')
+  else if ('clear' in d) t = ''
+  v.input.value = t.replace(/\s+/g, ' ').replace(/^ /, '')
+  v.input.focus()
+})
+
+// --- Drums ---
+
+const rows = [['kicks', 'kick'], ['snares', 'snare'], ['hats', 'hat']]
+const cells = {}
+for (const [name, label] of rows) {
+  const span = document.createElement('span'); span.textContent = label; $('grid').append(span)
+  cells[name] = []
+  for (let i = 0; i < 16; i++) {
+    const b = document.createElement('button')
+    b.title = `${name}.toggle(${i})`
+    b.onclick = () => run(`${name}.toggle(${i})`)
+    $('grid').append(b); cells[name].push(b)
+  }
+}
+
+// --- Tempo and key ---
+
+$('bpm').addEventListener('input', () => { $('bpmOut').textContent = $('bpm').value; run(`clock.bpm = ${$('bpm').value}`, { replace: 'clock.bpm =' }) })
+const roots = ['C3', 'C#3', 'D3', 'D#3', 'E3', 'F3', 'F#3', 'G3', 'G#3', 'A3', 'A#3', 'B3']
+$('root').innerHTML = roots.map((r) => `<option>${r}</option>`).join('')
+$('root').value = 'D3'
+const setKey = () => run(`key = Scale(${$('scale').value}, Pitch("${$('root').value}"))`, { replace: 'key =' })
+$('root').onchange = setKey
+$('scale').onchange = setKey
+
+// --- The Python line ---
+
+$('line').addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter' || !$('line').value.trim()) return
+  if (run($('line').value.trim())) $('line').value = ''
+})
+$('copy').onclick = () => navigator.clipboard.writeText([...log.children].map((li) => li.textContent).join('\n'))
+
+// --- Drawing what Python plays, where the music is now ---
+
+let colors = {}
+function readColors() {
+  const s = getComputedStyle(document.documentElement)
+  for (const k of ['ink', 'muted', 'line', 'soft', 'accent', 'warm', 'bg']) colors[k] = s.getPropertyValue('--' + k).trim()
+}
+readColors()
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', readColors)
+
+function draw(v, data, beat) {
+  const c = v.canvas, dpr = devicePixelRatio || 1
+  const w = c.clientWidth, h = c.clientHeight
+  if (c.width !== w * dpr || c.height !== h * dpr) { c.width = w * dpr; c.height = h * dpr }
+  const g = c.getContext('2d')
+  g.setTransform(dpr, 0, 0, dpr, 0, 0)
+  g.clearRect(0, 0, w, h)
+  const { events, length, start } = data
+  const degrees = events.map((e) => e[1])
+  let lo = Math.min(0, ...degrees), hi = Math.max(5, ...degrees)
+  if (hi - lo < 7) hi = lo + 7
+  const rowH = (h - 8) / (hi - lo + 1)
+  const x = (b) => (b / length) * w
+  const y = (d) => 4 + (hi - d) * rowH
+  // beat lines, every 4 beats darker
+  for (let b = 0; b <= length; b++) {
+    g.fillStyle = b % 4 === 0 ? colors.line : colors.soft
+    g.fillRect(Math.round(x(b)), 0, 1, h)
+  }
+  g.fillStyle = colors.line
+  g.fillRect(0, Math.round(y(0) + rowH / 2), w, 1)                   // degree 0, the tonic
+  const pos = beat >= start ? (beat - start) % length : -1
+  const onsets = [...new Set(events.map((e) => e[0]))].sort((a, b) => a - b)
+  for (const [onset, degree] of events) {
+    const nextOnset = onsets.find((o) => o > onset) ?? length
+    const on = pos >= onset && pos < nextOnset
+    g.fillStyle = on ? colors.warm : colors.accent
+    const bx = x(onset) + 1, bw = Math.max(3, x(nextOnset) - x(onset) - 2)
+    g.beginPath(); g.roundRect(bx, y(degree) + 1, bw, Math.max(3, rowH - 2), 3); g.fill()
+  }
+  if (pos >= 0) { g.fillStyle = colors.warm; g.fillRect(Math.round(x(pos)), 0, 2, h) }
+}
+
+let snapshot = null
+function frame() {
+  requestAnimationFrame(frame)
+  if (!snapshot) return
+  let s
+  try { s = JSON.parse(snapshot([...voices.keys()].join(','))) } catch { return }
+  const beat = Math.max(0, s.beat)
+  // the beat dots and the bar
+  const dots = $('beats').querySelectorAll('i'), b = Math.floor(beat)
+  dots.forEach((d, i) => { d.classList.toggle('on', audio.ready && b % 4 === i); d.classList.toggle('one', i === 0) })
+  $('where').textContent = audio.ready ? `bar ${Math.floor(b / 4) + 1}` : ''
+  for (const data of s.voices) {
+    const v = voices.get(data.name)
+    if (!v) continue
+    if (!data.next && v.pending !== null) { v.text = v.pending; v.pending = null; v.plays.textContent = v.text }
+    if (v.pending !== null) {
+      const edge = data.start + Math.ceil(Math.max(0, beat - data.start) / data.length + 1e-9) * data.length
+      v.status.textContent = `next: ${v.pending} · in ${(edge - beat).toFixed(1)} beats`
+    } else if (beat < data.start) v.status.textContent = `enters in ${(data.start - beat).toFixed(1)} beats`
+    else v.status.textContent = ''
+    draw(v, data, beat)
+  }
+  for (const [name] of rows) {
+    const steps = s.steps[name], col = Math.floor((beat % 4) / 0.25)
+    cells[name].forEach((cell, i) => { cell.classList.toggle('on', steps[i] === 'x'); cell.classList.toggle('now', audio.ready && i === col) })
+  }
+  if (audio.ready) $('state').textContent = `${audio.engine} · underflows: ${audio.underflows}`
+}
+
+// --- Start: Python, the library, the band ---
+
+$('go').addEventListener('click', () => { $('go').disabled = true; $('go').textContent = 'audio on' })
+const [library, setup] = await Promise.all(['band.py', 'setup.py'].map(async (f) => (await fetch(f)).text()))
+$('library').textContent = library
+$('setup').textContent = setup
+py = await startPython({ button: '#go' })
+window.pyodide = py                          // for the console: pyodide.runPython("melody.next = call")
+py.runPython(library)
+py.runPython(setup)
+snapshot = py.globals.get('snapshot')
+addVoiceRow('melody', 'pluck', 0, 'fm')
+$('go').disabled = false
+$('go').textContent = '▶ start audio'
+requestAnimationFrame(frame)
+window.roundReady = true
+</script>
+</body>
+</html>

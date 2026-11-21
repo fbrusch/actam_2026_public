@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Latency</title>
+  <style>
+    body { font-family: ui-monospace, Menlo, monospace; margin: 1.5rem; background: #f7f5ef; color: #182f3a; line-height: 1.5; }
+    h1 { font-size: 1.4rem; margin: 0 0 1rem; }
+    button { font: inherit; padding: .4rem .8rem; margin: 0 .3rem .3rem 0; border: 1px solid #087e83; background: #fff; color: #087e83; cursor: pointer; }
+    button:disabled { opacity: .45; cursor: default; }
+    #state { color: #53656c; font-size: .85rem; }
+    .lights div { margin: 1rem 0; }
+    .light { display: inline-block; width: 1.4rem; height: 1.4rem; border-radius: 50%; background: #e4e9e4; vertical-align: middle; margin-right: .6rem; }
+    .light.on { background: #b5651d; }
+  </style>
+</head>
+<body>
+  <h1>Latency</h1>
+  <button id="play" disabled>▶ play</button>
+  <button id="stop" disabled>stop</button>
+  <span id="state">loading Python…</span>
+  <div class="lights">
+    <div><span class="light" id="made"></span> Python makes the click <b id="madeBeat"></b></div>
+    <div><span class="light" id="heard"></span> you hear the click <b id="heardBeat"></b></div>
+  </div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
