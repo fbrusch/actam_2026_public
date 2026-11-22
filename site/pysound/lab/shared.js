@@ -35,7 +35,7 @@ export function changes(text, old) {          // which lines of text are new, an
 }
 
 // --- The editor: a textarea over a <pre> that marks the lines; tabs for the files ---
-export function codeEditor({ tabs, textarea, marks, onRun = () => {}, onChange = () => {}, showRemoved = false }) {
+export function codeEditor({ tabs, textarea, marks, onRun = null, onChange = () => {}, showRemoved = false }) {
   let files = {}, before = null, current = null, view = false
   const box = textarea.parentElement
   for (const b of tabs.querySelectorAll('[data-file]')) b.dataset.label = b.textContent
@@ -83,7 +83,7 @@ export function codeEditor({ tabs, textarea, marks, onRun = () => {}, onChange =
   textarea.addEventListener('input', () => { sync(); paint(); onChange(current) })
   textarea.addEventListener('scroll', () => { if (!view) { marks.scrollTop = textarea.scrollTop; marks.scrollLeft = textarea.scrollLeft } })
   textarea.addEventListener('keydown', (e) => {
-    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); onRun() }
+    if (onRun && (e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); onRun() }
     else if (e.key === 'Tab' && !e.shiftKey && !e.metaKey && !e.ctrlKey && !e.altKey) {
       e.preventDefault()
       textarea.setRangeText(current === 'py' ? '    ' : '  ', textarea.selectionStart, textarea.selectionEnd, 'end')
@@ -103,6 +103,40 @@ export function codeEditor({ tabs, textarea, marks, onRun = () => {}, onChange =
     files() { sync(); return { ...files } },
     get current() { return current },
   }
+}
+
+// --- Shortcuts: a key combination as text, 'Mod+Shift+S' (Mod is ⌘ on a Mac, Ctrl elsewhere) ---
+export const MAC = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent)
+export function comboOf(e) {
+  if (['Meta', 'Control', 'Alt', 'Shift', 'CapsLock'].includes(e.key)) return null
+  const key = /^Key[A-Z]$/.test(e.code) ? e.code.slice(3) : /^Digit\d$/.test(e.code) ? e.code.slice(5)
+            : e.key === ' ' ? 'Space' : e.key.length === 1 ? e.key.toUpperCase() : e.key
+  const mods = []
+  if (MAC ? e.metaKey : e.ctrlKey) mods.push('Mod')
+  if (MAC && e.ctrlKey) mods.push('Ctrl')
+  if (e.altKey) mods.push('Alt')
+  if (e.shiftKey) mods.push('Shift')
+  return [...mods, key].join('+')
+}
+const SIGNS = { ArrowUp: '↑', ArrowDown: '↓', ArrowLeft: '←', ArrowRight: '→', Enter: '↩', Backspace: '⌫', Escape: 'Esc' }
+export function showCombo(c) {
+  if (!c) return ''
+  const parts = c.split('+').map((p) => SIGNS[p] ?? p)
+  if (!MAC) return parts.map((p) => p === 'Mod' ? 'Ctrl' : p).join('+')
+  return parts.map((p) => ({ Mod: '⌘', Ctrl: '⌃', Alt: '⌥', Shift: '⇧' })[p] ?? p).join('')
+}
+// keys: { 'Mod+Enter': run }, or a function from a combination to what to do. The preview counts too.
+export function shortcuts(keys, preview) {
+  const find = typeof keys === 'function' ? keys : (c) => keys[c]
+  const onKey = (e) => {
+    if (e.defaultPrevented) return
+    const f = find(comboOf(e))
+    if (f) { e.preventDefault(); f() }
+  }
+  document.addEventListener('keydown', onKey)
+  preview?.addEventListener('load', () => {     // the page in the preview is a srcdoc: same origin
+    try { preview.contentDocument.addEventListener('keydown', onKey) } catch {}
+  })
 }
 
 // --- The page, put together ---
