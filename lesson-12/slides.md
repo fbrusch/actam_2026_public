@@ -111,6 +111,59 @@ platform.machine()       # 'wasm32'
 class: dark
 ---
 
+<div class="chapter"><div class="kicker">Architecture</div><h1>Python, driven<br>by JavaScript</h1></div>
+
+---
+
+# One page, two languages
+
+<div class="flow">
+  <div>HTML<small>buttons, sliders, keys</small></div><b>→</b>
+  <div>JavaScript<small>events: click, input, keydown</small></div><b>⇄</b>
+  <div class="hot">Python<small>Pyodide, in the same page</small></div><b>⇄</b>
+  <div>Web Audio</div>
+</div>
+
+| from JavaScript | what it does |
+|---|---|
+| `py.runPython("2 ** 100")` | runs a text of Python, returns the value of the last line |
+| `py.globals.get("shout")` | a Python name, as a JavaScript value |
+| `py.globals.set("f", 440)` | sets a Python variable |
+
+From Python, `import js` gives the page: `js.document.getElementById("out")`.
+
+---
+class: code-sm
+---
+
+# Values that cross
+
+```js
+py.runPython("1 + 1")              // 2: a number
+py.runPython("2 ** 100")           // a BigInt: too big for a JavaScript number
+py.runPython("'fra' + ' martino'") // a string
+
+const shout = py.globals.get("shout")
+shout("fra martino", 3)            // a Python function, called from JavaScript
+
+const list = py.globals.get("notes")(10)
+list.toJs()                        // a list stays in Python: a proxy; toJs() copies it
+```
+
+- Numbers and strings are converted. Lists, dicts, functions stay in Python, and JavaScript holds a **proxy**.
+
+<LabCue step="2" task="Evaluate expressions, call shout and notes, let Python write in the page." />
+
+---
+
+# The lab
+
+<LabFrame :step="2" :height="430" />
+
+---
+class: dark
+---
+
 <div class="chapter"><div class="kicker">An adapter</div><h1>No sound card<br>in there</h1></div>
 
 ---
@@ -174,59 +227,6 @@ stream.start()
 <!--
 The details are in pysound.js and sounddevice.py, on the site: about 150 lines of JavaScript and 150 of Python. The point is the shape: the page is the sound card, and it asks Python for blocks.
 -->
-
----
-class: dark
----
-
-<div class="chapter"><div class="kicker">Architecture</div><h1>Python, driven<br>by JavaScript</h1></div>
-
----
-
-# One page, two languages
-
-<div class="flow">
-  <div>HTML<small>buttons, sliders, keys</small></div><b>→</b>
-  <div>JavaScript<small>events: click, input, keydown</small></div><b>⇄</b>
-  <div class="hot">Python<small>Pyodide, in the same page</small></div><b>⇄</b>
-  <div>Web Audio</div>
-</div>
-
-| from JavaScript | what it does |
-|---|---|
-| `py.runPython("2 ** 100")` | runs a text of Python, returns the value of the last line |
-| `py.globals.get("shout")` | a Python name, as a JavaScript value |
-| `py.globals.set("f", 440)` | sets a Python variable |
-
-From Python, `import js` gives the page: `js.document.getElementById("out")`.
-
----
-class: code-sm
----
-
-# Values that cross
-
-```js
-py.runPython("1 + 1")              // 2: a number
-py.runPython("2 ** 100")           // a BigInt: too big for a JavaScript number
-py.runPython("'fra' + ' martino'") // a string
-
-const shout = py.globals.get("shout")
-shout("fra martino", 3)            // a Python function, called from JavaScript
-
-const list = py.globals.get("notes")(10)
-list.toJs()                        // a list stays in Python: a proxy; toJs() copies it
-```
-
-- Numbers and strings are converted. Lists, dicts, functions stay in Python, and JavaScript holds a **proxy**.
-
-<LabCue step="2" task="Evaluate expressions, call shout and notes, let Python write in the page." />
-
----
-
-# The lab
-
-<LabFrame :step="2" :height="430" />
 
 ---
 class: dark
