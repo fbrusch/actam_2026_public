@@ -45,7 +45,7 @@
 
 <script type="module">
 import { steps } from './steps.js'
-import { SITE, PUBLIC, codeEditor, compose, downloadText, openPen } from './shared.js'
+import { SITE, PUBLIC, codeEditor, compose, downloadText, openPen, shortcuts } from './shared.js'
 
 const $ = (id) => document.getElementById(id)
 const params = new URLSearchParams(location.search)
@@ -89,6 +89,7 @@ async function go(n, keepTab = false) {
 }
 
 $('run').onclick = run
+shortcuts({ 'Mod+Enter': run }, $('preview'))
 $('reset').onclick = () => go(step, true)
 $('pen').onclick = () => openPen(`Python in a web page · ${steps[step - 1].title}`, editor.files(), toPublic)
 $('save').onclick = () => downloadText(`pysound-step-${step}.html`, compose(editor.files(), { swap: toPublic }).html)

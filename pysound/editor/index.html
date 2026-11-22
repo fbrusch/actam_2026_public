@@ -28,6 +28,18 @@
   .step-tools .row { display: flex; flex-wrap: wrap; gap: .3rem; align-items: center; }
   .legend i.del { background: var(--del); box-shadow: inset 3px 0 0 var(--del-mark); }
   [hidden] { display: none !important; }
+  dialog.keys { border: 1px solid var(--line); background: var(--bg, #f7f5ef); color: var(--ink); padding: 1rem 1.2rem; max-width: min(34rem, calc(100vw - 32px)); }
+  dialog.keys::backdrop { background: rgb(0 0 0 / .25); }
+  dialog.keys h2 { margin: 0 0 .6rem; font-size: 1rem; }
+  dialog.keys table { border-collapse: collapse; width: 100%; font-size: .8rem; }
+  dialog.keys td { padding: .2rem .4rem .2rem 0; border-bottom: 1px solid var(--line); }
+  dialog.keys td:last-child { text-align: right; padding-right: 0; }
+  dialog.keys td button { min-width: 9ch; border: 1px solid var(--line); background: var(--panel); padding: .2rem .5rem; font-size: .8rem; }
+  dialog.keys td button.wait { border-color: var(--accent); color: var(--accent); }
+  dialog.keys td button:empty::before { content: 'none'; color: var(--muted); }
+  dialog.keys .note { font-size: .75rem; color: var(--muted); margin: .6rem 0; min-height: 1.2em; }
+  dialog.keys .row { display: flex; gap: .4rem; justify-content: flex-end; }
+  dialog.keys .row button { border: 1px solid var(--line); background: var(--panel); padding: .25rem .6rem; font-size: .75rem; }
 </style>
 </head>
 <body>
@@ -43,6 +55,7 @@
       <button id="openFolder" class="fs" title="open steps saved in a folder">open folder</button>
       <button id="saveFolder" class="fs" title="write the steps into a folder, and keep it up to date">save to folder</button>
       <button id="remove" title="delete these steps from this browser">delete</button>
+      <button id="keysOpen" title="see and change the keyboard shortcuts">⌨ shortcuts</button>
       <input type="file" id="importFile" accept=".json,application/json" hidden />
     </div>
     <span class="status" id="status"></span>
@@ -81,8 +94,15 @@
   </section>
 </div>
 
+<dialog class="keys" id="keys">
+  <h2>Keyboard shortcuts</h2>
+  <table id="keysTable"></table>
+  <p class="note" id="keysNote">Click a shortcut, then press the new keys. Backspace removes it, Esc keeps it.</p>
+  <div class="row"><button id="keysReset">back to the defaults</button><button id="keysClose">close</button></div>
+</dialog>
+
 <script type="module">
-import { SITE, PUBLIC, codeEditor, compose, downloadText, openPen } from '../lab/shared.js'
+import { SITE, PUBLIC, codeEditor, compose, downloadText, openPen, shortcuts, comboOf, showCombo } from '../lab/shared.js'
 
 const $ = (id) => document.getElementById(id)
 const toLocal = (t) => t.replaceAll(PUBLIC, SITE)       // the preview uses the files of this server
@@ -154,7 +174,7 @@ let path = null          // the set of steps being edited
 let folderAll = true     // the folder needs every step written, not only the current one
 
 // --- The editor ---
-const editor = codeEditor({ tabs: $('tabs'), textarea: $('code'), marks: $('marks'), onRun: run, onChange: changed, showRemoved: true })
+const editor = codeEditor({ tabs: $('tabs'), textarea: $('code'), marks: $('marks'), onChange: changed, showRemoved: true })
 const step = () => path.steps[path.current]
 function commit() { if (path) step().files = editor.files() }
 
@@ -389,7 +409,75 @@ $('save').onclick = () => {
   downloadText(`${slug}-step-${path.current + 1}.html`, compose(step().files).html)
 }
 $('pen').onclick = () => { commit(); openPen(`${path.name} · ${path.current + 1}`, step().files) }
-document.addEventListener('keydown', (e) => { if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); save() } })
+// --- Shortcuts: defaults, changed in the dialog, kept in this browser ---
+const tab = (k) => () => { $('tabs').querySelector(`[data-file="${k}"]`).click(); $('code').focus() }
+const ACTIONS = [
+  { id: 'run', label: 'run the page', keys: 'Mod+Enter', do: run, button: 'run' },
+  { id: 'save', label: 'save now', keys: 'Mod+S', do: () => { commit(); save() } },
+  { id: 'addStep', label: '+ step', keys: 'Mod+Shift+Enter', do: () => $('addStep').click(), button: 'addStep' },
+  { id: 'prev', label: 'step before', keys: 'Mod+Alt+ArrowUp', do: () => { if (path.current > 0) go(path.current - 1) } },
+  { id: 'next', label: 'step after', keys: 'Mod+Alt+ArrowDown', do: () => { if (path.current < path.steps.length - 1) go(path.current + 1) } },
+  { id: 'py', label: 'main.py', keys: 'Alt+1', do: tab('py') },
+  { id: 'js', label: 'main.js', keys: 'Alt+2', do: tab('js') },
+  { id: 'css', label: 'style.css', keys: 'Alt+3', do: tab('css') },
+  { id: 'html', label: 'page.html', keys: 'Alt+4', do: tab('html') },
+  { id: 'removed', label: 'show removed lines', keys: 'Alt+D', do: () => $('showRemoved').click() },
+  { id: 'download', label: 'download the page', keys: 'Mod+Shift+S', do: () => $('save').click(), button: 'save' },
+  { id: 'pen', label: 'open on CodePen', keys: '', do: () => $('pen').click(), button: 'pen' },
+  { id: 'left', label: 'move the step left', keys: '', do: () => move(-1), button: 'left' },
+  { id: 'right', label: 'move the step right', keys: '', do: () => move(1), button: 'right' },
+]
+const KEYS = 'pysound-editor-keys'
+let keys = {}
+try { keys = JSON.parse(localStorage.getItem(KEYS)) ?? {} } catch {}
+const keyOf = (a) => keys[a.id] ?? a.keys
+function paintKeys() {
+  $('keysTable').replaceChildren(...ACTIONS.map((a) => {
+    const tr = document.createElement('tr'), td = document.createElement('td'), td2 = document.createElement('td'), b = document.createElement('button')
+    td.textContent = a.label
+    b.textContent = showCombo(keyOf(a)); b.dataset.action = a.id; b.title = 'click, then press the keys'
+    td2.append(b); tr.append(td, td2); return tr
+  }))
+  for (const a of ACTIONS) if (a.button) {
+    const b = $(a.button), t = b.title.replace(/ \(.*\)$|^Ctrl\/⌘ \+ Enter$/, '')
+    b.title = keyOf(a) ? `${t || a.label} (${showCombo(keyOf(a))})` : t || a.label
+  }
+}
+function setKey(a, combo) {
+  let note = ''
+  if (combo) for (const o of ACTIONS) if (o !== a && keyOf(o) === combo) { keys[o.id] = ''; note = `${showCombo(combo)} was on “${o.label}”: now it is on “${a.label}”.` }
+  keys[a.id] = combo
+  try { localStorage.setItem(KEYS, JSON.stringify(keys)) } catch {}
+  paintKeys()
+  return note
+}
+let waiting = null                    // the action whose keys are being recorded
+window.addEventListener('keydown', (e) => {
+  if (!waiting) return
+  const combo = comboOf(e)
+  if (!combo) return
+  e.preventDefault(); e.stopImmediatePropagation()
+  const a = waiting
+  if (combo === 'Escape') { waiting = null; paintKeys(); $('keysNote').textContent = 'Kept as it was.'; return }
+  if (combo === 'Backspace' || combo === 'Delete') { waiting = null; setKey(a, ''); $('keysNote').textContent = `“${a.label}” has no shortcut now.`; return }
+  if (!/(^|\+)(Mod|Ctrl|Alt)\+/.test(combo) && !/^(Shift\+)?F\d+$/.test(combo)) { $('keysNote').textContent = `${showCombo(combo)} alone would type in the code: add ${showCombo('Mod')} or ${showCombo('Alt')}.`; return }
+  waiting = null
+  $('keysNote').textContent = setKey(a, combo) || `“${a.label}”: ${showCombo(combo)}.`
+}, true)
+$('keysTable').onclick = (e) => {
+  const b = e.target.closest('[data-action]'); if (!b) return
+  paintKeys()
+  waiting = ACTIONS.find((a) => a.id === b.dataset.action)
+  const nb = $('keysTable').querySelector(`[data-action="${waiting.id}"]`)
+  nb.textContent = 'press the keys…'; nb.classList.add('wait')
+  $('keysNote').textContent = 'Backspace removes it, Esc keeps it.'
+}
+$('keysOpen').onclick = () => { paintKeys(); $('keysNote').textContent = 'Click a shortcut, then press the new keys.'; $('keys').showModal() }
+$('keysClose').onclick = () => $('keys').close()
+$('keys').onclose = () => { waiting = null }
+$('keysReset').onclick = () => { keys = {}; try { localStorage.removeItem(KEYS) } catch {}; paintKeys(); $('keysNote').textContent = 'Back to the defaults.' }
+paintKeys()
+shortcuts((c) => $('keys').open ? null : ACTIONS.find((a) => keyOf(a) === c)?.do, $('preview'))
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && path) save() })
 
 // --- Start: the last set of steps opened, or a new one ---
