@@ -2,10 +2,9 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Option 2 - control messages</title>
 </head>
 <body>
-<h1>Option 2: Python sends control, browser makes sound</h1>
+<h1>Python sends control, browser makes sound</h1>
 <p id="status">connecting...</p>
 <button id="start" disabled>start</button>
 <button id="stop" disabled>stop</button>
@@ -13,7 +12,9 @@
 
 <script>
 let ctx;                    // created lazily, on the user's first click
+
 const ws = new WebSocket("ws://localhost:8765");
+
 const voices = new Map();   // freq -> {osc, gain, filter}
 const startBtn = document.getElementById("start");
 const stopBtn = document.getElementById("stop");
@@ -37,6 +38,7 @@ ws.onopen = () => {
   document.getElementById("status").textContent = "connected";
   startBtn.disabled = false;
 };
+
 ws.onclose = () => {
   document.getElementById("status").textContent = "disconnected";
   startBtn.disabled = true;
@@ -48,14 +50,20 @@ ws.onmessage = (event) => {
 
   if (msg.type === "note_on") {
     const osc = ctx.createOscillator();
+
     const filter = ctx.createBiquadFilter();
+
     const gain = ctx.createGain();
+
     osc.type = "sawtooth";
-    osc.frequency.value = msg.freq;
+    osc.frequency.value = msg.freq; // from the python code
+
     filter.type = "lowpass";
     filter.frequency.value = cutoffHz;
+
     gain.gain.setValueAtTime(0, ctx.currentTime);
     gain.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 0.01);  // short attack
+    
     osc.connect(filter).connect(gain).connect(ctx.destination);
     osc.start();
     voices.set(msg.freq, { osc, gain, filter });
@@ -105,5 +113,6 @@ document.getElementById("cutoff").addEventListener("input", (e) => {
   }
 });
 </script>
+
 </body>
 </html>

@@ -2,10 +2,9 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Option 3 - audio streaming</title>
 </head>
 <body>
-<h1>Option 3: Python makes sound, browser just plays it back</h1>
+<h1>Python makes sound, browser just plays it back</h1>
 <p id="status">connecting...</p>
 <button id="start" disabled>start</button>
 <button id="stop" disabled>stop</button>
@@ -20,7 +19,9 @@ let queue = [];          // Float32Array chunks waiting to be played
 let queueOffset = 0;     // how far we are into queue[0]
 
 const ws = new WebSocket("ws://localhost:8766");
+
 ws.binaryType = "arraybuffer";
+
 const startBtn = document.getElementById("start");
 const stopBtn = document.getElementById("stop");
 
@@ -28,6 +29,7 @@ ws.onopen = () => {
   document.getElementById("status").textContent = "connected";
   startBtn.disabled = false;
 };
+
 ws.onclose = () => {
   document.getElementById("status").textContent = "disconnected";
   startBtn.disabled = true;
